@@ -1,0 +1,127 @@
+
+Initial import en googlecode - rev 32 local repo
+
+La app esta bastante armada; el nivel juega bien.
+El problema del momento esta en la continuacion luego de terminar de jugar, ganando o perdiendo.  
+
+Reproducir el problema:
+
+1. arrancar, jugar un nivel ganándolo, la vista avanza correctamente hasta el anuncio 'Level 2' pero ahi se queda: lo que seria el 2do nivel nunca arranca. En la consola vemos:
+
+Traceback (most recent call last):
+  File "play_balldrive.py", line 22, in <module>
+    director.run( scene )
+  File "C:\Python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\director.py"
+, line 287, in run
+    event_loop.run()
+  File "C:\Python26\lib\site-packages\pyglet\app\base.py", line 133, in run
+    self._run_estimated()
+  File "C:\Python26\lib\site-packages\pyglet\app\base.py", line 161, in _run_est
+imated
+    timeout = self.idle()
+  File "C:\Python26\lib\site-packages\pyglet\app\base.py", line 275, in idle
+    window.dispatch_event('on_draw')
+  File "C:\Python26\lib\site-packages\pyglet\window\__init__.py", line 1150, in
+dispatch_event
+    if EventDispatcher.dispatch_event(self, *args) != False:
+  File "C:\Python26\lib\site-packages\pyglet\event.py", line 355, in dispatch_ev
+ent
+    if handler(*args):
+  File "C:\Python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\director.py"
+, line 297, in on_draw
+    self._set_scene( self.next_scene )
+  File "C:\Python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\director.py"
+, line 353, in _set_scene
+    self.scene.on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\cocosnode.py
+", line 459, in on_exit
+    c.on_exit()
+  File "D:\pyweek8\local_balldrive\trunk\playview.py", line 40, in on_exit
+    super(LadderView,self).on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\layer\base_l
+ayers.py", line 90, in on_exit
+    super(Layer, self).on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\cocosnode.py
+", line 459, in on_exit
+    c.on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\layer\base_l
+ayers.py", line 90, in on_exit
+    super(Layer, self).on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\cocosnode.py
+", line 459, in on_exit
+    c.on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\draw.py", li
+ne 316, in on_exit
+    self.free()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\draw.py", li
+ne 320, in free
+    self._vertex_list.delete()
+  File "C:\Python26\lib\site-packages\pyglet\graphics\vertexdomain.py", line 399
+, in delete
+    self.domain.allocator.dealloc(self.start, self.count)
+  File "C:\Python26\lib\site-packages\pyglet\graphics\allocation.py", line 293,
+in dealloc
+    assert self.starts
+AssertionError
+
+
+2. arrancar, jugar un nivel perdiendolo:  el programa termina con
+
+Traceback (most recent call last):
+  File "play_balldrive.py", line 22, in <module>
+    director.run( scene )
+  File "C:\Python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\director.py"
+, line 287, in run
+    event_loop.run()
+  File "C:\Python26\lib\site-packages\pyglet\app\base.py", line 133, in run
+    self._run_estimated()
+  File "C:\Python26\lib\site-packages\pyglet\app\base.py", line 161, in _run_est
+imated
+    timeout = self.idle()
+  File "C:\Python26\lib\site-packages\pyglet\app\base.py", line 275, in idle
+    window.dispatch_event('on_draw')
+  File "C:\Python26\lib\site-packages\pyglet\window\__init__.py", line 1150, in
+dispatch_event
+    if EventDispatcher.dispatch_event(self, *args) != False:
+  File "C:\Python26\lib\site-packages\pyglet\event.py", line 355, in dispatch_ev
+ent
+    if handler(*args):
+  File "C:\Python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\director.py"
+, line 297, in on_draw
+    self._set_scene( self.next_scene )
+  File "C:\Python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\director.py"
+, line 353, in _set_scene
+    self.scene.on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\cocosnode.py
+", line 459, in on_exit
+    c.on_exit()
+  File "D:\pyweek8\local_balldrive\trunk\playview.py", line 41, in on_exit
+    super(LadderView,self).on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\layer\base_l
+ayers.py", line 90, in on_exit
+    super(Layer, self).on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\cocosnode.py
+", line 459, in on_exit
+    c.on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\layer\base_l
+ayers.py", line 90, in on_exit
+    super(Layer, self).on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\cocosnode.py
+", line 459, in on_exit
+    c.on_exit()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\draw.py", li
+ne 316, in on_exit
+    self.free()
+  File "c:\python26\lib\site-packages\cocos2d-0.3.0-py2.6.egg\cocos\draw.py", li
+ne 320, in free
+    self._vertex_list.delete()
+  File "C:\Python26\lib\site-packages\pyglet\graphics\vertexdomain.py", line 399
+, in delete
+    self.domain.allocator.dealloc(self.start, self.count)
+  File "C:\Python26\lib\site-packages\pyglet\graphics\allocation.py", line 293,
+in dealloc
+    assert self.starts
+AssertionError
+
+---------------------------------------------------------------------------------
+

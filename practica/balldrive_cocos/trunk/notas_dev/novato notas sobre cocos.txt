@@ -1,0 +1,62 @@
+1. una accion puede ser interrumpida o reemplazada ? Por ejemplo si un sprite choca contra algo, habria que cambiar el current move.
+
+Si, usando sprite.remove_action(action) ( heredada de cocosnode ). Es removida como primer paso del siguiente step de action.
+
+2. cocos prefiere/admite alguna especificacion de pos, vel en particular ? ( complex, list, tuple, euclid vectors...) ?
+En Cocosnode vemos que
+.position es una property con
+    def _get_position(self):
+        return (self.x, self.y)
+    def _set_position(self, (x,y)):
+        self.x, self.y = x,y
+Asi que para entregar cocos usa tuples; para recibir la magia de python hace que sean aceptados tuples, list y euclid.Vector2D , pero no complex ('complex object not iterable' )
+
+3. que significa .position en un cocosnode ?
+la pos de la entity anchor respecto del parent.childern_anchor en el coord system del parent ?
+
+
+4. para usar world coords parece que habria dos sistemas separados:
+a. usar props x,y,scale, rot de cocosnode
+b. usar prop camera de cocosnode
+Lo que no hay que hacer es mezclar ambas, porque camera will be overriden by the transformation done by the other atributes 
+
+5. cual es la diferencia entre Layer y Scene ?
+
+7. un canvas no necesitaria como prop fundamental width y height ?
+
+8. como lanzar un evento:
+si A es subclass de EventDispatcher, entonces dentro del codigo de A podemos usar
+self.dispatch_event(event_handler_name[, params for the event-handler if any]  )
+por ejemplo:
+self.dispatch_event("on_line_complete", lines )
+self.dispatch_event("on_line_complete" )
+
+if a is instance of A and A is sublclass of EventDispatcher, entonces se puede lanzar un evento con:
+a.dispatch_event(event_handler_name, [,params for the effect handler name])
+
+Un ejemplo de esto en gamemodel.Gamemodel de tetrico. Notar que los lanzadores de eventos estan en Gamemodel y los correspondientes event handlers en gameview. Ademas, el que hace push handlers es gameview, y hace push sobre el model
+
+
+9. en tetrico los key events y los timers event son recibidos por el layer gamecontrol, que no dibuja nada, y llaman directamente a funciones en model ( no a traves de nuevos eventos)
+
+11 . por lo que vimos en balldrive GameIntro pareceria que el orden de add no correlaciona con la profundidad (z), con lo cual aparentemente habria que agregar
+z en todo add. Si, correcto.
+
+12. parece que si queremos una accion sobre una instancia, la accion no la podriamos poner en el init de la instancia. ( lo mas temprano seria en on_enter)
+
+13. habria que aclarar si hay otras cosas que no pueden hacerse en el init.
+
+14. En multiplex layer seria mejor si se pudiese hacer .switch_to tambien por nombre; esto haria mas claro el codigo, y mas robusto, porque si se reorganizan los layers hay que actualizar todos los indices. Se podria hacer definiendo un class method CreateWithNames(self,*layer-names-pairs)
+
+15. cuando es apropiado usar batchs ? criterio para incluir dos sprites en un batch ? 
+
+16. childs de un cocosnode pueden solo tener name de clase string. Es una pena que no admita resultados de id(). El codigo de cocosnode.remove(self,obj) podria cambiarse para permitirlo: cambiando
+        if isinstance(obj, str):
+por
+	if hasattr(obj, 'parent'): e invirtiendo las clausulas
+
+17. sprites .rotation es en degrees
+
+18. pyglet on_key_press no toma en cuenta key repeats. Pregunta: como se usaria desde cocos la receta pyglet pasa el KeyStateHandler ( C:\Python26\Doc\pyglet 1.1.2 r2443\doc\html\programming_guide\keyboard_events.html )
+
+19. el action callFunc parece interesante para usar como callback al terminar una accion: si la ponemos a continuacion del action principal, al terminar la primera llamaria al callback.
