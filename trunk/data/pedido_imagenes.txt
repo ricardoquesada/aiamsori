@@ -1,0 +1,80 @@
+El juego es en una casa, donde estas vos (el padre) con tu familia y empieza un
+ataque de zombies. Como siempre, los zombies van a tratar de tirar abajo
+puertas y ventanas. El juego se ve de arriba, centrado en tu personaje. Vos moves
+a tu personaje por el mapa de la casa y vas posicionando a tus familiares en
+lugares estrategicos para defenderla. La idea es ir matando y resistiendo ola tras
+ola de ataque zombie.
+
+TILES:
+    Los tiles son como mosaicos, que se ponen uno al latro del otro y como
+    en un rompecabezas, repitiendolos, armamos la escena.
+    Los tiles tienen que ser de XxX de tamanio. Excepto los muebles, que pueden
+    ocupar varios tiles. Como referencia, una cama ocupa XxX tiles.
+
+    Pared.
+    Pared en L
+    Pared en T
+    Pared en X
+
+    Columna Ventana
+    Vidrio
+    Puerta
+
+    Sofa
+    Mesa
+    Mesada Cocina
+    Comoda
+    Cama
+    Televisor
+
+PISOS:
+    Los pisos son de decorado y los dibujamos en el mapa y nunca cambian.
+
+    Ceramico
+    Madera
+    Pasto
+    Alfombra
+    "Tapete" (alfombra chiquita, no alfombrado)
+
+Familiares:
+    Estos son los personajes que podes controlar. Se ven de arriba.
+    Ocupan XxX tiles un personaje adulto (un menor puede ser menos)
+    el personaje es una cabeza por cada tipo mas unas patitas
+    los brazos van a ser compartidos por todos ya que llevan las armas
+    Las patitas deberian tener varios frames de animacion
+
+    Padre
+    Madre
+    Hija
+    Hijo
+    Cuniado
+
+Armas:
+    las armas son un par de brazos y el arma
+
+    Manos vacias
+    Motosierra
+    Bate
+    Pistola
+    Escopeta
+    Ametralladora
+    Granadas
+
+Zombies:
+    Varios tipos de zombies
+    Con las patitas animadas
+
+Caras:
+    Zobies
+    1xFamiliar
+    Television
+
+Props:
+    Globo de hablar
+    Salpicon de sangre (para poner en movimiento)
+    Mancha de sangre (para poner en el piso)
+    Restos de zombie (para poner en el piso)
+    Cadaver 1xFamiliar (para poner en el piso)
+    Explosion (varios frames)
+    Vidrio Roto
+    Madera Rota
