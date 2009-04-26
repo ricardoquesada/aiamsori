@@ -346,13 +346,15 @@ class CollisionSpace(object):
                     for body_attr in _get_vars(shape.body):
                         value = getattr(shape.body, body_attr)
                         setattr(pm_obj.body, body_attr, value)
-                elif attr == 'position':
+                elif attr in ('x', 'y', 'position'):
                     # special case: the 'position' attribute is special,
                     # because it is located at the top level in the source
                     # object and inside the 'body' attribute of the pymunk
                     # object
-                    value = getattr(shape, attr)
-                    setattr(pm_obj.body, attr, value)
+                    # any change in the 'x' and 'y' attributes indicates the
+                    # position has changed, so we update it accordingly
+                    value = shape.position
+                    pm_obj.body.position = value
                 elif attr == 'vertices':
                     # special case: the 'vertices' attribute is special,
                     # because it maps to the 'verts' attribute of the pymunk

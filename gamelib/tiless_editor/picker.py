@@ -119,6 +119,8 @@ class PickerBatchNode(BatchNode):
         super(PickerBatchNode, self).__init__()
 
     def add(self, child, z=0, name=None):
+        child.register(self, 'x')
+        child.register(self, 'y')
         child.register(self, 'position')
         child.register(self, 'rotation')
         child.register(self, 'scale')
@@ -126,6 +128,8 @@ class PickerBatchNode(BatchNode):
         super(PickerBatchNode, self).add(child, z, name)
 
     def remove(self, child):
+        child.unregister(self, 'x')
+        child.unregister(self, 'y')
         child.unregister(self, 'position')
         child.unregister(self, 'rotation')
         child.unregister(self, 'scale')
