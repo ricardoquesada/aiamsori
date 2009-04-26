@@ -10,6 +10,8 @@ import os.path
 import pyglet
 import simplejson
 import sys
+import random
+import geom
 
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 
@@ -23,6 +25,7 @@ from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 
 from gamectrl import GameCtrl
+from boids import merge, seek, cap, avoid_group
 
 WIDTH, HEIGHT = 800, 600
 MAPFILE = 'data/map.json'
@@ -71,10 +74,10 @@ class GameLayer(Layer):
         self.add(self.map_node)
 
         # create agents (players)
-        self._create_agent()
+        self._create_agents()
 
 
-    def _create_agent(self):
+    def _create_agents(self):
         # get collision layer
         collision_layer = self.map_node.get('collision')
 
@@ -83,6 +86,14 @@ class GameLayer(Layer):
         self.player = agent
         self.add(agent)
         collision_layer.add(agent, shape_name='square', static=False)
+
+        x, y = director.get_window_size()
+        for i in range(10):
+            z = Zombie('data/img/zombie.png', self.player)
+            z.x = random.randint(0, x)
+            z.y = random.randint(0, y)
+            z.position = z.x, z.y
+            self.add(z)
 
     def on_collision(self, shape_a, shape_b):
         collision_layer = self.children[1][1].get('collision')
@@ -154,6 +165,44 @@ class Agent(NotifierSprite):
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
 
+class Zombie(NotifierSprite):
+    def __init__(self, img, player):
+        super(Zombie, self).__init__(img)
+        self.speed = 100
+        self.schedule(self.update)
+        self.player = player
+
+        
+    def update(self, dt):
+        locals = []
+        b = self
+        goal = seek(b.x, b.y, self.player.x, self.player.y)
+        #print "GOAL", goal
+        escape, danger = avoid_group(b.x, b.y, locals)
+        #print "danger", danger, escape
+        if danger < 50:
+            #print "escape"
+            chosen = escape
+        elif danger > 100:
+            #print "goal"
+            chosen = goal
+        else:
+            d = (danger-50)/50
+            chosen = merge([(goal, d), (escape, 1-d)])
+
+        delta = geom.angle_rotation(radians(b.rotation), radians(chosen))
+        delta = degrees(delta)
+        max_r = 180
+        delta = cap(delta, -max_r, max_r) * dt
+        b.rotation += delta
+        
+        # update position
+        a = -b.rotation
+        b.x = (b.x + cos( radians(a) ) * b.speed * dt)
+        b.y = (b.y + sin( radians(a) ) * b.speed * dt)
+        b.rotation = b.rotation % 360
+
+    
 
 if __name__ == '__main__':
     main()
