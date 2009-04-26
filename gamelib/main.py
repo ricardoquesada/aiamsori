@@ -54,7 +54,8 @@ def main():
 class WallLayer(cocos.cocosnode.CocosNode):
     def __init__(self):
         super(WallLayer, self).__init__()
-        self.batch = pyglet.graphics.Batch()
+        self.top_batch = pyglet.graphics.Batch()
+        self.wall_batch = pyglet.graphics.Batch()
 
     def on_enter(self):
         super(WallLayer, self).on_enter()
@@ -69,16 +70,48 @@ class WallLayer(cocos.cocosnode.CocosNode):
         y = int(y)
         l = (x-wd, y-hd, wh, x+wd, y-hd, wh, x+wd, y+hd, wh, x-wd, y+hd, wh)
         #l = (x-wd, y-hd, x+wd, y-hd, x+wd, y+hd, x-wd, y+hd)
-        print l
-        vertex_list = self.batch.add(4, pyglet.gl.GL_QUADS, None,
+        vertex_list = self.top_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
-            ('c3B', [0, 0, 255]*4)
+            ('c3B', [255, 255, 255]*4),
+            ('t3f', sprite.image.tex_coords)
         )
+
+        #top wall
+        l = (x-wd, y-hd, 0, x+wd, y-hd, 0, x+wd, y-hd, wh, x-wd, y-hd, wh)
+        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v3i', l),
+            ('c3B', [255, 255, 255]*4),
+        )
+        #bottom wall
+        l = (x-wd, y+hd, 0, x+wd, y+hd, 0, x+wd, y+hd, wh, x-wd, y+hd, wh)
+        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v3i', l),
+            ('c3B', [255, 255, 255]*4),
+        )
+        #left wall
+        l = (x-wd, y+hd, 0, x-wd, y-hd, 0, x-wd, y-hd, wh, x-wd, y+hd, wh)
+        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v3i', l),
+            ('c3B', [255, 255, 255]*4),
+        )
+        #right wall
+        l = (x+wd, y+hd, 0, x+wd, y-hd, 0, x+wd, y-hd, wh, x+wd, y+hd, wh)
+        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v3i', l),
+            ('c3B', [255, 255, 255]*4),
+        )
+        self.texture = sprite.image.texture
 
     def draw(self):
         pyglet.gl.glPushMatrix()
         self.transform()
-        self.batch.draw()
+        self.wall_batch.draw()
+        texture = self.texture
+        pyglet.gl.glEnable(texture.target)
+        pyglet.gl.glBindTexture(texture.target, texture.id)
+        self.top_batch.draw()
+        pyglet.gl.glDisable(texture.target)
+
         pyglet.gl.glPopMatrix()
 
 
