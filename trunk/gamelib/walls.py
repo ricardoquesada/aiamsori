@@ -170,6 +170,7 @@ def get_wall(child):
     path = {'tiles/pared.jpg':'tiles/pared.jpg',
             'tiles/ventana_rot.png':'tiles/ventana_v.png',
             'tiles/ventana.png':'tiles/ventana_v.png',
+            'tiles/alambre.png':'tiles/alambre_v.png',
         }[child.path]
     s = Sprite(path)
     s.path = path
