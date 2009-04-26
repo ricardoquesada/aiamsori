@@ -94,7 +94,7 @@ class GameLayer(Layer):
         agent = Agent('data/img/tipito.png', (0,0), self)
         self.player = agent
         self.add(agent)
-        collision_layer.add(agent, shape_name='square', static=False)
+        collision_layer.add(agent, shape_name='circle', static=False)
 
         x, y = director.get_window_size()
         for i in range(10):
@@ -103,7 +103,7 @@ class GameLayer(Layer):
             z.y = random.randint(0, y)
             z.position = z.x, z.y
             self.add(z)
-            collision_layer.add(z, shape_name='square', static=False)
+            collision_layer.add(z, shape_name='circle', static=False)
 
     def on_collision(self, shape_a, shape_b):
         collision_layer = self.map_node.get('collision')
@@ -122,7 +122,7 @@ class GameLayer(Layer):
                        'rotation': child.rotation, 'scale': child.scale,
                        'opacity': child.opacity, 'rect': child.rect}
                 collision_child = self._create_child(img)
-                collision_layer.add(collision_child, shape_name='square')
+                collision_layer.add(collision_child, shape_name='circle')
         return collision_layer
 
     def _create_child(self, img):
@@ -188,14 +188,16 @@ class Agent(NotifierSprite):
 class Zombie(NotifierSprite):
     def __init__(self, img, player):
         super(Zombie, self).__init__(img)
-        self._old_state = {'position': (0, 0), 'rotation': 0}
+        self._old_state = {}
         self.speed = 100
         self.schedule(self.update)
         self.player = player
 
     def on_collision(self):
-        self.position = self._old_state['position']
-        self.rotation = self._old_state['rotation']
+        if self._old_state.has_key('position'):
+            self.position = self._old_state['position']
+        if self._old_state.has_key('rotation'):
+            self.rotation = self._old_state['rotation']
 
     def update(self, dt):
         # save old position
@@ -228,7 +230,7 @@ class Zombie(NotifierSprite):
         b.x = (b.x + cos( radians(a) ) * b.speed * dt)
         b.y = (b.y + sin( radians(a) ) * b.speed * dt)
         # FIXME: for some reason the x/y attributes don't update the position attribute correctly
-        b.position = (b.x,b.y)
+        b.position = (b.x, b.y)
         b.rotation = b.rotation % 360
 
         # test for collisions
