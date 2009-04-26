@@ -45,10 +45,9 @@ __all__ = ['Interpreter']
 try:
     import readline
     has_readline = True
+    del readline
 except:
     has_readline = False
-finally:
-    del readline
 import sys
 
 from code import InteractiveInterpreter

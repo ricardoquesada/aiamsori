@@ -44,11 +44,10 @@ try:
     import readline
     # if import was successful, we can include the readline based history
     from _readline import ReadlineHistory
+    # remove unnecessary import from namespace
+    del readline
 except:
     # silently handle this error, as we don't want the user to be alarmed by this
     pass
-finally:
-    # remove unnecessary import from namespace
-    del readline
 
 
