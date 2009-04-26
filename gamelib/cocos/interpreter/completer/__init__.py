@@ -45,11 +45,10 @@ try:
     import rlcompleter
     # if imports were successful, we can include the readline based history
     from _readline import ReadlineCompleter
-except:
-    # silently handle this error, as we don't want the user to be alarmed by this
-    pass
-finally:
     # remove unnecessary imports from namespace
     del readline
     del rlcompleter
+except:
+    # silently handle this error, as we don't want the user to be alarmed by this
+    pass
 
