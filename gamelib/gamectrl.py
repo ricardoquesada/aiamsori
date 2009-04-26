@@ -20,10 +20,10 @@ class GameCtrl(Layer):
 
 
         if k in [key.UP, key.W]:
-            self.game_layer.player.acceleration= 2
+            self.game_layer.player.acceleration= 1
 
         if k in [key.DOWN, key.S]:
-            self.game_layer.player.acceleration= -2
+            self.game_layer.player.acceleration= -1
 
         if k in [key.RIGHT, key.D]:
             pass
