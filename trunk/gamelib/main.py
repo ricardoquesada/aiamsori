@@ -103,14 +103,15 @@ class GameLayer(Layer):
             z.y = random.randint(0, y)
             z.position = z.x, z.y
             self.add(z)
+            collision_layer.add(z, shape_name='square', static=False)
 
     def on_collision(self, shape_a, shape_b):
-        collision_layer = self.children[1][1].get('collision')
+        collision_layer = self.map_node.get('collision')
         for shape in (shape_a, shape_b):
             node = collision_layer._get_node(shape)
-            if isinstance(node, Agent):
+            if isinstance(node, (Agent, Zombie)):
                 # reset agent position and set speed to zero
-                node.reset()
+                node.on_collision()
 
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
@@ -143,29 +144,30 @@ class GameLayer(Layer):
 class Agent(NotifierSprite):
     def __init__(self, img, position, game_layer):
         super(Agent, self).__init__(img, position)
-        self._old_position = position
+        self._old_state = {'position': position}
         self.speed = 0
         self.position = position
         self.schedule(self.update)
         self.game_layer = game_layer
         self.acceleration = 0
 
-    def reset(self):
-        self.position = self._old_position
+    def on_collision(self):
+        self.position = self._old_state['position']
         self.speed = 0
 
     def update(self, dt):
-        # save old position
-        self._old_position = self.position
+        # save old state
+        self._old_state = {'position': self.position}
 
         # update speed
         if self.acceleration != 0 and abs(self.speed) < 100:
             self.speed += self.acceleration
 
         # update the position, based on the speed
-        x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
-        y = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
-        self.position = (x, y)
+        self.x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
+        self.y = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
+        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
+        self.position = (self.x, self.y)
 
         # update layer position (center camera)
         self.game_layer.update(dt)
@@ -186,12 +188,19 @@ class Agent(NotifierSprite):
 class Zombie(NotifierSprite):
     def __init__(self, img, player):
         super(Zombie, self).__init__(img)
+        self._old_state = {'position': (0, 0), 'rotation': 0}
         self.speed = 100
         self.schedule(self.update)
         self.player = player
 
+    def on_collision(self):
+        self.position = self._old_state['position']
+        self.rotation = self._old_state['rotation']
 
     def update(self, dt):
+        # save old position
+        self._old_state = {'position': self.position, 'rotation': self.rotation}
+
         locals = []
         b = self
         goal = seek(b.x, b.y, self.player.x, self.player.y)
@@ -218,7 +227,13 @@ class Zombie(NotifierSprite):
         a = -b.rotation
         b.x = (b.x + cos( radians(a) ) * b.speed * dt)
         b.y = (b.y + sin( radians(a) ) * b.speed * dt)
+        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
+        b.position = (b.x,b.y)
         b.rotation = b.rotation % 360
+
+        # test for collisions
+        collision_layer = self.parent
+        collision_layer.step()
 
 
 
