@@ -24,6 +24,7 @@ from cocos.sprite import NotifierSprite, Sprite
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
+from walls import create_wall_layer
 
 from gamectrl import GameCtrl
 from boids import merge, seek, cap, avoid_group
@@ -50,82 +51,6 @@ def main():
     main_scene.add(GameCtrl(game_layer))
 
     director.run(main_scene)
-
-class WallLayer(cocos.cocosnode.CocosNode):
-    def __init__(self):
-        super(WallLayer, self).__init__()
-        self.top_batch = pyglet.graphics.Batch()
-        self.wall_batch = pyglet.graphics.Batch()
-
-    def on_enter(self):
-        super(WallLayer, self).on_enter()
-        director.set_3d_projection()
-
-    def add(self, sprite):
-        wd = sprite.image.width/2
-        hd = sprite.image.height/2
-        wh = 50
-        x, y = sprite.position
-        x = int(x)
-        y = int(y)
-
-        print sprite, dir(sprite.image.texture), sprite.image.target
-        l = (x-wd, y-hd, wh, x+wd, y-hd, wh, x+wd, y+hd, wh, x-wd, y+hd, wh)
-        #l = (x-wd, y-hd, x+wd, y-hd, x+wd, y+hd, x-wd, y+hd)
-        vertex_list = self.top_batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v3i', l),
-            ('c3B', [255, 255, 255]*4),
-            ('t3f', sprite.image.tex_coords)
-        )
-
-        #top wall
-        l = (x-wd, y-hd, 0, x+wd, y-hd, 0, x+wd, y-hd, wh, x-wd, y-hd, wh)
-        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v3i', l),
-            ('c3B', [255, 255, 255]*4),
-        )
-        #bottom wall
-        l = (x-wd, y+hd, 0, x+wd, y+hd, 0, x+wd, y+hd, wh, x-wd, y+hd, wh)
-        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v3i', l),
-            ('c3B', [255, 255, 255]*4),
-        )
-        #left wall
-        l = (x-wd, y+hd, 0, x-wd, y-hd, 0, x-wd, y-hd, wh, x-wd, y+hd, wh)
-        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v3i', l),
-            ('c3B', [255, 255, 255]*4),
-        )
-        #right wall
-        l = (x+wd, y+hd, 0, x+wd, y-hd, 0, x+wd, y-hd, wh, x+wd, y+hd, wh)
-        vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
-            ('v3i', l),
-            ('c3B', [255, 255, 255]*4),
-        )
-        self.texture = sprite.image.texture
-
-    def draw(self):
-        return
-        pyglet.gl.glPushMatrix()
-        self.transform()
-        self.wall_batch.draw()
-        texture = self.texture
-        pyglet.gl.glEnable(texture.target)
-        pyglet.gl.glBindTexture(texture.target, texture.id)
-        self.top_batch.draw()
-        pyglet.gl.glDisable(texture.target)
-
-        pyglet.gl.glPopMatrix()
-
-
-def create_wall_layer(layers):
-#    print layers[0].children
-    
-    dest = WallLayer()
-    for layer in layers:
-        for z, child in layer.children:
-            dest.add(child)
-    return dest
 
 class GameLayer(Layer):
     def __init__(self, mapfile):
