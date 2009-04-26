@@ -2,7 +2,12 @@ from tiless_editor.plugin import LayerFactory, Plugin
 from tiless_editor.picker import PickerBatchNode
 from cocos.sprite import NotifierSprite
 
+from tiless_editor.atlas import TextureAtlas
+
 class SpriteLayerFactory(LayerFactory):
+    def __init__(self, tiles_path):
+        self.atlas = TextureAtlas(tile_path)
+
     def get_new_layer(self):
         layer = PickerBatchNode()
         layer.layer_type = "sprite"
@@ -43,5 +48,5 @@ class SpriteLayerPlugin(Plugin):
 
     def __init__(self, editor):
         self.ed = editor
-        self.factory = SpriteLayerFactory()
+        self.factory = SpriteLayerFactory(editor.tilesdir)
         editor.register_layer_factory("sprite", self.factory)

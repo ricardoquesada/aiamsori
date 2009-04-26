@@ -27,7 +27,7 @@ from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from walls import create_wall_layer
 
-from gamectrl import GameCtrl
+from gamectrl import MouseGameCtrl, KeyGameCtrl
 from boids import merge, seek, cap, avoid_group
 
 WIDTH, HEIGHT = 1024, 768
@@ -51,7 +51,10 @@ def main():
 
     main_scene = Scene()
     main_scene.add(game_layer)
-    main_scene.add(GameCtrl(game_layer))
+    if False:
+        main_scene.add(MouseGameCtrl(game_layer))
+    else:
+        main_scene.add(KeyGameCtrl(game_layer))
 
     director.run(main_scene)
 
@@ -85,6 +88,7 @@ class GameLayer(Layer):
         # get layers from map
         for_collision_layers = []
         walls_layers = []
+        zombie_spawm = None
         layers = simplejson.load(open(mapfile))['layers']
         for layer_data in layers:
             layer_type = layer_data['layer_type']
@@ -98,6 +102,8 @@ class GameLayer(Layer):
                     for_collision_layers.append(sprite_layer)
                 if layer_label in ['walls', 'gates']:
                     walls_layers.append(sprite_layer)
+                if layer_label in ['zombie_spawn']:
+                    zombie_spawn = sprite_layer
 
         # create collision shapes
         collision_layer = self._create_collision_layer(for_collision_layers)
@@ -107,11 +113,11 @@ class GameLayer(Layer):
         self.add(self.map_node)
 
         # create agents (players)
-        self._create_agents()
+        self._create_agents(zombie_spawn)
         #self.map_node.add(LightLayer(self), z=+1001)
 
 
-    def _create_agents(self):
+    def _create_agents(self, zombie_spawn):
         # get collision layer
         collision_layer = self.map_node.get('collision')
 
@@ -121,14 +127,16 @@ class GameLayer(Layer):
         self.add(agent)
         collision_layer.add(agent, shape_name='circle', static=False)
 
-        x, y = director.get_window_size()
-        for i in range(2):
-            z = Zombie('data/img/zombie.png', self.player)
-            z.x = random.randint(0, x)
-            z.y = random.randint(0, y)
-            z.position = z.x, z.y
-            self.map_node.add(z)
-            collision_layer.add(z, shape_name='circle', static=False)
+        if zombie_spawn:
+            x, y = director.get_window_size()
+            for c in zombie_spawn.get_children():
+                z = Zombie('data/img/zombie.png', self.player)
+                z.x = c.x
+                z.y = c.y
+                z.position = z.x, z.y
+                self.map_node.add(z)
+                collision_layer.add(z, shape_name='circle', static=False,
+                                    scale=.75)
 
     def on_collision(self, shape_a, shape_b):
         collision_layer = self.map_node.get('collision')
@@ -161,9 +169,9 @@ class GameLayer(Layer):
 
 
     def update(self, dt):
-        x = (self.x + cos( radians(-self.player.rotation) ) * self.player.speed * -dt)
-        y = (self.y + sin( radians(-self.player.rotation) ) * self.player.speed * -dt)
-        self.position = (x, y)
+        x, y = director.get_window_size()
+        self.x = -self.player.x + x/2
+        self.y = -self.player.y + y/2
 
 
 class Agent(NotifierSprite):
@@ -175,11 +183,13 @@ class Agent(NotifierSprite):
         self.schedule(self.update)
         self.game_layer = game_layer
         self.acceleration = 0
+        self.updating = False
+        self.rotation_speed = 0
 
     def on_collision(self):
+        if not self.updating:
+            return
         self.position = self._old_state['position']
-        self.speed *= -1
-        self.do(Delay(RETREAT_DELAY) + CallFunc(self.reset))
 
     def reset(self):
         self.speed *= -1
@@ -189,8 +199,8 @@ class Agent(NotifierSprite):
         self._old_state = {'position': self.position}
 
         # update speed
-        if self.acceleration != 0 and abs(self.speed) < 100:
-            self.speed += self.acceleration
+        if self.acceleration != 0 and abs(self.speed) < 130:
+            self.speed += self.acceleration*100*dt
 
         # update the position, based on the speed
         self.x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
@@ -198,12 +208,15 @@ class Agent(NotifierSprite):
         # FIXME: for some reason the x/y attributes don't update the position attribute correctly
         self.position = (self.x, self.y)
 
+        self.rotation += 110 * self.rotation_speed * dt
         # update layer position (center camera)
         self.game_layer.update(dt)
 
         # test for collisions
+        self.updating = True
         collision_layer = self.parent
         collision_layer.step()
+        self.updating = False
 
     def look_at(self, px, py):
         # translate mouse position to world
@@ -221,17 +234,14 @@ class Zombie(NotifierSprite):
         self.speed = 100
         self.schedule(self.update)
         self.player = player
+        self.updating = False
 
     def on_collision(self):
-        if self._old_state.has_key('position'):
-            self.position = self._old_state['position']
-        if self._old_state.has_key('rotation'):
-            self.rotation = self._old_state['rotation']
-        self.speed *= -1
-        self.do(Delay(RETREAT_DELAY) + CallFunc(self.reset))
-
-    def reset(self):
-        self.speed *= -1
+        if self.updating:
+            if self._old_state.has_key('position'):
+                self.position = self._old_state['position']
+        #if self._old_state.has_key('rotation'):
+        #    self.rotation = self._old_state['rotation']
 
     def update(self, dt):
         # save old position
@@ -268,8 +278,10 @@ class Zombie(NotifierSprite):
         b.rotation = b.rotation % 360
 
         # test for collisions
+        self.updating = True
         collision_layer = self.parent
         collision_layer.step()
+        self.updating = False
 
 
 
