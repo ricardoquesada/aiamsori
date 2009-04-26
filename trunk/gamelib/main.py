@@ -59,22 +59,26 @@ class GameLayer(Layer):
 
         factory = SpriteLayerFactory()
         # get layers from map
-        sprite_layers = []
+        for_collision_layers = []
+        walls_layers = []
         layers = simplejson.load(open(mapfile))['layers']
         for layer_data in layers:
             layer_type = layer_data['layer_type']
             layer_label = layer_data['label']
             if layer_type == 'sprite':
                 sprite_layer = factory.dict_to_layer(layer_data['data'])
-                self.map_node.add_layer(layer_data['label'], layer_data['z'],
-                                   sprite_layer)
-#                if layer_label in ['walls']:
-                sprite_layers.append(sprite_layer)
-                    
+                if layer_label in ["floor"]:
+                    self.map_node.add_layer(layer_data['label'], layer_data['z'],
+                                       sprite_layer)
+                if layer_label in ['walls']:
+                    for_collision_layers.append(sprite_layer)
+                if layer_label in ['walls', 'gates']:
+                    walls_layers.append(sprite_layer)
+
         # create collision shapes
-        collision_layer = self._create_collision_layer(sprite_layers)
+        collision_layer = self._create_collision_layer(for_collision_layers)
         self.map_node.add_layer('collision', 1000, collision_layer)
-        self.map_node.add(create_wall_layer(sprite_layers), z=10)
+        self.map_node.add(create_wall_layer(walls_layers), z=10)
         # add scene map node to the main layer
         self.add(self.map_node)
 
@@ -134,7 +138,7 @@ class GameLayer(Layer):
         x = (self.x + cos( radians(-self.player.rotation) ) * self.player.speed * -dt)
         y = (self.y + sin( radians(-self.player.rotation) ) * self.player.speed * -dt)
         self.position = (x, y)
-                
+
 
 class Agent(NotifierSprite):
     def __init__(self, img, position, game_layer):
@@ -165,7 +169,7 @@ class Agent(NotifierSprite):
 
         # update layer position (center camera)
         self.game_layer.update(dt)
-        
+
         # test for collisions
         collision_layer = self.parent
         collision_layer.step()
