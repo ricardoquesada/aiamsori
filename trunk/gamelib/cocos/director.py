@@ -462,7 +462,6 @@ class Director(event.EventDispatcher):
 
     def set_2d_projection(self):
         '''Sets a 2D projection mantaining the aspect ratio of the original window size'''
-        print "2d"
         width, height = self.get_window_size()
         glLoadIdentity()
         glViewport(0, 0, width, height)
@@ -474,7 +473,6 @@ class Director(event.EventDispatcher):
 
     def set_3d_projection(self):
         '''Sets a 3D projection mantaining the aspect ratio of the original window size'''
-        print '#D@@@@'
         width, height = self.window.width, self.window.height
         ow, oh = self.get_window_size()
 
