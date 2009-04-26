@@ -34,14 +34,15 @@ def load_library(libname, print_path=True):
 
     if libfn_specific != None:
         libfn_specific = os.path.join(path, libfn_specific)
+
         try:
             if print_path:
                 print "Loading chipmunk for %s (%s) [%s]" % (s, arch, libfn_specific)
-            lib = ctypes.cdll.LoadLibrary(libfn)
+            lib = ctypes.cdll.LoadLibrary(libfn_specific)
         except:
             if print_path:
                 print "Loading chipmunk for %s (%s) [%s]" % (s, arch, libfn)
-            lib = ctypes.cdll.LoadLibrary(libfn)    
+            lib = ctypes.cdll.LoadLibrary(libfn)
     else:
         if print_path:
             print "Loading chipmunk for %s (%s) [%s]" % (s, arch, libfn)
