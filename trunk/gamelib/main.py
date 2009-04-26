@@ -16,6 +16,7 @@ import geom
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 
 import cocos
+from cocos.actions import Delay, CallFunc
 from cocos.director import director
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
@@ -31,6 +32,7 @@ from boids import merge, seek, cap, avoid_group
 
 WIDTH, HEIGHT = 800, 600
 MAPFILE = 'data/map.json'
+RETREAT_DELAY = 0.1
 
 def main():
     # fix pyglet resource path
@@ -97,7 +99,7 @@ class GameLayer(Layer):
         collision_layer.add(agent, shape_name='circle', static=False)
 
         x, y = director.get_window_size()
-        for i in range(10):
+        for i in range(2):
             z = Zombie('data/img/zombie.png', self.player)
             z.x = random.randint(0, x)
             z.y = random.randint(0, y)
@@ -153,7 +155,11 @@ class Agent(NotifierSprite):
 
     def on_collision(self):
         self.position = self._old_state['position']
-        self.speed = 0
+        self.speed *= -1
+        self.do(Delay(RETREAT_DELAY) + CallFunc(self.reset))
+
+    def reset(self):
+        self.speed *= -1
 
     def update(self, dt):
         # save old state
@@ -198,6 +204,11 @@ class Zombie(NotifierSprite):
             self.position = self._old_state['position']
         if self._old_state.has_key('rotation'):
             self.rotation = self._old_state['rotation']
+        self.speed *= -1
+        self.do(Delay(RETREAT_DELAY) + CallFunc(self.reset))
+
+    def reset(self):
+        self.speed *= -1
 
     def update(self, dt):
         # save old position
