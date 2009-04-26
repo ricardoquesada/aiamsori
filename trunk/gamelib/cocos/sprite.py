@@ -228,6 +228,18 @@ class NotifierSprite(Sprite):
 
     # README: this is done in a special case, because we need 
     # to override a property
+    def _set_x(self, x):
+        super(NotifierSprite, self)._set_x(x)
+        if self._initialized:
+            self._notify('x')
+    x = property(lambda self: self._x, _set_x)
+
+    def _set_y(self, y):
+        super(NotifierSprite, self)._set_y(y)
+        if self._initialized:
+            self._notify('y')
+    y = property(lambda self: self._y, _set_y)
+
     def _set_position(self, position):
         super(NotifierSprite, self)._set_position(position)
         if self._initialized:
