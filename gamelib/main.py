@@ -15,6 +15,7 @@ import geom
 
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 
+import cocos
 from cocos.director import director
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
@@ -42,12 +43,51 @@ def main():
     game_layer = GameLayer(MAPFILE)
     game_layer.position = (400, 300)
 
+    director.set_3d_projection()
+
     main_scene = Scene()
     main_scene.add(game_layer)
     main_scene.add(GameCtrl(game_layer))
 
     director.run(main_scene)
 
+class WallLayer(cocos.cocosnode.CocosNode):
+    def __init__(self):
+        super(WallLayer, self).__init__()
+        self.batch = pyglet.graphics.Batch()
+
+    def on_enter(self):
+        super(WallLayer, self).on_enter()
+        director.set_3d_projection()
+
+    def add(self, sprite):
+        wd = sprite.image.width/2
+        hd = sprite.image.height/2
+        wh = 50
+        x, y = sprite.position
+        x = int(x)
+        y = int(y)
+        l = (x-wd, y-hd, wh, x+wd, y-hd, wh, x+wd, y+hd, wh, x-wd, y+hd, wh)
+        #l = (x-wd, y-hd, x+wd, y-hd, x+wd, y+hd, x-wd, y+hd)
+        print l
+        vertex_list = self.batch.add(4, pyglet.gl.GL_QUADS, None,
+            ('v3i', l),
+            ('c3B', [0, 0, 255]*4)
+        )
+
+    def draw(self):
+        pyglet.gl.glPushMatrix()
+        self.transform()
+        self.batch.draw()
+        pyglet.gl.glPopMatrix()
+
+
+def create_wall_layer(layers):
+    dest = WallLayer()
+    for layer in layers:
+        for z, child in layer.children:
+            dest.add(child)
+    return dest
 
 class GameLayer(Layer):
     def __init__(self, mapfile):
@@ -69,7 +109,7 @@ class GameLayer(Layer):
         # create collision shapes
         collision_layer = self._create_collision_layer(sprite_layers)
         self.map_node.add_layer('collision', -1, collision_layer)
-
+        self.map_node.add(create_wall_layer(sprite_layers), z=10)
         # add scene map node to the main layer
         self.add(self.map_node)
 
@@ -117,7 +157,7 @@ class GameLayer(Layer):
 
     def _create_child(self, img):
         sprite = NotifierSprite(str(img['filename']),
-                                img['position'], img['rotation'], 
+                                img['position'], img['rotation'],
                                 img['scale'], img['opacity'])
         sprite.label = img['label'] if "label" in img else None
         sprite.path = img['filename']
@@ -147,7 +187,7 @@ class Agent(NotifierSprite):
         # update speed
         if self.acceleration != 0 and abs(self.speed) < 100:
             self.speed += self.acceleration
-            
+
         # update the position, based on the speed
         x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
         y = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
@@ -172,7 +212,7 @@ class Zombie(NotifierSprite):
         self.schedule(self.update)
         self.player = player
 
-        
+
     def update(self, dt):
         locals = []
         b = self
@@ -192,17 +232,17 @@ class Zombie(NotifierSprite):
 
         delta = geom.angle_rotation(radians(b.rotation), radians(chosen))
         delta = degrees(delta)
-        max_r = 180
+        max_r = 270
         delta = cap(delta, -max_r, max_r) * dt
         b.rotation += delta
-        
+
         # update position
         a = -b.rotation
         b.x = (b.x + cos( radians(a) ) * b.speed * dt)
         b.y = (b.y + sin( radians(a) ) * b.speed * dt)
         b.rotation = b.rotation % 360
 
-    
+
 
 if __name__ == '__main__':
     main()
