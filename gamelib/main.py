@@ -46,12 +46,11 @@ def main():
     director.run(main_scene)
 
 
-
 class GameLayer(Layer):
     def __init__(self, mapfile):
         super(GameLayer, self).__init__()
         map_node = LayersNode()
-        
+
         factory = SpriteLayerFactory()
         # get layers from map
         sprite_layers = []
@@ -67,7 +66,7 @@ class GameLayer(Layer):
         # create collision shapes
         collision_layer = self._create_collision_layer(sprite_layers)
         map_node.add_layer('collision', -1, collision_layer)
-        
+
         # create agents (players)
         self._create_agent(map_node)
 
@@ -83,11 +82,16 @@ class GameLayer(Layer):
         self.add(agent)
         collision_layer.add(agent, shape_name='square', static=False)
 
+    def on_collision(self, shape_a, shape_b):
+        collision_layer = self.children[1][1].get('collision')
+        for shape in (shape_a, shape_b):
+            node = collision_layer._get_node(shape)
+            if isinstance(node, Agent):
+                # reset agent position and set speed to zero
+                node.reset()
+
     def _create_collision_layer(self, layers):
-        #def on_collision(self, shape_a, shape_b):
-        #    print 'PIZZA'
-        #collision_layer = CollisionLayer(on_collision)
-        collision_layer = CollisionLayer()
+        collision_layer = CollisionLayer(self.on_collision)
 
         for layer in layers:
             for z, child in layer.children:
@@ -109,16 +113,28 @@ class GameLayer(Layer):
 
 
 class Agent(NotifierSprite):
-    def __init__(self, img, position=(0, 0), speed=0):
-        super(Agent, self).__init__(img, position)
+    def __init__(self, image, position=(0, 0), speed=0):
+        super(Agent, self).__init__(image, position)
+        self._old_position = position
         self.speed = speed
         self.schedule(self.update)
 
+    def reset(self):
+        self.position = self._old_position
+        self.speed = 0
+
     def update(self, dt):
+        # save old position
+        self._old_position = self.position
+        # update the position, based on the speed
         b = self
         a = -b.rotation
-        b.x = (b.x + cos( radians(a) ) * b.speed * dt)
-        b.y = (b.y + sin( radians(a) ) * b.speed * dt)
+        x = (b.x + cos( radians(a) ) * b.speed * dt)
+        y = (b.y + sin( radians(a) ) * b.speed * dt)
+        self.position = (x, y)
+        # test for collisions
+        collision_layer = self.parent
+        collision_layer.step()
 
     def look_at(self, px, py):
         pl_x, pl_y = self.position
