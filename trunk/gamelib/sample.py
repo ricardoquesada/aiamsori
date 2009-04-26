@@ -2,6 +2,8 @@
 import simplejson
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 
+import cocos
+import pyglet
 from cocos.director import director
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
@@ -29,6 +31,25 @@ def create_collision_layer(layer):
         collision_layer.add(new_child, shape_name='square')
     return collision_layer
 
+class WallLayer(cocos.cocosnode.CocosNode):
+    def __init__(self):
+        super(WallLayer, self).__init__()
+        self.batch = pyglet.graphics.Batch()
+
+    def add(self, sprite):
+        print sprite.image.rect
+
+def create_wall_layer(layer):
+    layer = WallLayer()
+    for z, child in layer.children:
+        img = {'filename': child.path,
+               'position': child.position, 'rotation': child.rotation, 'scale': child.scale, 'opacity': child.opacity,
+               'label': child.label, 'rect': child.rect}
+        new_child = build_sprite(img)
+        layer.add(new_child)
+    return layer
+
+
 def load_scene(filename):
     layers_node = LayersNode()
     layers = simplejson.load(open(filename))['layers']
@@ -37,7 +58,9 @@ def load_scene(filename):
 
         sprite_layer = SpriteLayerFactory().dict_to_layer(layer_data['data'])
         layers_node.add_layer(layer_data['label'], layer_data['z'], sprite_layer)
-#        layers_node.add_layer('collision', layer_data['z'], create_collision_layer(sprite_layer))
+        layers_node.add_layer('collision', layer_data['z'], create_collision_layer(sprite_layer))
+        layers_node.add(create_wall_layer(sprite_layer), z = 10)
+
 
     scene = Scene()
     scene.add(layers_node)
@@ -73,7 +96,6 @@ class Char(NotifierSprite):
 
     def update(self, dt):
         a = -self.rotation
-#        print self.speed, dt, cos(radians(a)) * self.speed * dt
         self.x += cos(radians(a)) * self.speed * dt
         self.y += sin(radians(a)) * self.speed * dt
 
