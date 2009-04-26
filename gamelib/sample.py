@@ -72,10 +72,10 @@ class Char(NotifierSprite):
         self.schedule(self.update)
 
     def update(self, dt):
-        b = self
-        a = -b.rotation
-        b.x = (b.x + cos( radians(a) ) * b.speed * dt)
-        b.y = (b.y + sin( radians(a) ) * b.speed * dt)
+        a = -self.rotation
+        print self.speed, dt, cos(radians(a)) * self.speed * dt
+        self.x += cos(radians(a)) * self.speed * dt
+        self.y += sin(radians(a)) * self.speed * dt
 
     def look_at(self, px, py):
         pl_x, pl_y = self.position[0], self.position[1]
