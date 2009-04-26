@@ -68,6 +68,8 @@ class WallLayer(cocos.cocosnode.CocosNode):
         x, y = sprite.position
         x = int(x)
         y = int(y)
+
+        print sprite, dir(sprite.image.texture), sprite.image.target
         l = (x-wd, y-hd, wh, x+wd, y-hd, wh, x+wd, y+hd, wh, x-wd, y+hd, wh)
         #l = (x-wd, y-hd, x+wd, y-hd, x+wd, y+hd, x-wd, y+hd)
         vertex_list = self.top_batch.add(4, pyglet.gl.GL_QUADS, None,
@@ -103,6 +105,7 @@ class WallLayer(cocos.cocosnode.CocosNode):
         self.texture = sprite.image.texture
 
     def draw(self):
+        return
         pyglet.gl.glPushMatrix()
         self.transform()
         self.wall_batch.draw()
@@ -116,6 +119,8 @@ class WallLayer(cocos.cocosnode.CocosNode):
 
 
 def create_wall_layer(layers):
+#    print layers[0].children
+    
     dest = WallLayer()
     for layer in layers:
         for z, child in layer.children:
@@ -133,15 +138,17 @@ class GameLayer(Layer):
         layers = simplejson.load(open(mapfile))['layers']
         for layer_data in layers:
             layer_type = layer_data['layer_type']
+            layer_label = layer_data['label']
             if layer_type == 'sprite':
                 sprite_layer = factory.dict_to_layer(layer_data['data'])
                 self.map_node.add_layer(layer_data['label'], layer_data['z'],
                                    sprite_layer)
+#                if layer_label in ['walls']:
                 sprite_layers.append(sprite_layer)
-
+                    
         # create collision shapes
         collision_layer = self._create_collision_layer(sprite_layers)
-        self.map_node.add_layer('collision', -1, collision_layer)
+        self.map_node.add_layer('collision', 1000, collision_layer)
         self.map_node.add(create_wall_layer(sprite_layers), z=10)
         # add scene map node to the main layer
         self.add(self.map_node)
@@ -155,7 +162,7 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        agent = Agent('data/img/tipito.png', (100,100), self)
+        agent = Agent('data/img/tipito.png', (0,0), self)
         self.player = agent
         self.add(agent)
         collision_layer.add(agent, shape_name='square', static=False)
@@ -198,6 +205,11 @@ class GameLayer(Layer):
         return sprite
 
 
+    def update(self, dt):
+        x = (self.x + cos( radians(-self.player.rotation) ) * self.player.speed * -dt)
+        y = (self.y + sin( radians(-self.player.rotation) ) * self.player.speed * -dt)
+        self.position = (x, y)
+                
 
 class Agent(NotifierSprite):
     def __init__(self, img, position, game_layer):
@@ -225,6 +237,10 @@ class Agent(NotifierSprite):
         x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
         y = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
         self.position = (x, y)
+
+        # update layer position (center camera)
+        self.game_layer.update(dt)
+        
         # test for collisions
         collision_layer = self.parent
         collision_layer.step()

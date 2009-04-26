@@ -30,6 +30,11 @@ from layers.collision import CollisionLayer
 
 from cocos.euclid import Point2
 
+
+# fix pyglet resource path
+pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../data'))
+pyglet.resource.reindex()
+
 LACCEL       = key.LCTRL
 import sys as _sys
 if _sys.platform == 'darwin':
