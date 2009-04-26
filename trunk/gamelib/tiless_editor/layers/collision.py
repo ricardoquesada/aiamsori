@@ -390,11 +390,11 @@ class CollisionLayer(PickerBatchNode):
             callback = self._on_collision
         self.space = CollisionSpace(callback=callback)
 
-    def add(self, child, z=0, name=None, static=True, shape_name=''):
+    def add(self, child, z=0, name=None, static=True, shape_name='', scale=1):
         super(CollisionLayer, self).add(child, z, name)
 
         # create a shape
-        shape = self._create_shape(child, shape_name)
+        shape = self._create_shape(child, shape_name, scale=scale)
         self._shapes[child] = shape
         self.space.add(shape, static)
 
@@ -420,7 +420,7 @@ class CollisionLayer(PickerBatchNode):
     def step(self, dt=0):
         self.space.step(dt)
 
-    def _create_shape(self, child, shape_name=''):
+    def _create_shape(self, child, shape_name='', scale=1):
         def get_shape_name(child):
             image_name = os.path.basename(child.path)
             shape_name = image_name.split('.')[0]
@@ -431,15 +431,15 @@ class CollisionLayer(PickerBatchNode):
         else:
             _shape = get_shape_name(child)
         if _shape == 'circle':
-            radius = 0.5 * max(child.width, child.height)
+            radius = 0.5 * max(child.width, child.height) * scale
             shape = Circle(radius, child.position, child.scale, child.rotation)
         elif _shape == 'segment':
-            radius = 0.5 * child.height
-            length = child.width
+            radius = 0.5 * child.height * scale
+            length = child.width * scale
             shape = Segment(radius, length, child.position, child.scale,
                             child.rotation)
         elif _shape == 'square':
-            shape = Square(child.width, child.height, child.position,
+            shape = Square(child.width*scale, child.height*scale, child.position,
                            child.scale, child.rotation)
         else:
             raise ValueError("Child has invalid shape", _shape)
