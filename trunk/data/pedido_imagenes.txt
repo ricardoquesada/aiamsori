@@ -5,18 +5,23 @@ a tu personaje por el mapa de la casa y vas posicionando a tus familiares en
 lugares estrategicos para defenderla. La idea es ir matando y resistiendo ola tras
 ola de ataque zombie.
 
+Los gráficos deberían ser PNGs con transparencia.
+
+---------------------------------------
+
 TILES:
-    Los tiles son como mosaicos, que se ponen uno al latro del otro y como
+    Los tiles son como mosaicos, que se ponen uno al lado del otro y como
     en un rompecabezas, repitiendolos, armamos la escena.
-    Los tiles tienen que ser de XxX de tamanio. Excepto los muebles, que pueden
-    ocupar varios tiles. Como referencia, una cama ocupa XxX tiles.
+    Los tiles tienen que ser de 128x128 de tamanio. Excepto los muebles, que pueden
+    ocupar varios tiles. 
 
     Pared.
     Pared en L
     Pared en T
-    Pared en X
+    Pared en + (cruz)
 
-    Columna Ventana
+    Columna
+    Ventana
     Vidrio
     Puerta
 
@@ -26,32 +31,37 @@ TILES:
     Comoda
     Cama
     Televisor
+    Mascotas
+    y los muebles o detalles que se les ocurran
 
-PISOS:
-    Los pisos son de decorado y los dibujamos en el mapa y nunca cambian.
+
+Pisos:
+    Los pisos son de decorado y los dibujamos en el mapa y nunca cambian también son de 128x128 pero puede haber algunos que ocupen más tiles, como por ej. la alfombra.
 
     Ceramico
     Madera
     Pasto
     Alfombra
     "Tapete" (alfombra chiquita, no alfombrado)
+    etc.
+
+
+----------------------------------------
 
 Familiares:
     Estos son los personajes que podes controlar. Se ven de arriba.
-    Ocupan XxX tiles un personaje adulto (un menor puede ser menos)
-    el personaje es una cabeza por cada tipo mas unas patitas
-    los brazos van a ser compartidos por todos ya que llevan las armas
-    Las patitas deberian tener varios frames de animacion
+    El gráfico mide lo mismo que un tile de mapa: 128x128. Los niños pueden ser más chicos, aunque también podemos darles escala luego en el juego.
 
-    Padre
-    Madre
-    Hija
-    Hijo
-    Cuniado
+    Cada personaje debería tener frames de animación de caminata y de ataque.
+    Si hay tiempo sería bueno tener frames o al menos una imagen de cada personaje cuando recibe daño y cuando muere.
 
-Armas:
-    las armas son un par de brazos y el arma
+    Padre llevando una escopeta
+    Madre llevando un cuchillo de cocina
+    Hija llevando una muñeca
+    Hijo llevando un bate de beisball
 
+
+    Tamnbién si hay tiempo se podría hacer al Padre llevando diferentes armas, por ej.:
     Manos vacias
     Motosierra
     Bate
@@ -60,14 +70,17 @@ Armas:
     Ametralladora
     Granadas
 
+    Otro plus deseable sería tener gráficos de los familiares con las manos vacías.
+
+
 Zombies:
     Varios tipos de zombies
-    Con las patitas animadas
+    Con frames de animación de caminata y ataque y si hay tiempo de daño recibido y muerte.
 
-Caras:
-    Zobies
+Caras de frente(para globitos de diálogo):
+    Zombies
     1xFamiliar
-    Television
+    Televisión
 
 Props:
     Globo de hablar
