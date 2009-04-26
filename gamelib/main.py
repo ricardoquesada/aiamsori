@@ -16,7 +16,7 @@ from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from cocos.director import director
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
-from cocos.sprite import NotifierSprite
+from cocos.sprite import NotifierSprite, Sprite
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 from tiless_editor.layers.collision import CollisionLayer
@@ -49,7 +49,7 @@ def main():
 class GameLayer(Layer):
     def __init__(self, mapfile):
         super(GameLayer, self).__init__()
-        map_node = LayersNode()
+        self.map_node = LayersNode()
 
         factory = SpriteLayerFactory()
         # get layers from map
@@ -59,25 +59,27 @@ class GameLayer(Layer):
             layer_type = layer_data['layer_type']
             if layer_type == 'sprite':
                 sprite_layer = factory.dict_to_layer(layer_data['data'])
-                map_node.add_layer(layer_data['label'], layer_data['z'],
+                self.map_node.add_layer(layer_data['label'], layer_data['z'],
                                    sprite_layer)
                 sprite_layers.append(sprite_layer)
 
         # create collision shapes
         collision_layer = self._create_collision_layer(sprite_layers)
-        map_node.add_layer('collision', -1, collision_layer)
+        self.map_node.add_layer('collision', -1, collision_layer)
+
+        # add scene map node to the main layer
+        self.add(self.map_node)
 
         # create agents (players)
-        self._create_agent(map_node)
+        self._create_agent()
 
-        self.add(map_node)
 
-    def _create_agent(self, map_node):
+    def _create_agent(self):
         # get collision layer
-        collision_layer = map_node.get('collision')
+        collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        agent = Agent('data/img/tipito.png', (100, 100))
+        agent = Agent('data/img/tipito.png', (100,100), self)
         self.player = agent
         self.add(agent)
         collision_layer.add(agent, shape_name='square', static=False)
@@ -112,12 +114,16 @@ class GameLayer(Layer):
         return sprite
 
 
+
 class Agent(NotifierSprite):
-    def __init__(self, image, position=(0, 0), speed=0):
-        super(Agent, self).__init__(image, position)
+    def __init__(self, img, position, game_layer):
+        super(Agent, self).__init__(img, position)
         self._old_position = position
-        self.speed = speed
+        self.speed = 0
+        self.position = position
         self.schedule(self.update)
+        self.game_layer = game_layer
+        self.acceleration = 0
 
     def reset(self):
         self.position = self._old_position
@@ -126,19 +132,27 @@ class Agent(NotifierSprite):
     def update(self, dt):
         # save old position
         self._old_position = self.position
+
+        # update speed
+        if self.acceleration != 0 and abs(self.speed) < 100:
+            self.speed += self.acceleration
+            
         # update the position, based on the speed
-        b = self
-        a = -b.rotation
-        x = (b.x + cos( radians(a) ) * b.speed * dt)
-        y = (b.y + sin( radians(a) ) * b.speed * dt)
+        x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
+        y = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
         self.position = (x, y)
         # test for collisions
         collision_layer = self.parent
         collision_layer.step()
 
     def look_at(self, px, py):
-        pl_x, pl_y = self.position
+        # translate mouse position to world
+        px = px - self.game_layer.x
+        py = py - self.game_layer.y
+        self.target = (px, py)
+        pl_x, pl_y = self.position[0], self.position[1]
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
+
 
 
 if __name__ == '__main__':

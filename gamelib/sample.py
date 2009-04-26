@@ -73,13 +73,12 @@ class Char(NotifierSprite):
 
     def update(self, dt):
         a = -self.rotation
-        print self.speed, dt, cos(radians(a)) * self.speed * dt
+#        print self.speed, dt, cos(radians(a)) * self.speed * dt
         self.x += cos(radians(a)) * self.speed * dt
         self.y += sin(radians(a)) * self.speed * dt
 
     def look_at(self, px, py):
         pl_x, pl_y = self.position[0], self.position[1]
-
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
 
