@@ -107,7 +107,7 @@ class GameLayer(Layer):
 
         # create agents (players)
         self._create_agents()
-        self.map_node.add(LightLayer(self), z=+1001)
+        #self.map_node.add(LightLayer(self), z=+1001)
 
 
     def _create_agents(self):
