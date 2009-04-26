@@ -94,16 +94,21 @@ class WallLayer(cocos.cocosnode.CocosNode):
         self.top_batch = pyglet.graphics.Batch()
         self.wall_batch = pyglet.graphics.Batch()
         self.atlas = TextureAtlas()
+        self.top_to_wall = {}
 
-    def add_source(self, sprite):
+    def add_source(self, sprite, wall):
         self.atlas.source_images[sprite.path] = sprite.image
+        self.atlas.source_images[wall.path] = wall.image
+        self.top_to_wall[sprite.path] = wall.path
 
     def make(self):
         self.atlas.build()
 
     def add(self, source_sprite):
         sprite = self.atlas.sprites[source_sprite.path]
-
+        wall_sprite = self.atlas.sprites[
+            self.top_to_wall[source_sprite.path]
+        ]
         wd = sprite.image.width/2
         hd = sprite.image.height/2
         wh = 50
@@ -123,46 +128,58 @@ class WallLayer(cocos.cocosnode.CocosNode):
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', [255, 255, 255]*4),
+            ('t3f', wall_sprite.image.tex_coords)
         )
         #bottom wall
         l = (x-wd, y+hd, 0, x+wd, y+hd, 0, x+wd, y+hd, wh, x-wd, y+hd, wh)
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', [255, 255, 255]*4),
+            ('t3f', wall_sprite.image.tex_coords)
         )
         #left wall
         l = (x-wd, y+hd, 0, x-wd, y-hd, 0, x-wd, y-hd, wh, x-wd, y+hd, wh)
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', [255, 255, 255]*4),
+            ('t3f', wall_sprite.image.tex_coords)
         )
         #right wall
         l = (x+wd, y+hd, 0, x+wd, y-hd, 0, x+wd, y-hd, wh, x+wd, y+hd, wh)
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', [255, 255, 255]*4),
+            ('t3f', wall_sprite.image.tex_coords)
         )
         self.texture = sprite.image.texture
 
     def draw(self):
         pyglet.gl.glPushMatrix()
         self.transform()
-        self.wall_batch.draw()
         texture = self.texture
         pyglet.gl.glEnable(texture.target)
         pyglet.gl.glBindTexture(texture.target, texture.id)
+        self.wall_batch.draw()
         self.top_batch.draw()
         pyglet.gl.glDisable(texture.target)
 
         pyglet.gl.glPopMatrix()
 
+def get_wall(child):
+    path = {'tiles/pared.jpg':'tiles/pared.jpg',
+            'tiles/ventana_rot.png':'tiles/ventana_v.png',
+            'tiles/ventana.png':'tiles/ventana_v.png',
+        }[child.path]
+    s = Sprite(path)
+    s.path = path
+    return s
 
 def create_wall_layer(layers):
     dest = WallLayer()
     for layer in layers:
         for z, child in layer.children:
             print child.path
-            dest.add_source(child)
+            dest.add_source(child, get_wall(child))
     dest.make()
     for layer in layers:
         for z, child in layer.children:
