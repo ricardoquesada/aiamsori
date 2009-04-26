@@ -54,6 +54,27 @@ def main():
 
     director.run(main_scene)
 
+class LightLayer(cocos.cocosnode.CocosNode):
+    def __init__(self, main):
+        super(LightLayer, self).__init__()
+        self.main = main
+        self.sprite = Sprite('light.png')
+
+    def draw(self):
+        pyglet.gl.glPushMatrix()
+        self.transform()
+
+
+        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        pyglet.gl.glBlendFunc(pyglet.gl.GL_ZERO, pyglet.gl.GL_SRC_ALPHA)
+        #pyglet.gl.glBlendEquation(pyglet.gl.GL_FUNC_ADD)
+
+        self.sprite.image.blit(self.main.player.x, self.main.player.y)
+        pyglet.gl.glPopMatrix()
+
+        pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
+        #pyglet.gl.glBlendEquation(pyglet.gl.GL_FUNC_ADD)
+
 class GameLayer(Layer):
     def __init__(self, mapfile):
         super(GameLayer, self).__init__()
@@ -86,6 +107,7 @@ class GameLayer(Layer):
 
         # create agents (players)
         self._create_agents()
+        self.map_node.add(LightLayer(self), z=+1001)
 
 
     def _create_agents(self):
@@ -104,7 +126,7 @@ class GameLayer(Layer):
             z.x = random.randint(0, x)
             z.y = random.randint(0, y)
             z.position = z.x, z.y
-            self.add(z)
+            self.map_node.add(z)
             collision_layer.add(z, shape_name='circle', static=False)
 
     def on_collision(self, shape_a, shape_b):
