@@ -190,8 +190,10 @@ class Agent(NotifierSprite):
         if not self.updating:
             return
         self.position = self._old_state['position']
+        self.speed *= -1
+        self.do(Delay(RETREAT_DELAY) + CallFunc(self._reset))
 
-    def reset(self):
+    def _reset(self):
         self.speed *= -1
 
     def update(self, dt):
@@ -237,11 +239,15 @@ class Zombie(NotifierSprite):
         self.updating = False
 
     def on_collision(self):
-        if self.updating:
-            if self._old_state.has_key('position'):
-                self.position = self._old_state['position']
-        #if self._old_state.has_key('rotation'):
-        #    self.rotation = self._old_state['rotation']
+        if self._old_state.has_key('position'):
+            self.position = self._old_state['position']
+        if self._old_state.has_key('rotation'):
+            self.rotation = self._old_state['rotation']
+        self.speed *= -1
+        self.do(Delay(RETREAT_DELAY) + CallFunc(self._reset))
+
+    def _reset(self):
+        self.speed *= -1
 
     def update(self, dt):
         # save old position

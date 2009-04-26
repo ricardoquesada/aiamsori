@@ -299,7 +299,7 @@ class CollisionSpace(object):
         elif isinstance(shape, Segment):
             # WARNING: the segment is assumed to be centered around its position
             # points a and b are equally distant from the segments center
-            print 'creating segment: pos:',  pm_body.position, 'from: ', shape.a,  'to: ', shape.b, 'radius: ', shape.radius
+            #print 'creating segment: pos:',  pm_body.position, 'from: ', shape.a,  'to: ', shape.b, 'radius: ', shape.radius
             pm_obj = pm.Segment(pm_body, shape.a, shape.b, shape.radius)
         elif isinstance(shape, Polygon):
             vertices = shape.vertices
@@ -334,11 +334,11 @@ class CollisionSpace(object):
     def update(self, shape):
         pm_obj = self._get_pm_object(shape)
         if pm_obj is not None:
-            if isinstance(shape, Segment):
-                print shape.position
-                print pm_obj.body.position
-                print shape.length
-                print pm_obj.a, pm_obj.b, abs(pm_obj.a - pm_obj.b)
+            #if isinstance(shape, Segment):
+            #    print shape.position
+            #    print pm_obj.body.position
+            #    print shape.length
+            #    print pm_obj.a, pm_obj.b, abs(pm_obj.a - pm_obj.b)
             for attr in _get_vars(shape):
                 if attr == 'body':
                     # special case: the 'body' attribute has to be exploded
@@ -365,13 +365,13 @@ class CollisionSpace(object):
                     value = getattr(shape, attr)
                     setattr(pm_obj, attr, value)
 
-        if isinstance(shape, Segment):
-            print '---'
-            print shape.position
-            print pm_obj.body.position
-            print shape.length
-            print pm_obj.a, pm_obj.b, abs(pm_obj.a - pm_obj.b)
-            print '==='
+        #if isinstance(shape, Segment):
+        #    print '---'
+        #    print shape.position
+        #    print pm_obj.body.position
+        #    print shape.length
+        #    print pm_obj.a, pm_obj.b, abs(pm_obj.a - pm_obj.b)
+        #    print '==='
         if self.is_static(shape):
             # since a static shape has been moved, we need to rehash them
             self._space.rehash_static()
