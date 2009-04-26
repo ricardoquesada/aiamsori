@@ -30,7 +30,7 @@ from walls import create_wall_layer
 from gamectrl import GameCtrl
 from boids import merge, seek, cap, avoid_group
 
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 1024, 768
 MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
@@ -40,7 +40,8 @@ def main():
     pyglet.resource.reindex()
 
     # initialize cocos director
-    director.init(WIDTH, HEIGHT)
+#    director.init(WIDTH, HEIGHT, fullscreen=True)
+    director.init(fullscreen=True)
 
     # create game scene
     game_layer = GameLayer(MAPFILE)
@@ -90,7 +91,7 @@ class GameLayer(Layer):
             layer_label = layer_data['label']
             if layer_type == 'sprite':
                 sprite_layer = factory.dict_to_layer(layer_data['data'])
-                if layer_label in ["floor"]:
+                if layer_label in ["piso"]:
                     self.map_node.add_layer(layer_data['label'], layer_data['z'],
                                        sprite_layer)
                 if layer_label in ['walls']:
