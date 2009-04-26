@@ -37,7 +37,7 @@ def load_scene(filename):
 
         sprite_layer = SpriteLayerFactory().dict_to_layer(layer_data['data'])
         layers_node.add_layer(layer_data['label'], layer_data['z'], sprite_layer)
-        layers_node.add_layer('collision', layer_data['z'], create_collision_layer(sprite_layer))
+#        layers_node.add_layer('collision', layer_data['z'], create_collision_layer(sprite_layer))
 
     scene = Scene()
     scene.add(layers_node)
@@ -53,7 +53,7 @@ def build_sprite(img):
 
 def create_agent(scene):
     layers = scene.children[0][1]
-    collision_layer = layers.get('collision')
+#    collision_layer = layers.get('collision')
     agent_layer = scene.add(Layer())
 #    img = {'filename': 'data/img/tipito.png', 'position': (100, 100), 'rotation': 0, 'scale': 1.0, 'opacity': 255,
 #           'label': 'Agent', 'rect': [0, 0, 64, 64]}
@@ -61,7 +61,7 @@ def create_agent(scene):
     agent_sprite.position = (100, 100)
     agent_sprite.speed = 0
     agent_layer.add(agent_sprite)
-    collision_layer.add(agent_sprite, shape_name='square')
+#    collision_layer.add(agent_sprite, shape_name='square')
     return agent_sprite
 
 class Char(NotifierSprite):
