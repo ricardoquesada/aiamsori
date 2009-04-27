@@ -84,7 +84,7 @@ class GameLayer(Layer):
         super(GameLayer, self).__init__()
         self.map_node = LayersNode()
 
-        factory = SpriteLayerFactory()
+        factory = SpriteLayerFactory("data/tiles")
         # get layers from map
         for_collision_layers = []
         walls_layers = []
