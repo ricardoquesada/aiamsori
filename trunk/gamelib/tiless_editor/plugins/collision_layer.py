@@ -14,6 +14,9 @@ from plugins.stamp import StampMode
 
 
 class CollisionLayerFactory(SpriteLayerFactory):
+    def __init__(self, path=None):
+        pass
+    
     def get_new_layer(self):
         layer = CollisionLayer()
         layer.layer_type = "collision"
@@ -82,4 +85,3 @@ class CollisionStampMode(CollisionEventHandler, StampMode):
         collision_tiles_dir = os.path.join(self.ed.tilesdir, '../collision')
         self.atlas = atlas.TextureAtlas(collision_tiles_dir)
         self.atlas.fix_image()
-

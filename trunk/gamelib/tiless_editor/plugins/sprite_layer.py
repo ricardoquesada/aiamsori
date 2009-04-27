@@ -6,7 +6,7 @@ from tiless_editor.atlas import TextureAtlas
 
 class SpriteLayerFactory(LayerFactory):
     def __init__(self, tiles_path):
-        self.atlas = TextureAtlas(tile_path)
+        pass#self.atlas = TextureAtlas(tiles_path)
 
     def get_new_layer(self):
         layer = PickerBatchNode()
