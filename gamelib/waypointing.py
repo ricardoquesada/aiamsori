@@ -24,7 +24,12 @@ print bignum
 
 class WaypointNav:
     def __init__(self,points,fn_visibles):
-
+        """
+        points: waypoints; all points in the map should have at least uone waypoint in sight
+        fn_visibles(a,b) True if point b is visible from point a
+        Interfase:
+        .get_dest(a,b): give a good intermediate point for going from a to b
+        """
         self.fn_visibles = fn_visibles
         self.points = [V2(tuple(p)) for p in points] 
         self.min_dist = {}
@@ -90,6 +95,8 @@ class WaypointNav:
             a = V2(a[0],a[1])
         if not isinstance(b,V2):
             a = V2(b[0],b[1])
+        if self.fn_visibles(a,b):
+            return b
         #get 3 ( if posible ) waypoints near a
         points = self.points
         lia = [(abs(a-p),i) for i,p in enumerate(points)]
