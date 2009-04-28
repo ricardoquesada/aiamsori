@@ -1,5 +1,12 @@
 import pyglet
 
+sound_resources =  {
+    'zombie_attack': 'sounds/zombie_attack.wav',
+    'player_defend': 'sounds/player_defend.mp3',
+    'player_die':    'sounds/player_die.mp3',
+    'player_punch':  'sounds/player_punch.ogg',
+}
+
 class Sounds(object):
     """
         Para agregar un sonido:
@@ -26,17 +33,14 @@ class Sounds(object):
 
         self.playing = False
 
-        self.sounds = { 'zombie_attack':
-            pyglet.resource.media('sounds/zombie_attack.wav', streaming=False),
-                        'player_defend':
-            pyglet.resource.media('sounds/player_defend.mp3', streaming=False),
-                        'player_die':
-            pyglet.resource.media('sounds/player_die.mp3', streaming=False),
-                        'player_punch':
-            pyglet.resource.media('sounds/player_punch.ogg', streaming=False),
-            }
+        self.sounds = dict([(k,  pyglet.resource.media(v, streaming=False)) for k, v in sound_resources.items() ])
 
 
-    def sound(self, s):
+    def play(self, s):
         if self.have_avbin and self.sfx:
             self.sounds[s].play().volume *= 1
+
+play = None
+def init():
+    global play
+    play = Sounds().play
