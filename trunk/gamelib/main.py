@@ -18,6 +18,7 @@ from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 import cocos
 from cocos.actions import Delay, CallFunc
 from cocos.director import director
+from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
 from cocos.sprite import NotifierSprite, Sprite
@@ -25,6 +26,7 @@ from cocos.sprite import NotifierSprite, Sprite
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
+from tiless_editor.tilesslayer import TilessLayer
 from walls import create_wall_layer
 
 from gamectrl import MouseGameCtrl, KeyGameCtrl
@@ -79,22 +81,46 @@ class LightLayer(cocos.cocosnode.CocosNode):
         pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
         #pyglet.gl.glBlendEquation(pyglet.gl.GL_FUNC_ADD)
 
+def make_sprites_layer(layer_data, atlas):
+    def build_sprite(img):
+        rect = img['rect']
+        region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], atlas.texture )
+        s = NotifierSprite(str(img['filename']),
+                   img['position'], img['rotation'], img['scale'], img['opacity'])
+        s.label = img['label'] if "label" in img else None
+        s.path = img['filename']
+        s.rect =img['rect']
+        return s
+
+    layer = BatchNode()
+    for item in layer_data["sprites"]:
+        sprite = build_sprite(item)
+        layer.add(sprite)
+    return layer
+
 class GameLayer(Layer):
     def __init__(self, mapfile):
         super(GameLayer, self).__init__()
         self.map_node = LayersNode()
 
-        factory = SpriteLayerFactory("data/tiles")
         # get layers from map
         for_collision_layers = []
         walls_layers = []
         zombie_spawm = None
+
+        img = pyglet.image.load(  'data/atlas.png' )
+        self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
+        self.atlas.texture = img.texture
+        pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_S, pyglet.gl.GL_CLAMP_TO_EDGE )
+        pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_T, pyglet.gl.GL_CLAMP_TO_EDGE )
+
+
         layers = simplejson.load(open(mapfile))['layers']
         for layer_data in layers:
             layer_type = layer_data['layer_type']
             layer_label = layer_data['label']
             if layer_type == 'sprite':
-                sprite_layer = factory.dict_to_layer(layer_data['data'])
+                sprite_layer = make_sprites_layer(layer_data['data'], self.atlas)
                 if layer_label in ["piso"]:
                     self.map_node.add_layer(layer_data['label'], layer_data['z'],
                                        sprite_layer)
