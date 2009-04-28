@@ -7,7 +7,7 @@ from tiless_editor.atlas import TextureAtlas
 
 class SpriteLayerFactory(LayerFactory):
     def __init__(self, tiles_path):
-        pass#self.atlas = TextureAtlas(tiles_path)
+        self.tiles_path = tiles_path
 
     def get_new_layer(self):
         layer = PickerBatchNode()
@@ -58,7 +58,7 @@ class SpriteLayerFactory(LayerFactory):
         gl.glTexParameteri( image.texture.target, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE )
 
 
-        newatlas = TextureAtlas('tiles')
+        newatlas = TextureAtlas(self.tiles_path)
         newatlas.fix_image()
 
         for item in in_dict["sprites"]:
