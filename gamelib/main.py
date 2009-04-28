@@ -176,9 +176,13 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
         for shape in (shape_a, shape_b):
             node = collision_layer._get_node(shape)
+            if shape == shape_a:
+                other = collision_layer._get_node(shape_b)
+            else:
+                other = collision_layer._get_node(shape_b)
             if isinstance(node, (Agent, Zombie)):
                 # reset agent position and set speed to zero
-                node.on_collision()
+                node.on_collision(other)
 
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
@@ -220,13 +224,14 @@ class Agent(NotifierSprite):
         self.updating = False
         self.rotation_speed = 0
 
-    def on_collision(self):
+    def on_collision(self, other):
         if not self.updating:
             return
         self.position = self._old_state['position']
-        from sound import Sounds
-        a = Sounds()
-        a.sound('player_punch')
+        if isinstance(other, (Agent, Zombie)):
+            from sound import Sounds
+            a = Sounds()
+            a.sound('player_punch')
 
     def _reset(self):
         self.speed *= -1
@@ -273,7 +278,7 @@ class Zombie(NotifierSprite):
         self.player = player
         self.updating = False
 
-    def on_collision(self):
+    def on_collision(self, other):
         if self._old_state.has_key('position'):
             self.position = self._old_state['position']
 
