@@ -7,7 +7,7 @@ Homepage: http://code.google.com/p/pymunk/
 
 Forum: http://www.slembcke.net/forums/viewforum.php?f=6
 """
-__version__ = "$Id: __init__.py 168 2008-12-13 18:17:34Z vb@viblo.se $"
+__version__ = "$Id: __init__.py 183 2009-04-18 12:21:53Z vb@viblo.se $"
 __docformat__ = "reStructuredText"
 
 import ctypes as ct
@@ -19,7 +19,7 @@ from .vec2d import Vec2d
 #:
 #: Valid only if pymunk was installed from a source or binary 
 #: distribution (i.e. not in a checked-out copy from svn).
-version = "0.8.1"
+version = "0.8.2"
 
 #: Infinity that can be passed as mass or inertia to Body 
 #:
@@ -577,7 +577,8 @@ class Circle(Shape):
         ct.cast(self._shape, ct.POINTER(cp.cpCircleShape)).contents.r = r
     def _get_radius(self):
         return ct.cast(self._shape, ct.POINTER(cp.cpCircleShape)).contents.r
-    radius = property(_get_radius, _set_radius)
+    radius = property(_get_radius, _set_radius, 
+        doc="""The Radius of the circle""")
     
     def _get_center (self):
         return ct.cast(self._shape, ct.POINTER(cp.cpCircleShape)).contents.c
@@ -617,6 +618,13 @@ class Segment(Shape):
         return ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.b
     b = property(_get_b, _set_b, 
         doc="""One of the two endpoints for this segment""")
+        
+    def _set_radius(self, r):
+        ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.r = r
+    def _get_radius(self):
+        return ct.cast(self._shape, ct.POINTER(cp.cpSegmentShape)).contents.r
+    radius = property(_get_radius, _set_radius, 
+        doc="""The thickness of the segment""")
 
 
 class Poly(Shape):
