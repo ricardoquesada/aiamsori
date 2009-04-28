@@ -48,8 +48,8 @@ def main():
 
     # initialize cocos director
 #    director.init(WIDTH, HEIGHT, fullscreen=True)
-    director.init(fullscreen=True)
-    #director.init(resizable=True)
+    #director.init(fullscreen=True)
+    director.init(resizable=True)
     sound.init()
     # create game scene
     game_layer = GameLayer(MAPFILE)
