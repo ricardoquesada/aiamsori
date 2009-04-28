@@ -95,6 +95,7 @@ class TextureAtlas(object):
             sprite.path = voids[i].path
             sprite.rect = [region.x, region.y, region.width, region.height]
 
+
         self.texture = atlas.texture
         atlas.texture.save( self.atlas_image_name )
 

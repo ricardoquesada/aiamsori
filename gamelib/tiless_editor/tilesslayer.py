@@ -18,6 +18,7 @@ from cocos.cocosnode import *
 from cocos.director import director
 from cocos.actions import Accelerate, Rotate
 from cocos.sprite import Sprite, BatchNode
+from cocos.actions import *
 import pyglet
 from pyglet import gl
 
@@ -66,6 +67,12 @@ class TilessLayer( CocosNode ):
         self.load_atlas( atlasfile )
         self.parse_json_file( jsonfile )
 
+        moveU = MoveBy( (0,500), 2 )
+        moveD = MoveBy( (0,-500), 2 )
+        moveL = MoveBy( (-500,0), 2 )
+        moveR = MoveBy( (500,0), 2 )
+        self.do( Repeat( moveL + moveU + moveR + moveD ) )
+
     def load_atlas( self, atlasfile ):
         img = pyglet.image.load( atlasfile )
         self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
@@ -104,5 +111,6 @@ if __name__ == "__main__":
     director.init(width=800, height=600, fullscreen=False)
     test_layer = TilessLayer('../../data/map.json', '../../data/atlas-fixed.png')
     main_scene = cocos.scene.Scene (test_layer)
-    main_scene.scale = 0.3
+#    main_scene.scale = 0.3
+    main_scene.position = (400,0)
     director.run (main_scene)
