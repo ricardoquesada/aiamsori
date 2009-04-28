@@ -49,7 +49,8 @@ def main():
     game_layer = GameLayer(MAPFILE)
     game_layer.position = (400, 300)
 
-    director.set_3d_projection()
+#    director.set_3d_projection()
+    director.set_2d_projection()
 
     main_scene = Scene()
     main_scene.add(game_layer)
@@ -85,7 +86,11 @@ def make_sprites_layer(layer_data, atlas):
     def build_sprite(img):
         rect = img['rect']
         region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], atlas.texture )
-        s = NotifierSprite(str(img['filename']),
+#        s = NotifierSprite(str(img['filename']),
+#                   img['position'], img['rotation'], img['scale'], img['opacity'])
+
+        region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], atlas.texture )
+        s = NotifierSprite(region,
                    img['position'], img['rotation'], img['scale'], img['opacity'])
         s.label = img['label'] if "label" in img else None
         s.path = img['filename']
