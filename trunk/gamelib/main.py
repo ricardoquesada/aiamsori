@@ -220,8 +220,6 @@ class Agent(NotifierSprite):
         if not self.updating:
             return
         self.position = self._old_state['position']
-        self.speed *= -1
-        self.do(Delay(RETREAT_DELAY) + CallFunc(self._reset))
         from sound import Sounds
         a = Sounds()
         a.sound('player_punch')
@@ -274,10 +272,6 @@ class Zombie(NotifierSprite):
     def on_collision(self):
         if self._old_state.has_key('position'):
             self.position = self._old_state['position']
-        if self._old_state.has_key('rotation'):
-            self.rotation = self._old_state['rotation']
-        self.speed *= -1
-        self.do(Delay(RETREAT_DELAY) + CallFunc(self._reset))
 
     def _reset(self):
         self.speed *= -1
