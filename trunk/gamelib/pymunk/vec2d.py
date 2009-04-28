@@ -1,4 +1,4 @@
-__version__ = "$Id: vec2d.py 173 2009-01-17 13:14:08Z vb@viblo.se $"
+__version__ = "$Id: vec2d.py 180 2009-04-18 10:36:25Z vb@viblo.se $"
 __docformat__ = "reStructuredText"
 
 import operator
@@ -369,7 +369,7 @@ class Vec2d(ctypes.Structure):
     
     def cross(self, other):
         """The cross product between the vector and other vector
-            v1.cross(v2) -> v1.x*v2.y - v2.y-v1.x
+            v1.cross(v2) -> v1.x*v2.y - v2.y*v1.x
         
         :return: The cross product
         """
