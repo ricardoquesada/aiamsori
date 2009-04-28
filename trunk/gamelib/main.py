@@ -29,7 +29,7 @@ from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from walls import create_wall_layer
-
+import sound
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from boids import merge, seek, cap, avoid_group
 
@@ -47,8 +47,9 @@ def main():
 
     # initialize cocos director
 #    director.init(WIDTH, HEIGHT, fullscreen=True)
-    director.init(fullscreen=True)
-
+    #director.init(fullscreen=True)
+    director.init()
+    sound.init()
     # create game scene
     game_layer = GameLayer(MAPFILE)
     game_layer.position = (400, 300)
@@ -156,7 +157,7 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        agent = Agent('data/img/tipito.png', (0,0), self)
+        agent = UserAgent('data/img/tipito.png', (0,0), self)
         self.player = agent
         self.add(agent)
         collision_layer.add(agent, shape_name='circle', static=False)
@@ -174,15 +175,20 @@ class GameLayer(Layer):
 
     def on_collision(self, shape_a, shape_b):
         collision_layer = self.map_node.get('collision')
-        for shape in (shape_a, shape_b):
-            node = collision_layer._get_node(shape)
-            if shape == shape_a:
-                other = collision_layer._get_node(shape_b)
-            else:
-                other = collision_layer._get_node(shape_b)
-            if isinstance(node, (Agent, Zombie)):
-                # reset agent position and set speed to zero
-                node.on_collision(other)
+        node = collision_layer._get_node(shape_a)
+        other = collision_layer._get_node(shape_b)
+        other.shape = shape_b
+        if isinstance(node, (Agent, Zombie)):
+            # reset agent position and set speed to zero
+            node._on_collision(other)
+
+        node = collision_layer._get_node(shape_b)
+        other = collision_layer._get_node(shape_a)
+        other.shape = shape_a
+        if isinstance(node, (Agent, Zombie)):
+            # reset agent position and set speed to zero
+            node._on_collision(other)
+
 
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
@@ -193,7 +199,7 @@ class GameLayer(Layer):
                        'rotation': child.rotation, 'scale': child.scale,
                        'opacity': child.opacity, 'rect': child.rect}
                 collision_child = self._create_child(img)
-                collision_layer.add(collision_child, shape_name='circle')
+                collision_layer.add(collision_child, shape_name='square', static=True)
         return collision_layer
 
     def _create_child(self, img):
@@ -211,10 +217,46 @@ class GameLayer(Layer):
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
 
-
 class Agent(NotifierSprite):
+    def update_position(self, position):
+        # test for collisions
+        old_position = self.position
+        self.updating = True
+        collision_layer = self.parent
+
+        self.position = position
+        self.collision = None
+        collision_layer.step()
+        if self.collision:
+            self.on_collision(self.collision)
+            f = getattr(self.collision, "on_collision", None)
+            if f is not None:
+                f(self)
+
+            self.position = position[0], old_position[1]
+            self.collision = None
+            collision_layer.step()
+            if self.collision:
+                self.position = old_position[0], position[1]
+                self.collision = None
+                collision_layer.step()
+                if self.collision:
+                    self.position = old_position
+
+    def _on_collision(self, other):
+        # used internally for collision testing
+        if not self.updating:
+            return
+        self.collision = other
+
+    def on_collision(self, other):
+        # called when we want to report a collision
+        pass
+
+
+class UserAgent(Agent):
     def __init__(self, img, position, game_layer):
-        super(Agent, self).__init__(img, position)
+        super(UserAgent, self).__init__(img, position)
         self._old_state = {'position': position}
         self.speed = 0
         self.position = position
@@ -223,42 +265,29 @@ class Agent(NotifierSprite):
         self.acceleration = 0
         self.updating = False
         self.rotation_speed = 0
+        self.collision = False
 
     def on_collision(self, other):
-        if not self.updating:
-            return
-        self.position = self._old_state['position']
-        if isinstance(other, (Agent, Zombie)):
-            from sound import Sounds
-            a = Sounds()
-            a.sound('player_punch')
-
-    def _reset(self):
-        self.speed *= -1
+        if isinstance(self.collision, Agent):
+            sound.play("player_punch")
 
     def update(self, dt):
-        # save old state
-        self._old_state = {'position': self.position}
-
         # update speed
         if self.acceleration != 0 and abs(self.speed) < 130:
             self.speed += self.acceleration*100*dt
 
-        # update the position, based on the speed
-        self.x = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
-        self.y = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
-        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
-        self.position = (self.x, self.y)
 
         self.rotation += 110 * self.rotation_speed * dt
+        # update the position, based on the speed
+        nx = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
+        ny = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
+        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
+        new_position = (nx, ny)
+
+        self.update_position(new_position)
+
         # update layer position (center camera)
         self.game_layer.update(dt)
-
-        # test for collisions
-        self.updating = True
-        collision_layer = self.parent
-        collision_layer.step()
-        self.updating = False
 
     def look_at(self, px, py):
         # translate mouse position to world
@@ -269,7 +298,7 @@ class Agent(NotifierSprite):
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
 
-class Zombie(NotifierSprite):
+class Zombie(Agent):
     def __init__(self, img, player):
         super(Zombie, self).__init__(img)
         self._old_state = {}
@@ -277,13 +306,6 @@ class Zombie(NotifierSprite):
         self.schedule(self.update)
         self.player = player
         self.updating = False
-
-    def on_collision(self, other):
-        if self._old_state.has_key('position'):
-            self.position = self._old_state['position']
-
-    def _reset(self):
-        self.speed *= -1
 
     def update(self, dt):
         # save old position
@@ -311,19 +333,15 @@ class Zombie(NotifierSprite):
         delta = cap(delta, -max_r, max_r) * dt
         b.rotation += delta
 
-        # update position
-        a = -b.rotation
-        b.x = (b.x + cos( radians(a) ) * b.speed * dt)
-        b.y = (b.y + sin( radians(a) ) * b.speed * dt)
         # FIXME: for some reason the x/y attributes don't update the position attribute correctly
         b.position = (b.x, b.y)
         b.rotation = b.rotation % 360
+        # update position
+        a = -b.rotation
+        nx = (b.x + cos( radians(a) ) * b.speed * dt)
+        ny = (b.y + sin( radians(a) ) * b.speed * dt)
 
-        # test for collisions
-        self.updating = True
-        collision_layer = self.parent
-        collision_layer.step()
-        self.updating = False
+        self.update_position((nx, ny))
 
 
 
