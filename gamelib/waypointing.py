@@ -19,7 +19,7 @@ considerando mejorar algunas cosas, hay partes bastante brute force
 ##}
 import math
 from cocos.euclid import Vector2 as V2
-
+from geom import dist_point_to_segment
 bignum = 1.0e+40
 
 class WaypointNav:
@@ -87,8 +87,19 @@ class WaypointNav:
         for j in xrange(n):
             for i in xrange(n):
                 if fn(i,j):
-                    m[i,j] = abs(points[i]-points[j])
-                    adj_j.append(i)
+                    # points visible, but dont want to add a quasi colinear, so
+                    # check no node diferent from i,j is at distance <epsilon from
+                    # segment
+                    cuasi_colinear = False
+                    for k in xrange(len(points)):
+                        if ( not (k in [i,j])
+                             and dist_point_to_segment(points[k],points[i],points[k])<20.0):
+                            cuasi_colinear = True
+                    if not cuasi_colinear:
+                        m[i,j] = abs(points[i]-points[j])
+                        adj_j.append(i)
+                    else:
+                        m[i,j] = m[j,i] = bignum
                 else:
                     m[i,j] = m[j,i] = bignum
             self.adj.append(adj_j)
@@ -299,60 +310,3 @@ class Voucher:
         return self.going
 
 
-def test_deviation():
-    import math
-    class MockupActor:
-        def __init__(self,position):
-            self.position = position
-        
-    class MockupVoucher(Voucher):
-        def __init__(self,actor,comming,going):
-            self.chaser_actor = actor
-            self.comming = comming
-            self.going = going
-
-    def rotate45(v):
-        return V2(v.x*math.cos(math.radians(45.0))-v.y*math.sin(math.radians(45.0)),
-                  v.x*math.sin(math.radians(45.0))+v.y*math.cos(math.radians(45.0)))
-
-    def translate3_5(v):
-        return v+V2(3,5)
-                               
-            
-    actor = MockupActor(V2(0,0))
-    voucher = MockupVoucher(actor,V2(-1,0),V2(1,0))
-
-    actor.position = V2(0,7)
-    print voucher.deviation()
-    assert(abs(voucher.deviation()-7.0)<1.0e-3)
-    actor.position = V2(0,0)
-    assert(abs(voucher.deviation()-0.0)<1.0e-3)
-
-    # same but rotated 45 deg
-    actor = MockupActor(V2(0,0))
-    voucher = MockupVoucher(actor,V2(-1,0),V2(1,0))
-
-    voucher.comming = rotate45(voucher.comming)
-    voucher.going = rotate45(voucher.going)
-    actor.position = V2(0,7)
-    actor.position = rotate45(actor.position)
-    assert(abs(voucher.deviation()-7.0)<1.0e-3)
-    actor.position = V2(0,0)
-    actor.position = rotate45(actor.position)
-    assert(abs(voucher.deviation()-0.0)<1.0e-3)
-
-    # same but translated
-    actor = MockupActor(V2(0,0))
-    voucher = MockupVoucher(actor,V2(-1,0),V2(1,0))
-
-    voucher.comming = translate3_5(voucher.comming)
-    voucher.going = translate3_5(voucher.going)
-    actor.position = V2(0,7)
-    actor.position = translate3_5(actor.position)
-    assert(abs(voucher.deviation()-7.0)<1.0e-3)
-    actor.position = V2(0,0)
-    actor.position = translate3_5(actor.position)
-    assert(abs(voucher.deviation()-0.0)<1.0e-3)
-
-if __name__ == '__main__':
-    test_deviation()

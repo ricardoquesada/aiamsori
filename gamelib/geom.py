@@ -82,3 +82,16 @@ def angle_rotation(angle1, angle2):
         else:
             delta = 2*pi+angle2-angle1
     return delta
+
+def dist_point_to_segment((px,py), (x1,y1), (x2, y2)):
+    dx = x2-x1
+    dy = y2-y1
+    t = ((px - x1) * dx + (py - y1) * dy) / float (dx * dx + dy * dy)
+    if t > 1:
+        return dist((px,py),(x2,y2))
+    elif t < 0:
+        return dist((px,py),(x1,y1))
+    else:
+        nx = x1 + t*dx
+        ny = y1 + t*dy
+        return dist((px,py), (nx, ny))
