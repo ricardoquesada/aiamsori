@@ -85,7 +85,6 @@ class LightLayer(cocos.cocosnode.CocosNode):
 def make_sprites_layer(layer_data, atlas):
     def build_sprite(img):
         rect = img['rect']
-        region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], atlas.texture )
 #        s = NotifierSprite(str(img['filename']),
 #                   img['position'], img['rotation'], img['scale'], img['opacity'])
 
