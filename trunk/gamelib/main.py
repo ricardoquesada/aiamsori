@@ -49,8 +49,8 @@ def main():
     game_layer = GameLayer(MAPFILE)
     game_layer.position = (400, 300)
 
-#    director.set_3d_projection()
-    director.set_2d_projection()
+    director.set_3d_projection()
+#    director.set_2d_projection()
 
     main_scene = Scene()
     main_scene.add(game_layer)
