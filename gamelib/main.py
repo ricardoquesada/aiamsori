@@ -48,8 +48,8 @@ def main():
 
     # initialize cocos director
 #    director.init(WIDTH, HEIGHT, fullscreen=True)
-    #director.init(fullscreen=True)
-    director.init(resizable=True)
+    director.init(fullscreen=True)
+    #director.init(resizable=True)
     sound.init()
     # create game scene
     game_layer = GameLayer(MAPFILE)
@@ -166,7 +166,6 @@ class GameLayer(Layer):
         self.light.disable()
 
     def on_resize(self, w, h):
-        print "ON RESIZE!!!!!!!!!!"
         x, y = director.get_window_size()
         self.light.set_position(w/2, h/2)
 
