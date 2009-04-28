@@ -12,6 +12,7 @@ import simplejson
 import sys
 import random
 import geom
+import avbin
 
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 
@@ -40,6 +41,9 @@ def main():
     # fix pyglet resource path
     pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
     pyglet.resource.reindex()
+
+    #Load avbin
+    avbin.init_avbin()
 
     # initialize cocos director
 #    director.init(WIDTH, HEIGHT, fullscreen=True)
