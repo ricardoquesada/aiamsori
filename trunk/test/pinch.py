@@ -11,47 +11,38 @@ kitten = image.load('kitten.jpg')
 
 pinch_f = '''
 uniform sampler2D tex;
-uniform vec2 size;
 uniform vec2 mouse;
-uniform float strength;
 
 void main() {
-    vec2 h = vec2(1.0/size.x, 0.0);
     vec2 pos = gl_TexCoord[0].st;
     vec3 col = texture2D(tex, pos).rgb;
 
-    vec2 v = pos - mouse;
+    vec2 v = mouse - gl_FragCoord.xy;
     float d = length(v);
-    float a = clamp(0.1/d, 0., 1.);
+    float a = clamp(52.0/d, 0., 1.);
 
     gl_FragColor = vec4(col, a);
 }
 '''
 
+pinchf = shader.ShaderProgram()
+pinchf.setShader(shader.FragmentShader('pinch_f', pinch_f))
+#pinchf.setShader(shader.VertexShader('pinch_v', pinch_v))
 
-pinch = shader.ShaderProgram()
-pinch.setShader(shader.FragmentShader('pinch_f', pinch_f))
-pinch.install()
-pinch.uset2F('size', float(kitten.width), float(kitten.height))
+pinchf.install()
+
 
 @w.event
 def on_mouse_motion(x, y, *args):
-    pinch.uset2F('mouse', float(x)/kitten.width, float(y)/kitten.height)
+    pinchf.uset2F('mouse', float(x), float(y))
+    #pinchf.uset2F('mouse', float(x)/kitten.width, float(y)/kitten.height)
     return True
 
-strength = 50.
-pinch.uset1F('strength', strength)
-@w.event
-def on_mouse_scroll(x, y, dx, dy):
-    global strength
-    strength = max(1, strength + dy)
-    pinch.uset1F('strength', float(strength))
-    return True
 
 glEnable(GL_BLEND)
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 while not w.has_exit:
     w.dispatch_events()
     glClear(GL_COLOR_BUFFER_BIT)
-    kitten.blit(0, 0)
+    kitten.blit(100, 0)
     w.flip()

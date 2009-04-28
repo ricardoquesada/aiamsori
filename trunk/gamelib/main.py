@@ -30,6 +30,7 @@ from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from walls import create_wall_layer
 import sound
+import light
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from boids import merge, seek, cap, avoid_group
 
@@ -48,7 +49,7 @@ def main():
     # initialize cocos director
 #    director.init(WIDTH, HEIGHT, fullscreen=True)
     #director.init(fullscreen=True)
-    director.init()
+    director.init(resizable=True)
     sound.init()
     # create game scene
     game_layer = GameLayer(MAPFILE)
@@ -108,6 +109,8 @@ def make_sprites_layer(layer_data, atlas):
     return layer
 
 class GameLayer(Layer):
+    is_event_handler = True
+
     def __init__(self, mapfile):
         super(GameLayer, self).__init__()
         self.map_node = LayersNode()
@@ -149,7 +152,24 @@ class GameLayer(Layer):
 
         # create agents (players)
         self._create_agents(zombie_spawn)
-        #self.map_node.add(LightLayer(self), z=+1001)
+        x, y = director.get_window_size()
+        self.light = light.Light(x/2, y/2)
+
+    def on_enter(self):
+        super(GameLayer, self).on_enter()
+        x, y = director.get_window_size()
+        self.light.set_position(x/2, y/2)
+        self.light.enable()
+
+    def on_exit(self):
+        super(GameLayer, self).on_exit()
+        self.light.disable()
+
+    def on_resize(self, w, h):
+        print "ON RESIZE!!!!!!!!!!"
+        x, y = director.get_window_size()
+        self.light.set_position(w/2, h/2)
+
 
 
     def _create_agents(self, zombie_spawn):
