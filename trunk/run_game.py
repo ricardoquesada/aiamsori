@@ -1,4 +1,8 @@
 #! /usr/bin/env python
 
-from gamelib import main
+import sys
+
+sys.path.insert(0, 'gamelib')
+
+import main
 main.main()
