@@ -3,7 +3,7 @@ from waypointing import *
 from cocos.euclid import Vector2 as V2
 from geom import dist_point_to_segment
 
-fe = 1.0e-4 #float error allowed
+fe = 1.0e-4 #float error allowed in assert
 
 def rotate(v,degs):
     return V2(v.x*math.cos(math.radians(degs))-v.y*math.sin(math.radians(degs)),
@@ -128,7 +128,7 @@ def segment_circle_intersection(p0,p1,center,r):
 
     u = (p0+p1)/2.0
     v = p1-p0
-    
+
     a = v.dot(v)
     b = 2.0*v.dot(u-center)
     c = (u-center).dot(u-center)-r*r

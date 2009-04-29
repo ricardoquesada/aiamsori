@@ -5,8 +5,9 @@ un poco de test heuristicos para debugear.
 considerando mejorar algunas cosas, hay partes bastante brute force
 """
 
-
-
+DCOLINEAR = 0.25 #? thats for testing in world 4x4 units, scale up if
+                    # using a world 1000x1000
+# w 0.1 12 nodos, 288 paths ; con 125 lo mismo
 
 ##FLOYD'S ALGORITHM (int **m, int size)
 ##{
@@ -21,6 +22,7 @@ import math
 from cocos.euclid import Vector2 as V2
 from geom import dist_point_to_segment
 bignum = 1.0e+40
+
 
 class WaypointNav:
     def __init__(self,points,fn_visibles):
@@ -40,7 +42,7 @@ class WaypointNav:
         Later crowding info can be available. 
         """
         self.fn_visibles = fn_visibles
-        self.points = [V2(tuple(p)) for p in points] 
+        self.points = [V2(x,y) for x,y in points] 
         self.min_dist = {}
         self.adj = [] # adj[i] -> list of nodes directly reacheables from i 
         self._init_min_dist()
@@ -81,29 +83,61 @@ class WaypointNav:
         """
         points = self.points
         n = len(points)
-        fn = self.fn_visible()
+        fn = self.fn_visibles
         m = self.min_dist
-        adj_j = []
+        colinear_drops = 0
         for j in xrange(n):
+            adj_j = []
+            print '\n*** j:',j
             for i in xrange(n):
-                if fn(i,j):
+                if i==j:
+                    m[i,j]=0
+                    continue
+                ix0, jx0 = i,j
+                if fn(points[i],points[j]):
+                    ix1, jx1 = i,j
+                    assert((points[ix0]==points[ix1]) and
+                           (points[jx0]==points[jx1]))
                     # points visible, but dont want to add a quasi colinear, so
                     # check no node diferent from i,j is at distance <epsilon from
                     # segment
                     cuasi_colinear = False
                     for k in xrange(len(points)):
                         if ( not (k in [i,j])
-                             and dist_point_to_segment(points[k],points[i],points[k])<20.0):
+                             and dist_point_to_segment(points[k],points[i],points[j])<DCOLINEAR):
                             cuasi_colinear = True
                     if not cuasi_colinear:
-                        m[i,j] = abs(points[i]-points[j])
+                        m[i,j] =  abs(points[i]-points[j])
                         adj_j.append(i)
                     else:
-                        m[i,j] = m[j,i] = bignum
+                        colinear_drops += 1
+                        m[i,j] = bignum
                 else:
-                    m[i,j] = m[j,i] = bignum
-            self.adj.append(adj_j)
+                    m[i,j] = bignum
+                ix2, jx2 = i,j
+                assert((points[ix0]==points[ix2]) and
+                       (points[jx0]==points[jx2]))
 
+            self.adj.append(adj_j)
+##            m[j,j] = 0.0 
+##        m[n,n] = 0.0
+        print 'colinear_drops:',colinear_drops
+        cnt_segments = 0
+        for li in self.adj:
+            cnt_segments += len(li)
+        print 'cnt_segments:',cnt_segments
+        for i in xrange(n):
+            print
+            for j in xrange(n):
+                z = m[i,j]
+                if z>=bignum:
+                    print '        ',
+                else:
+                    print '%8.2f'%(int(z*100.0)/float(100)),
+        print
+        print
+                
+        
     def _floyd(self):
         """
         knowing the distance between adjacents, the Floyd-Warshalls algo
