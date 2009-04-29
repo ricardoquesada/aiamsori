@@ -16,9 +16,12 @@ class KeyGameCtrl(Layer):
     def on_key_press(self, k, m):
         if k in [key.UP, key.W]:
             self.game_layer.player.acceleration= 1
+            self.game_layer.player.play_anim('walk')
+            
 
         if k in [key.DOWN, key.S]:
             self.game_layer.player.acceleration= -1
+            self.game_layer.player.play_anim('walk')
 
         if k in [key.RIGHT, key.D]:
             self.game_layer.player.rotation_speed = 1
@@ -39,6 +42,8 @@ class KeyGameCtrl(Layer):
         if k in [key.UP, key.DOWN, key.W, key.S]:
             self.game_layer.player.acceleration = 0
             self.game_layer.player.speed = 0
+            self.game_layer.player.play_anim('idle')
+
         if k in [key.LEFT, key.RIGHT, key.A, key.D]:
             self.game_layer.player.rotation_speed = 0
 
