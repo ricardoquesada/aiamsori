@@ -284,7 +284,6 @@ def test_dist_point_to_segment():
     assert( abs(dist_point_to_segment(p,x1,x2)-1.0)<fe)
     print 'test dist_point_to_segment ok'
     
-
 if __name__ == '__main__':
     test_deviation()
     test_segment_circle_intersection()
