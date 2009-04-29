@@ -25,7 +25,7 @@ from cocos.layer.base_layers import Layer
 from cocos.sprite import NotifierSprite, Sprite
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
-from tiless_editor.layers.collision import CollisionLayer
+from tiless_editor.layers.collision import CollisionLayer, Ray
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from walls import create_wall_layer
@@ -60,10 +60,8 @@ def main():
 
     main_scene = Scene()
     main_scene.add(game_layer)
-    if False:
-        main_scene.add(MouseGameCtrl(game_layer))
-    else:
-        main_scene.add(KeyGameCtrl(game_layer))
+    main_scene.add(KeyGameCtrl(game_layer))
+    main_scene.add(MouseGameCtrl(game_layer))
 
     director.run(main_scene)
 
@@ -118,7 +116,7 @@ class GameLayer(Layer):
         # get layers from map
         for_collision_layers = []
         walls_layers = []
-        zombie_spawm = None
+        zombie_spawn = None
 
         img = pyglet.image.load(  'data/atlas.png' )
         self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
@@ -179,7 +177,7 @@ class GameLayer(Layer):
         agent = UserAgent('data/img/tipito.png', (0,0), self)
         self.player = agent
         self.add(agent)
-        collision_layer.add(agent, shape_name='circle', static=False)
+        collision_layer.add(agent, shape_name='circle', static=False, layers=1)
 
         if zombie_spawn:
             x, y = director.get_window_size()
@@ -190,23 +188,76 @@ class GameLayer(Layer):
                 z.position = z.x, z.y
                 self.map_node.add(z)
                 collision_layer.add(z, shape_name='circle', static=False,
-                                    scale=.75)
+                                    scale=.75, layers=1)
+
+    def is_collide(self, origin, target):
+        collision_layer = self.map_node.get('collision')
+        radius = 0.5 * max(self.player.width, self.player.height) * self.player.scale
+        ray = Ray(radius, origin, target)
+        ray.layers = 6
+        #print 'created ray between points.. origin: %s, target: %s' % (origin, target)
+        #print 'ray.pos:  %s' % str(ray.position)
+        #print 'ray.radius:  %s' % ray.radius
+        #print 'ray.a:  %s' % str(ray.a)
+        #print 'ray.b:  %s' % str(ray.b)
+        #print 'ray.length:  %s' % ray.length
+        collision_layer.space.add(ray)
+        collision_layer.step()
+        collision_layer.space.remove(ray)
+        return ray.data['collided']
 
     def on_collision(self, shape_a, shape_b):
+        #        collision_layer = self.map_node.get('collision')
+        #        node = collision_layer._get_node(shape_a)
+        #        other = collision_layer._get_node(shape_b)
+        #        other.shape = shape_b
+        #        if isinstance(node, (Agent, Zombie)):
+        #            # reset agent position and set speed to zero
+        #            node._on_collision(other)
+        #
+        #        node = collision_layer._get_node(shape_b)
+        #        other = collision_layer._get_node(shape_a)
+        #        other.shape = shape_a
+        #        if isinstance(node, (Agent, Zombie)):
+        #            # reset agent position and set speed to zero
+        #            node._on_collision(other)
         collision_layer = self.map_node.get('collision')
-        node = collision_layer._get_node(shape_a)
-        other = collision_layer._get_node(shape_b)
-        other.shape = shape_b
-        if isinstance(node, (Agent, Zombie)):
-            # reset agent position and set speed to zero
-            node._on_collision(other)
+        non_visual_shapes = (Ray,)
+        agent_shapes = (Agent, Zombie)
+        if isinstance(shape_a, non_visual_shapes):
+            try:
+                node = collision_layer._get_node(shape_b)
+                if isinstance(node, agent_shapes):
+                    node._on_collision()
+            except AttributeError:
+                # trying to collide two non-visual shapes... this should not happen
+                print 'Colliding two non-visual shapes... this should not be happening.'
+                print '-- shape_a: %s, shape_b: %s' % (shape_a, shape_b)
+                pass
+        elif isinstance(shape_b, non_visual_shapes):
+            try:
+                node = collision_layer._get_node(shape_a)
+                if isinstance(node, agent_shapes):
+                    node._on_collision()
+            except AttributeError:
+                # trying to collide two non-visual shapes... this should not happen
+                print 'Colliding two non-visual shapes... this should not be happening.'
+                print '-- shape_a: %s, shape_b: %s' % (shape_a, shape_b)
+                pass
+        else:
+            node = collision_layer._get_node(shape_a)
+            other = collision_layer._get_node(shape_b)
+            other.shape = shape_b
+            if isinstance(node, agent_shapes):
+                # reset agent position and set speed to zero
+                node._on_collision(other)
 
-        node = collision_layer._get_node(shape_b)
-        other = collision_layer._get_node(shape_a)
-        other.shape = shape_a
-        if isinstance(node, (Agent, Zombie)):
-            # reset agent position and set speed to zero
-            node._on_collision(other)
+            node = collision_layer._get_node(shape_b)
+            other = collision_layer._get_node(shape_a)
+            other.shape = shape_a
+            if isinstance(node, agent_shapes):
+                # reset agent position and set speed to zero
+                node._on_collision(other)
 
 
     def _create_collision_layer(self, layers):
@@ -218,7 +269,7 @@ class GameLayer(Layer):
                        'rotation': child.rotation, 'scale': child.scale,
                        'opacity': child.opacity, 'rect': child.rect}
                 collision_child = self._create_child(img)
-                collision_layer.add(collision_child, shape_name='square', static=True)
+                collision_layer.add(collision_child, shape_name='square', static=True, layers=5)
         return collision_layer
 
     def _create_child(self, img):

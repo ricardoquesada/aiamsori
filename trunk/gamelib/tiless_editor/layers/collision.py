@@ -31,6 +31,7 @@ class Shape(object):
         self._scale = scale
         self._rotation = rotation
         self.body = body
+        self.data = {'collided': False}
 
     @apply
     def position():
@@ -99,11 +100,11 @@ class Circle(Shape):
 
 
 class Segment(Shape):
-    def __init__(self, radius, length, position=(0, 0), scale=1.0, rotation=0):
-        super(Segment, self).__init__(position, scale, rotation)
+    def __init__(self, radius, origin=(0, 0), target=(0, 0), scale=1.0, rotation=0):
+        super(Segment, self).__init__(origin, scale, rotation)
         self.radius = radius
-        self.length = length
-        self._rebuild_endpoints()
+        self.length = (Vec2d(target) - Vec2d(origin)).length
+        self._rebuild_endpoints(origin, target, scale, rotation)
 
 #    def _position_updated(self, offset):
 #        self._rebuild_endpoints()
@@ -113,13 +114,9 @@ class Segment(Shape):
         self.length *= factor
         self._rebuild_endpoints()
 
-    def _rebuild_endpoints(self):
-        #position = Vec2d(self.position)
-        length = Vec2d(self.length, 0)
-        #self.a = position - 0.5 * length
-        #self.b = position + 0.5 * length
-        self.a = - 0.5 * length
-        self.b = + 0.5 * length
+    def _rebuild_endpoints(self, origin=(0, 0), target=(0, 0), scale=1.0, rotation=0):
+        self.a = origin
+        self.b = target
 
     def draw(self):
         import shape
@@ -200,6 +197,9 @@ class Square(Polygon):
                                  rotation=rotation,
                                  anchor_x='center', anchor_y='center')
         _shape.draw()
+
+
+class Ray(Segment): pass
 
 
 class CollisionSpace(object):
@@ -316,6 +316,37 @@ class CollisionSpace(object):
         if self.callback is not None:
             shapeA = self._get_shape(pm_shapeA)
             shapeB = self._get_shape(pm_shapeB)
+            #print 'shapeA: %s and shapeB: %s collided' % (shapeA, shapeB)
+            #print 'shapeA.pos: %s' % str(shapeA.position)
+            #try:
+            #    print 'shapeA.radius: %s' % shapeA.radius
+            #except:
+            #    pass
+            #try:
+            #    print 'shapeA.width: %s' % shapeA.width
+            #    print 'shapeA.height: %s' % shapeA.height
+            #except:
+            #    pass
+            #try:
+            #    print 'shapeA.length: %s' % shapeA.length
+            #except:
+            #    pass
+            #print 'shapeB.pos: %s' % str(shapeB.position)
+            #try:
+            #    print 'shapeB.radius: %s' % shapeB.radius
+            #except:
+            #    pass
+            #try:
+            #    print 'shapeB.width: %s' % shapeB.width
+            #    print 'shapeB.height: %s' % shapeB.height
+            #except:
+            #    pass
+            #try:
+            #    print 'shapeB.length: %s' % shapeB.length
+            #except:
+            #    pass
+            shapeA.data['collided'] = True
+            shapeB.data['collided'] = True
             self.callback(shapeA, shapeB)
         return True
 
@@ -390,11 +421,11 @@ class CollisionLayer(PickerBatchNode):
             callback = self._on_collision
         self.space = CollisionSpace(callback=callback)
 
-    def add(self, child, z=0, name=None, static=True, shape_name='', scale=1):
+    def add(self, child, z=0, name=None, static=True, shape_name='', scale=1, layers=0):
         super(CollisionLayer, self).add(child, z, name)
 
         # create a shape
-        shape = self._create_shape(child, shape_name, scale=scale)
+        shape = self._create_shape(child, shape_name, scale=scale, layers=layers)
         self._shapes[child] = shape
         self.space.add(shape, static)
 
@@ -420,7 +451,7 @@ class CollisionLayer(PickerBatchNode):
     def step(self, dt=0):
         self.space.step(dt)
 
-    def _create_shape(self, child, shape_name='', scale=1):
+    def _create_shape(self, child, shape_name='', scale=1, layers=0):
         def get_shape_name(child):
             image_name = os.path.basename(child.path)
             shape_name = image_name.split('.')[0]
@@ -444,6 +475,7 @@ class CollisionLayer(PickerBatchNode):
         else:
             raise ValueError("Child has invalid shape", _shape)
 
+        shape.layers = layers
         return shape
 
     #################
