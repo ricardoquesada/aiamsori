@@ -46,6 +46,14 @@ def main():
     #Load avbin
     avbin.init_avbin()
 
+    try:
+        import cocos.gl_framebuffer_object as FG
+        FG.FramebufferObject().check_status()
+    except Exception:
+        print 'ERROR: You should install your video card drivers.'
+        print 'If you already have, your video card doesn\'t support this game\'s effects.'
+        return
+
     # initialize cocos director
 #    director.init(WIDTH, HEIGHT, fullscreen=True)
     #director.init(fullscreen=True)
