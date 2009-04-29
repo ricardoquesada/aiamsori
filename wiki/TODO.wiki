@@ -1,39 +1,39 @@
 Basico:
-- arreglar tiles que no se ven los techos
-- terminar imagenes
-- poner skin nuevo
-- waypointing
-- agregar familiares
-- hacer que los zombies y la gente se mueva con un pathfinding decente
-- ponerle energia
-- que cuando te toquen los zombies te saquen energia
-- que cuando alguien o un zombie se queda sin energia se muere 
-- que cuando se queda sin energia el UserAgente de game over
-- que se pueda disparar
-- que los familiares puedan pegar con lo que tienen en la mano
-- que los disparos le saquen energia a los agentes
-- que se te acaben las balas
-- crear loader de zonas de spawn
-- cada tanto spawnear balas en una zona de spawn
-- que puedas levantar las balas y que se te recarguen las municiones
-- que puedas dar ordenes a tus familiares
+  * arreglar tiles que no se ven los techos
+  * terminar imagenes
+  * poner skin nuevo
+  * waypointing
+  * agregar familiares
+  * hacer que los zombies y la gente se mueva con un pathfinding decente
+  * ponerle energia
+  * que cuando te toquen los zombies te saquen energia
+  * que cuando alguien o un zombie se queda sin energia se muere 
+  * que cuando se queda sin energia el UserAgente de game over
+  * que se pueda disparar
+  * que los familiares puedan pegar con lo que tienen en la mano
+  * que los disparos le saquen energia a los agentes
+  * que se te acaben las balas
+  * crear loader de zonas de spawn
+  * cada tanto spawnear balas en una zona de spawn
+  * que puedas levantar las balas y que se te recarguen las municiones
+  * que puedas dar ordenes a tus familiares
 
 AI:
-- que tus familiares ataquen decentemente
-- que los zombies vayan a lugares que hacen sentido
+  * que tus familiares ataquen decentemente
+  * que los zombies vayan a lugares que hacen sentido
 
 GAMEPLAY:
-- definir mapa de la casa segun jugabilidad
-- definir algoritmo de oleada de zombies
-- definir danio de armas
+  * definir mapa de la casa segun jugabilidad
+  * definir algoritmo de oleada de zombies
+  * definir danio de armas
 
 PANTALLAS
-menu ppal
-perdiste
+  * menu ppal
+  * perdiste
 
 POLISH:
-luces
-caritas + mensajes
-musica
-sfx
-cut-scenes
+  * luces
+  * caritas + mensajes
+  * musica
+  * sfx 
+  * cut-scenes
