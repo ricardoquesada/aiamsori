@@ -15,6 +15,8 @@ import geom
 import avbin
 
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
+from glob import glob
+from pyglet.image import Animation, AnimationFrame, load
 
 import cocos
 from cocos.actions import Delay, CallFunc
@@ -181,7 +183,9 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        agent = UserAgent('data/img/tipito.png', (0,0), self)
+##        agent = UserAgent('data/img/tipito.png', (0,0), self)
+        
+        agent = UserAgent(get_animation('tipito_idle'), (0,0), self)        
         self.player = agent
         self.add(agent)
         collision_layer.add(agent, shape_name='circle', static=False, layers=1)
@@ -189,7 +193,7 @@ class GameLayer(Layer):
         if zombie_spawn:
             x, y = director.get_window_size()
             for c in zombie_spawn.get_children():
-                z = Zombie('data/img/zombie.png', self.player)
+                z = Zombie(get_animation('zombie_idle'), self.player)
                 z.x = c.x
                 z.y = c.y
                 z.position = z.x, z.y
@@ -294,10 +298,21 @@ class GameLayer(Layer):
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
 
+
+def get_animation(anim_name):
+    return Animation([AnimationFrame(load(img_file), 0.3)
+                      for img_file in  glob('data/img/%s*.png' % anim_name)])
+
+
 class Agent(NotifierSprite):
+    def __init__(self, img, position=(0,0)):
+        super(Agent, self).__init__(img, position)
+        self.anims = {}
+        self.current_anim = 'idle'
+    
     def update_position(self, position):
         # test for collisions
-        old_position = self.position
+        self.old_position = self.position
         self.updating = True
         collision_layer = self.parent
 
@@ -310,15 +325,15 @@ class Agent(NotifierSprite):
             if f is not None:
                 f(self)
 
-            self.position = position[0], old_position[1]
+            self.position = position[0], self.old_position[1]
             self.collision = None
             collision_layer.step()
             if self.collision:
-                self.position = old_position[0], position[1]
+                self.position = self.old_position[0], position[1]
                 self.collision = None
                 collision_layer.step()
                 if self.collision:
-                    self.position = old_position
+                    self.position = self.old_position
 
     def _on_collision(self, other):
         # used internally for collision testing
@@ -330,6 +345,12 @@ class Agent(NotifierSprite):
         # called when we want to report a collision
         pass
 
+    def play_anim(self, anim_name):        
+        self.image = self.anims[anim_name]
+        self.image_anchor = (self.image.frames[0].image.width / 2,
+                             self.image.frames[0].image.height / 2)
+        self.current_anim = anim_name
+        
 
 class UserAgent(Agent):
     def __init__(self, img, position, game_layer):
@@ -343,6 +364,10 @@ class UserAgent(Agent):
         self.updating = False
         self.rotation_speed = 0
         self.collision = False
+        self.anims = {'idle': get_animation('tipito_idle'),
+                      'walk': get_animation('tipito_walk'),
+                      }
+        self.current_anim = 'idle'
 
     def on_collision(self, other):
         if isinstance(self.collision, Agent):
@@ -374,6 +399,7 @@ class UserAgent(Agent):
         pl_x, pl_y = self.position[0], self.position[1]
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
+    
 
 class Zombie(Agent):
     def __init__(self, img, player):
@@ -383,6 +409,10 @@ class Zombie(Agent):
         self.schedule(self.update)
         self.player = player
         self.updating = False
+        self.anims = {'idle': get_animation('zombie_idle'),
+                      'walk': get_animation('zombie_walk'),
+                      }
+        self.current_anim = 'idle'
 
     def update(self, dt):
         # save old position
@@ -420,6 +450,12 @@ class Zombie(Agent):
 
         self.update_position((nx, ny))
 
+        if self.position != self.old_position:
+            self.play_anim('walk')
+
+        else:
+            if self.current_anim != 'idle':
+                self.play_anim('idle')
 
 
 if __name__ == '__main__':
