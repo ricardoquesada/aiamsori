@@ -9,19 +9,18 @@ sound_resources =  {
 
 class Sounds(object):
     """
-        Para agregar un sonido:
-            self.sounds = {'nombre_de_la_accion':
-                pyglet.resource.media('sounds/file_name.ext', streaming=False)}
+        Para agregar un sonido agregar:
+        'nombre_de_la_accion': 'sounds/file_name.ext',
+        a sound_resorces
 
         Para reproducir un sonido:
-            from sound import Sounds
-            a = Sounds()
-            a.sound('nombre_de_la_accion')
+            import sound
+            play('nombre_de_la_accion')
     """
 
     def __init__(self):
         try:
-            import pyglet.media.avbin
+            import pyglet.media.avbin as PMA
             self.have_avbin = True
             self.music = True
             self.sfx = True
@@ -33,7 +32,8 @@ class Sounds(object):
 
         self.playing = False
 
-        self.sounds = dict([(k,  pyglet.resource.media(v, streaming=False)) for k, v in sound_resources.items() ])
+        if self.have_avbin:
+            self.sounds = dict([(k,  pyglet.resource.media(v, streaming=False)) for k, v in sound_resources.items() ])
 
 
     def play(self, s):
