@@ -53,6 +53,8 @@ class TextureAtlas(object):
         self.regions = []
 
         self.atlas_image_name = 'atlas.png'
+        if basename:
+            basename += "-"
         self.basename = basename
 
         voids = []
@@ -103,12 +105,12 @@ class TextureAtlas(object):
 
 
         self.texture = atlas.texture
-        atlas.texture.save( self.basename + "-" + self.atlas_image_name )
+        atlas.texture.save( self.basename +  self.atlas_image_name )
 
 
     def fix_image(self):
 
-        im = Image.open( self.basename + "-" +self.atlas_image_name )
+        im = Image.open( self.basename  +self.atlas_image_name )
         size = im.size
         for region in self.regions:
             rect = [ region.x, (size[1] - region.y) - region.height, region.width, region.height ]
@@ -139,21 +141,34 @@ class TextureAtlas(object):
                     pixel = im.getpixel( (x,y) )
                     im.putpixel( (x+1,y), pixel )
 
-        im.save(self.basename + "-" +"atlas-fixed.png", "PNG")
+        im.save(self.basename + "atlas-fixed.png", "PNG")
         self.output_coords()
 
     def output_coords( self ):
-        im = Image.open( self.basename + "-" +self.atlas_image_name )
-        fp = open(self.basename + "-" +'atlas-coords.json','w')
+        im = Image.open( self.basename + self.atlas_image_name )
+        fp = open(self.basename + 'atlas-coords.json','w')
         size = im.size
         coords = []
-        for region in self.regions:
-            rect = [ region.x, (size[1] - region.y) - region.height, region.width, region.height ]
-            coords.append( rect )
         d = {}
-        d['coords'] = coords
+        for sprite in self.sprites:
+            print "out RECT", sprite.rect
+            d[sprite.path] = sprite.rect
+
         simplejson.dump(d,fp)
         fp.close()
+
+class SavedAtlas(object):
+    def __init__(self, atlas_img, coords_file):
+        img = pyglet.image.load(  atlas_img )
+        self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
+        self.atlas.texture = img.texture
+        self.map = simplejson.load(open(coords_file))
+
+    def __getitem__(self, key):
+        rect = self.map[key]
+        print "RECT", rect
+        region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], self.atlas.texture )
+        return Sprite(region)
 
 if __name__ == "__main__":
     director.init()

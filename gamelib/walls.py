@@ -16,6 +16,7 @@ from cocos.sprite import NotifierSprite, Sprite
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
+from tiless_editor.atlas import SavedAtlas
 
 from pyglet.image.atlas import Allocator
 
@@ -32,10 +33,12 @@ class WallLayer(cocos.cocosnode.CocosNode):
         self.top_batch = pyglet.graphics.Batch()
         self.wall_batch = pyglet.graphics.Batch()
         self.top_to_wall = {}
+        self.walls_atlas = SavedAtlas('data/walls-atlas-fixed.png', 'data/walls-atlas-coords.json')
 
     def add(self, source_sprite):
         sprite = source_sprite
         wall_sprite = self.get_wall(source_sprite)
+        print wall_sprite.image.tex_coords
         wd = sprite.image.width/2
         hd = sprite.image.height/2
         wh = 50
@@ -84,10 +87,12 @@ class WallLayer(cocos.cocosnode.CocosNode):
     def draw(self):
         pyglet.gl.glPushMatrix()
         self.transform()
-        texture = self.texture
+        texture = self.walls_atlas.atlas.texture
         pyglet.gl.glEnable(texture.target)
         pyglet.gl.glBindTexture(texture.target, texture.id)
         self.wall_batch.draw()
+        pyglet.gl.glDisable(texture.target)
+        texture = self.texture
         pyglet.gl.glEnable(texture.target)
         pyglet.gl.glBindTexture(texture.target, texture.id)
         self.top_batch.draw()
@@ -97,8 +102,7 @@ class WallLayer(cocos.cocosnode.CocosNode):
 
     def get_wall(self, child):
         path = conf_walls[child.path]
-        s = Sprite(path)
-        s.path = path
+        s = self.walls_atlas[path]
         return s
 
 def create_wall_layer(layers):
@@ -118,7 +122,6 @@ conf_walls =  {'tiles/pared.jpg':'tiles/pared.jpg',
             }
 if __name__ == "__main__":
     from tiless_editor.atlas import TextureAtlas
-    import os
-
+    director.init()
     atlas = TextureAtlas(conf_walls.values(), basename='walls')
     atlas.fix_image()
