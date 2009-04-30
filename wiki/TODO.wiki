@@ -3,14 +3,14 @@ Basico:
   * terminar imagenes
   * poner skin nuevo
   * waypointing
-  * agregar familiares
+  * agregar familiares -> NicoEchaniz (lwcyphr)
   * hacer que los zombies y la gente se mueva con un pathfinding decente
   * ponerle energia
-  * que cuando te toquen los zombies te saquen energia
-  * que cuando alguien o un zombie se queda sin energia se muere 
+  * que cuando te toquen los zombies te saquen energia (lwcyphr)
+  * que cuando alguien o un zombie se queda sin energia se muere (lwcyphr)
   * que cuando se queda sin energia el UserAgente de game over
   * que se pueda disparar
-  * que los familiares puedan pegar con lo que tienen en la mano
+  * que los familiares puedan pegar con lo que tienen en la mano (lwcyphr)
   * que los disparos le saquen energia a los agentes
   * que se te acaben las balas
   * crear loader de zonas de spawn
