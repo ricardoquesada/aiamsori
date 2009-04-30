@@ -25,6 +25,8 @@ from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
+from tiless_editor.atlas import SavedAtlas
+
 from shapes import Bullet, Ray
 from shapes import Wall, COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
@@ -94,9 +96,11 @@ class LightLayer(cocos.cocosnode.CocosNode):
         #pyglet.gl.glBlendEquation(pyglet.gl.GL_FUNC_ADD)
 
 def make_sprites_layer(layer_data, atlas):
+    saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
+
     def build_sprite(img):
         rect = img['rect']
-        region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], atlas.texture )
+        region = saved_atlas[img['filename']]
         s = NotifierSprite(region,
                    img['position'], img['rotation'], img['scale'], img['opacity'])
         s.label = img['label'] if "label" in img else None

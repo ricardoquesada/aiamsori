@@ -382,7 +382,7 @@ class TilessEditor(Layer):
             layers.append(dict(data=data, z=z, layer_type=layer_type,
                                label=layer.label))
         result = dict(tilesdir=self.tilesdir, layers=layers)
-        return simplejson.dumps(result)
+        return simplejson.dumps(result, indent=4)
 
 
     def read_json(self):

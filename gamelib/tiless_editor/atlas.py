@@ -21,6 +21,7 @@ from cocos.sprite import Sprite
 
 # pyglet
 import pyglet
+from pyglet import gl
 from pyglet.image.atlas import Allocator
 
 # python
@@ -151,10 +152,9 @@ class TextureAtlas(object):
         coords = []
         d = {}
         for sprite in self.sprites:
-            print "out RECT", sprite.rect
             d[sprite.path] = sprite.rect
 
-        simplejson.dump(d,fp)
+        simplejson.dump(d,fp, indent=4)
         fp.close()
 
 class SavedAtlas(object):
@@ -162,13 +162,15 @@ class SavedAtlas(object):
         img = pyglet.image.load(  atlas_img )
         self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
         self.atlas.texture = img.texture
-        self.map = simplejson.load(open(coords_file))
+        gl.glTexParameteri( img.texture.target, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE )
+        gl.glTexParameteri( img.texture.target, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE )
+        self.map = dict([
+            (k, pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], self.atlas.texture ))
+            for k, rect in simplejson.load(open(coords_file)).items()])
 
     def __getitem__(self, key):
-        rect = self.map[key]
-        print "RECT", rect
-        region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], self.atlas.texture )
-        return Sprite(region)
+        region = self.map[key]
+        return region
 
 if __name__ == "__main__":
     director.init()

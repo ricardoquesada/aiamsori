@@ -38,7 +38,6 @@ class WallLayer(cocos.cocosnode.CocosNode):
     def add(self, source_sprite):
         sprite = source_sprite
         wall_sprite = self.get_wall(source_sprite)
-        print wall_sprite.image.tex_coords
         wd = sprite.image.width/2
         hd = sprite.image.height/2
         wh = 50
@@ -59,28 +58,28 @@ class WallLayer(cocos.cocosnode.CocosNode):
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', color*4),
-            ('t3f', wall_sprite.image.tex_coords)
+            ('t3f', wall_sprite.tex_coords)
         )
         #bottom wall
         l = (x-wd, y+hd, 0, x+wd, y+hd, 0, x+wd, y+hd, wh, x-wd, y+hd, wh)
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', color*4),
-            ('t3f', wall_sprite.image.tex_coords)
+            ('t3f', wall_sprite.tex_coords)
         )
         #left wall
         l = (x-wd, y+hd, 0, x-wd, y-hd, 0, x-wd, y-hd, wh, x-wd, y+hd, wh)
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', color*4),
-            ('t3f', wall_sprite.image.tex_coords)
+            ('t3f', wall_sprite.tex_coords)
         )
         #right wall
         l = (x+wd, y+hd, 0, x+wd, y-hd, 0, x+wd, y-hd, wh, x+wd, y+hd, wh)
         vertex_list = self.wall_batch.add(4, pyglet.gl.GL_QUADS, None,
             ('v3i', l),
             ('c3B', color*4),
-            ('t3f', wall_sprite.image.tex_coords)
+            ('t3f', wall_sprite.tex_coords)
         )
         self.texture = sprite.image.texture
 
