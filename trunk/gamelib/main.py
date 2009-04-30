@@ -208,19 +208,21 @@ class GameLayer(Layer):
         self.add(father)
         collision_layer.add(father, static=father.shape.static)
 
-        boy = Boy(get_animation('boy_idle'), (100,100), self.player)
-        self.add(boy)
-        collision_layer.add(boy, static=boy.shape.static)
+        # any actor except father must be added into the if, else they
+        # pester you when editing waypoints
+        if not options.wpt_on:
+            boy = Boy(get_animation('boy_idle'), (100,100), self.player)
+            self.add(boy)
+            collision_layer.add(boy, static=boy.shape.static)
 
-        girl = Girl(get_animation('girl_idle'), (0,120), self.player)
-        self.add(girl)
-        collision_layer.add(girl, static=girl.shape.static)
-        
-        mother = Mother(get_animation('mother_idle'), (-100,-100), self.player)
-        self.add(mother)
-        collision_layer.add(mother, static=mother.shape.static)
+            girl = Girl(get_animation('girl_idle'), (0,120), self.player)
+            self.add(girl)
+            collision_layer.add(girl, static=girl.shape.static)
+            
+            mother = Mother(get_animation('mother_idle'), (-100,-100), self.player)
+            self.add(mother)
+            collision_layer.add(mother, static=mother.shape.static)
 
-        if zombie_spawn and not options.wpt_on:
             x, y = director.get_window_size()
             for c in zombie_spawn.get_children():
                 z = Zombie(get_animation('zombie1_idle'), self.player)
