@@ -1,5 +1,4 @@
 Basico:
-  * arreglar tiles que no se ven los techos
   * terminar imagenes
   * poner skin nuevo
   * waypointing -> claudio. crea el grafo, encuentra el min path (en testbed).siguiendo
