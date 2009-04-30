@@ -218,7 +218,8 @@ class GameLayer(Layer):
         return collision_layer
 
 
-    def _create_wall(self, img):
+    def _create_sprite(self, data, shape_cls=None):
+        img = data['img']
         sprite = NotifierSprite(str(img['filename']),
                                 img['position'], img['rotation'],
                                 img['scale'], img['opacity'])
@@ -226,8 +227,28 @@ class GameLayer(Layer):
         sprite.path = img['filename']
         sprite.rect = img['rect']
 
-        sprite.shape = Wall(sprite)
+        args = (sprite,) + data.get('args', ())
+        kwargs = dict(data.get('kwargs', {}))
+
+        if shape_cls is not None:
+            shape = shape_cls(*args, **kwargs)
+        else:
+            shape = None
+        sprite.shape = shape
         return sprite
+
+
+    def _create_wall(self, img):
+        data = {'img': img}
+        return self._create_sprite(data, Wall)
+
+    def _create_bullet(self, origin, target):
+        img = {'filename': 'img/bullet.png', 'position': origin,
+               'rotation': 0, 'scale': 1.0,
+               'opacity': 0, 'rect': [0, 0, 64, 64]}
+        args = (origin, target)
+        data = {'img': img, 'args': args}
+        return self._create_sprite(data, Bullet)
 
     def update(self, dt):
         x, y = director.get_window_size()
