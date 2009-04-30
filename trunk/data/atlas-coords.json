@@ -1,0 +1,62 @@
+{
+    "tiles/alambre.png": [
+        396, 
+        0, 
+        64, 
+        64
+    ], 
+    "tiles/checker.png": [
+        66, 
+        0, 
+        64, 
+        64
+    ], 
+    "tiles/piso_piedra1.jpg": [
+        330, 
+        0, 
+        64, 
+        64
+    ], 
+    "tiles/ventana.png": [
+        132, 
+        194, 
+        192, 
+        64
+    ], 
+    "tiles/piso_madera2.jpg": [
+        66, 
+        194, 
+        64, 
+        64
+    ], 
+    "tiles/pared.jpg": [
+        264, 
+        0, 
+        64, 
+        64
+    ], 
+    "tiles/pasto.jpg": [
+        0, 
+        194, 
+        64, 
+        64
+    ], 
+    "tiles/zombie-spawm.png": [
+        198, 
+        0, 
+        64, 
+        64
+    ], 
+    "tiles/piso_madera1.jpg": [
+        132, 
+        0, 
+        64, 
+        64
+    ], 
+    "tiles/ventana_rot.png": [
+        0, 
+        0, 
+        64, 
+        192
+    ]
+}
