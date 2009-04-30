@@ -116,6 +116,23 @@ class Father(Agent):
         pl_x, pl_y = self.position[0], self.position[1]
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
+    def fire(self):
+        origin = self.position
+        WEAPON_RANGE = 1000
+        from pymunk.vec2d import Vec2d
+        direction = Vec2d(WEAPON_RANGE, 0)
+        direction.rotate(self.rotation)
+        target = Vec2d(origin) + direction
+        print 'firing from ', origin , 'to', target
+
+        game_layer = self.game_layer
+        bullet = game_layer._create_bullet(origin, target)
+        game_layer.add(bullet)
+        collision_layer = game_layer.map_node.get('collision')
+        collision_layer.add(bullet, static=bullet.shape.static)
+        #collision_layer.step()
+
+
 
 class Relative(Agent):
     def __init__(self, img, position, player):
@@ -125,6 +142,7 @@ class Relative(Agent):
         self.schedule(self.update)
         self.player = player
         self.updating = False
+        self.collision = False
         self.current_anim = 'idle'
         self.target = self.position
 
@@ -179,6 +197,7 @@ class Zombie(Agent):
         self.schedule(self.update)
         self.player = player
         self.updating = False
+        self.collision = False
         self.anims = {'idle': get_animation('zombie_idle'),
                       'walk': get_animation('zombie_walk'),
                       }
@@ -228,3 +247,21 @@ class Zombie(Agent):
             if self.current_anim != 'idle':
                 self.play_anim('idle')
 
+    def on_collision(self, other):
+        #print 'Zombie on_collision', other
+        #if isinstance(self.collision, Bullet):
+        #    import pdb; pdb.set_trace()
+        #elif isinstance(other.shape, Bullet):
+        if isinstance(other.shape, Bullet):
+            print 'Zombie hit at position', self.position
+            self.die(other)
+
+    def die(self, bullet):
+        game_layer = self.player.game_layer
+        collision_layer = game_layer.map_node.get('collision')
+        # remove bullet
+        collision_layer.remove(bullet, static=bullet.shape.static)
+        game_layer.remove(bullet)
+        # remove zombie
+        collision_layer.remove(self, static=self.shape.static)
+        game_layer.map_node.remove(self)

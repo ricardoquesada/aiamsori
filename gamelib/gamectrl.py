@@ -36,6 +36,10 @@ class KeyGameCtrl(Layer):
             if collided:
                 print 'PIZZA'
 
+        ## fire weapon
+        if k == key.SPACE:
+            self.game_layer.player.fire()
+
 
     def on_key_release(self, k, m):
         if k in [key.UP, key.DOWN, key.W, key.S]:
@@ -45,6 +49,18 @@ class KeyGameCtrl(Layer):
 
         if k in [key.LEFT, key.RIGHT, key.A, key.D]:
             self.game_layer.player.rotation_speed = 0
+
+
+
+class MouseGameCtrl(Layer):
+    is_event_handler = True
+
+    def __init__(self, game_layer):
+        super(MouseGameCtrl, self).__init__()
+        self.game_layer = game_layer
+
+    def on_mouse_motion(self, px, py, dx, dy):
+        self.game_layer.player.look_at(px, py)
 
     def on_mouse_press(self, px, py, button, m):
         px = px - self.game_layer.x
@@ -62,18 +78,3 @@ class KeyGameCtrl(Layer):
                     mouse_over = (px-x)**2+(py-y)**2 < 100**2
                     if mouse_over:
                         self.game_layer.player.selected_relative = relative
-
-
-class MouseGameCtrl(Layer):
-    is_event_handler = True
-
-    def __init__(self, game_layer):
-        super(MouseGameCtrl, self).__init__()
-        self.game_layer = game_layer
-
-    def on_mouse_motion(self, px, py, dx, dy):
-        self.game_layer.player.look_at(px, py)
-
-    def on_mouse_press(self, x, y, button, m):
-        if button == 1:
-            self.game_layer.player.fire((x, y))

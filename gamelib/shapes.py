@@ -48,10 +48,10 @@ class Ray(Segment):
 
 
 class Bullet(Segment):
-    def __init__(self, origin, target):
+    def __init__(self, sprite, origin, target):
         super(Bullet, self).__init__(BULLET_RADIUS, origin=origin, target=target)
         self.sprite = sprite
         self.static = False
-        #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
+        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
         self.damage_energy = BULLET_DAMAGE_ENERGY
 
