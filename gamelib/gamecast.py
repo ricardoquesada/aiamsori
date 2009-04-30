@@ -78,6 +78,8 @@ class Father(Agent):
                       'walk': get_animation('father_walk'),
                       }
         self.current_anim = 'idle'
+        self.family = {}
+        self.selected_relative = None
 
     def on_collision(self, other):
         if isinstance(self.collision, Agent):
@@ -109,7 +111,60 @@ class Father(Agent):
         pl_x, pl_y = self.position[0], self.position[1]
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
-    
+
+class Relative(Agent):
+    def __init__(self, img, position, player):
+        super(Relative, self).__init__(img, position)
+        self._old_state = {}
+        self.speed = 100
+        self.schedule(self.update)
+        self.player = player
+        self.updating = False
+        self.current_anim = 'idle'
+        self.target = self.position
+
+    def update(self, dt):
+        # move to designated target or stay and fight
+
+        # save old position
+        self._old_state = {'position': self.position, 'rotation': self.rotation}
+
+        locals = []
+        goal = seek(self.x, self.y, self.target[0], self.target[1])
+
+        delta = geom.angle_rotation(radians(self.rotation), radians(goal))
+        delta = degrees(delta)
+        max_r = 270
+        delta = cap(delta, -max_r, max_r) * dt
+        self.rotation += delta
+
+        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
+        self.position = (self.x, self.y)
+        self.rotation = self.rotation % 360
+        # update position
+        a = -self.rotation
+        nx = (self.x + cos( radians(a) ) * self.speed * dt)
+        ny = (self.y + sin( radians(a) ) * self.speed * dt)
+
+        self.update_position((nx, ny))
+
+        if self.position != self.old_position:
+            self.play_anim('walk')
+
+        else:
+            if self.current_anim != 'idle':
+                self.play_anim('idle')
+
+
+class Boy(Relative):
+    def __init__(self, img, position, player):
+        super(Boy, self).__init__(img, position, player)
+        self.anims = {'idle': get_animation('boy_idle'),
+                      'walk': get_animation('boy_walk'),
+                      }
+        self.sounds = {}
+        player.family['boy'] = self
+
 
 class Zombie(Agent):
     def __init__(self, img, player):

@@ -47,6 +47,23 @@ class KeyGameCtrl(Layer):
         if k in [key.LEFT, key.RIGHT, key.A, key.D]:
             self.game_layer.player.rotation_speed = 0
 
+    def on_mouse_press(self, px, py, button, m):
+        px = px - self.game_layer.x
+        py = py - self.game_layer.y
+
+        ## select a relative or set target for the one already selected
+        if button == 4:
+            if self.game_layer.player.selected_relative:
+                self.game_layer.player.selected_relative.target = (px, py)
+                self.game_layer.player.selected_relative = None
+
+            else:
+                for relative in self.game_layer.player.family.values():
+                    x, y = relative.x, relative.y
+                    mouse_over = (px-x)**2+(py-y)**2 < 100**2
+                    if mouse_over:
+                        self.game_layer.player.selected_relative = relative
+
 
 class MouseGameCtrl(Layer):
     is_event_handler = True

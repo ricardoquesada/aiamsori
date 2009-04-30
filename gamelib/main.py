@@ -28,7 +28,7 @@ from tiless_editor.tilesslayer import TilessLayer
 from walls import create_wall_layer
 import sound
 import light
-from gamecast import Agent, Father, Zombie, get_animation
+from gamecast import Agent, Father, Zombie, Boy, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 
 WIDTH, HEIGHT = 1024, 768
@@ -57,7 +57,7 @@ def main():
     sound.init()
     # create game scene
     game_layer = GameLayer(MAPFILE)
-    game_layer.position = (400, 300)
+#    game_layer.position = (400, 300)
 
     director.set_3d_projection()
 #    director.set_2d_projection()
@@ -152,7 +152,7 @@ class GameLayer(Layer):
         # add scene map node to the main layer
         self.add(self.map_node)
 
-        # create agents (players)
+        # create agents (player and NPCs)
         self._create_agents(zombie_spawn)
         x, y = director.get_window_size()
         self.light = light.Light(x/2, y/2)
@@ -178,11 +178,16 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        agent = Father(get_animation('father_idle'), (0,0), self)        
-        self.player = agent
-        self.add(agent)
-        collision_layer.add(agent, shape_name='circle', static=False, layers=1)
+        father = Father(get_animation('father_idle'), (0,0), self)        
+        self.player = father
+        self.add(father)
+        collision_layer.add(father, shape_name='circle', static=False, layers=1)
 
+        boy = Boy(get_animation('boy_idle'), (100,100), self.player)
+        self.add(boy)
+        collision_layer.add(boy, shape_name='circle', static=False, layers=1)
+        
+        
         if zombie_spawn:
             x, y = director.get_window_size()
             for c in zombie_spawn.get_children():
