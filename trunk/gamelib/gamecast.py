@@ -88,7 +88,7 @@ class Father(Agent):
 
     def on_collision(self, other):
         if isinstance(self.collision, Agent):
-            sound.play("player_punch")
+            pass#sound.play("player_punch")
 
     def update(self, dt):
         # update speed
@@ -246,7 +246,6 @@ class Zombie(Agent):
         else:
             if self.current_anim != 'idle':
                 self.play_anim('idle')
-
     def on_collision(self, other):
         #print 'Zombie on_collision', other
         #if isinstance(self.collision, Bullet):

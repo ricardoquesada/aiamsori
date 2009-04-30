@@ -117,6 +117,17 @@ class TilessEditor(Layer):
 
         self.look_at(0,0)
 
+    def setup(self):
+        self.read_json()
+        if not self.layers.children:
+            layer = self.layer_types["sprite"].get_new_layer()
+            layer_num = 0
+            self.layers.add_layer(
+                "sprite layer (%s)" % (layer_num),
+                layer_num, layer)
+            self.set_current_layer(0)
+
+
     def register_layer_factory(self, name, factory):
         self.layer_types[name] = factory
 
@@ -435,5 +446,6 @@ if __name__ == '__main__':
     editor.register_plugin(camera.CameraPlugin)
     editor.register_plugin(stamp.StampPlugin)
 
+    editor.setup()
 
     director.run(editor_scene)

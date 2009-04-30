@@ -28,6 +28,7 @@ class ImgSelector(Layer):
         self.atlas = atlas #atlas.TextureAtlas(tilesdir)
         # self.atlas.fix_image()
 
+
         gl.glTexParameteri( self.atlas.texture.target,
                             gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE )
         gl.glTexParameteri( self.atlas.texture.target,
@@ -142,7 +143,7 @@ class StampMode(Mode, MouseEventHandler):
             return True
         if k in [key.SPACE, key.F3]:
             director.return_value = None
-            director.push(Scene(ImgSelector(self.ed.tilesdir)))
+            director.push(Scene(ImgSelector(self.atlas)))
         if k == key.PAGEUP or k == key.PAGEDOWN:
             if k == key.PAGEUP:
                 direction = 1
