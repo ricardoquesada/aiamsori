@@ -189,6 +189,27 @@ class Boy(Relative):
         player.family['boy'] = self
 
 
+class Girl(Relative):
+    def __init__(self, img, position, player):
+        super(Girl, self).__init__(img, position, player)
+        self.anims = {'idle': get_animation('girl_idle'),
+                      'walk': get_animation('girl_walk'),
+                      }
+        self.sounds = {}
+        player.family['girl'] = self
+
+
+class Mother(Relative):
+    def __init__(self, img, position, player):
+        super(Mother, self).__init__(img, position, player)
+        self.anims = {'idle': get_animation('mother_idle'),
+                      'walk': get_animation('mother_walk'),
+                      }
+        self.sounds = {}
+        player.family['mother'] = self
+
+
+
 class Zombie(Agent):
     def __init__(self, img, player):
         super(Zombie, self).__init__(img)
@@ -198,8 +219,8 @@ class Zombie(Agent):
         self.player = player
         self.updating = False
         self.collision = False
-        self.anims = {'idle': get_animation('zombie_idle'),
-                      'walk': get_animation('zombie_walk'),
+        self.anims = {'idle': get_animation('zombie1_idle'),
+                      'walk': get_animation('zombie1_walk'),
                       }
         self.current_anim = 'idle'
         self.shape = ZombieShape(self)
