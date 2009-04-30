@@ -11,6 +11,7 @@ import pyglet
 import simplejson
 import sys
 import random
+import optparse
 import avbin
 
 import cocos
@@ -39,8 +40,19 @@ WIDTH, HEIGHT = 1024, 768
 MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
+options = None
 
 def main():
+    # make available options
+    parser = optparse.OptionParser()
+    parser = optparse.OptionParser()
+    parser.add_option("-w", "--wpting",
+                      action="store_true", dest="wpt_on", default=False,
+                      help="waypointing mode on")
+    # need no enemies while waypointing, and another on_key 
+    global options
+    (options, args) = parser.parse_args()
+    
     # fix pyglet resource path
     pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
     pyglet.resource.reindex()
@@ -69,6 +81,10 @@ def main():
 
     main_scene = Scene()
     main_scene.add(game_layer)
+    if options.wpt_on:
+        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
+    else:
+        from gamectrl import MouseGameCtrl, KeyGameCtrl
     main_scene.add(KeyGameCtrl(game_layer))
     main_scene.add(MouseGameCtrl(game_layer))
 
@@ -162,6 +178,12 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         #self.light = light.Light(x/2, y/2)
 
+        # if waypoint editing mode, create waypoints
+        if options.wpt_on:
+            from wptlayer import WptLayer
+            self.wptlayer = WptLayer(mapfile)
+            self.map_node.add_layer('wptedit',1,self.wptlayer) # ?
+
     def on_enter(self):
         super(GameLayer, self).on_enter()
         x, y = director.get_window_size()
@@ -198,7 +220,7 @@ class GameLayer(Layer):
         self.add(mother)
         collision_layer.add(mother, static=mother.shape.static)
 
-        if zombie_spawn:
+        if zombie_spawn and not options.wpt_on:
             x, y = director.get_window_size()
             for c in zombie_spawn.get_children():
                 z = Zombie(get_animation('zombie1_idle'), self.player)
