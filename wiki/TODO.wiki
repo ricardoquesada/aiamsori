@@ -2,7 +2,7 @@ Basico:
   * arreglar tiles que no se ven los techos
   * terminar imagenes
   * poner skin nuevo
-  * waypointing
+  * waypointing -> claudio. crea el grafo, encuentra el min path (en testbed).siguiendo
   * agregar familiares -> NicoEchaniz (lwcyphr)
   * hacer que los zombies y la gente se mueva con un pathfinding decente
   * ponerle energia
