@@ -45,7 +45,7 @@ class _Void(object):
     pass
 
 class TextureAtlas(object):
-    def __init__(self, texture_dir):
+    def __init__(self, textures, basename=""):
         x=256
         y=256
 
@@ -53,14 +53,20 @@ class TextureAtlas(object):
         self.regions = []
 
         self.atlas_image_name = 'atlas.png'
+        self.basename = basename
 
         voids = []
+        if isinstance(textures, str):
+            out = []
+            for filename in os.listdir(textures):
+                if os.path.splitext(filename)[1] in ['.jpg', '.jpeg', '.png']:
+                    path = os.path.join(textures, filename)
+                    # FIXME: Hack for paths working on windows:
+                    path = path.replace("\\", "/")
+                    out.append(path)
+            textures = out
+        for path in textures:
 
-        for filename in os.listdir(texture_dir):
-            if os.path.splitext(filename)[1] in ['.jpg', '.jpeg', '.png']:
-                path = os.path.join(texture_dir, filename)
-                # FIXME: Hack for paths working on windows:
-                path = path.replace("\\", "/")
 
                 img = pyglet.image.load(path)
                 void = _Void()
@@ -97,12 +103,12 @@ class TextureAtlas(object):
 
 
         self.texture = atlas.texture
-        atlas.texture.save( self.atlas_image_name )
+        atlas.texture.save( self.basename + "-" + self.atlas_image_name )
 
 
     def fix_image(self):
 
-        im = Image.open( self.atlas_image_name )
+        im = Image.open( self.basename + "-" +self.atlas_image_name )
         size = im.size
         for region in self.regions:
             rect = [ region.x, (size[1] - region.y) - region.height, region.width, region.height ]
@@ -133,12 +139,12 @@ class TextureAtlas(object):
                     pixel = im.getpixel( (x,y) )
                     im.putpixel( (x+1,y), pixel )
 
-        im.save("atlas-fixed.png", "PNG")
+        im.save(self.basename + "-" +"atlas-fixed.png", "PNG")
         self.output_coords()
 
     def output_coords( self ):
-        im = Image.open( self.atlas_image_name )
-        fp = open('atlas-coords.json','w')
+        im = Image.open( self.basename + "-" +self.atlas_image_name )
+        fp = open(self.basename + "-" +'atlas-coords.json','w')
         size = im.size
         coords = []
         for region in self.regions:

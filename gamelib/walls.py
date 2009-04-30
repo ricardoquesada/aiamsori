@@ -88,17 +88,15 @@ class WallLayer(cocos.cocosnode.CocosNode):
         pyglet.gl.glEnable(texture.target)
         pyglet.gl.glBindTexture(texture.target, texture.id)
         self.wall_batch.draw()
+        pyglet.gl.glEnable(texture.target)
+        pyglet.gl.glBindTexture(texture.target, texture.id)
         self.top_batch.draw()
         pyglet.gl.glDisable(texture.target)
 
         pyglet.gl.glPopMatrix()
 
     def get_wall(self, child):
-        path = {'tiles/pared.jpg':'tiles/pared.jpg',
-                'tiles/ventana_rot.png':'tiles/ventana_v.png',
-                'tiles/ventana.png':'tiles/ventana_v.png',
-                'tiles/alambre.png':'tiles/alambre_v.png',
-            }[child.path]
+        path = conf_walls[child.path]
         s = Sprite(path)
         s.path = path
         return s
@@ -110,3 +108,17 @@ def create_wall_layer(layers):
             dest.add(child)
 
     return dest
+
+# si cambian esto, tienen que ejecutar este archivo para que arregle el atlas y la lista de coordenadas
+conf_walls =  {'tiles/pared.jpg':'tiles/pared.jpg',
+                'tiles/ventana_rot.png':'tiles/ventana_v.png',
+                'tiles/ventana.png':'tiles/ventana_v.png',
+                'tiles/alambre.png':'tiles/alambre_v.png',
+                'tiles/alambre_v.png':'tiles/alambre_v.png',
+            }
+if __name__ == "__main__":
+    from tiless_editor.atlas import TextureAtlas
+    import os
+
+    atlas = TextureAtlas(conf_walls.values(), basename='walls')
+    atlas.fix_image()

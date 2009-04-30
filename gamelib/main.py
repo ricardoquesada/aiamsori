@@ -123,7 +123,7 @@ class GameLayer(Layer):
         walls_layers = []
         zombie_spawn = None
 
-        img = pyglet.image.load(  'data/atlas.png' )
+        img = pyglet.image.load(  'data/atlas-fixed.png' )
         self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
         self.atlas.texture = img.texture
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_S, pyglet.gl.GL_CLAMP_TO_EDGE )
@@ -156,28 +156,28 @@ class GameLayer(Layer):
         # create agents (player and NPCs)
         self._create_agents(zombie_spawn)
         x, y = director.get_window_size()
-        self.light = light.Light(x/2, y/2)
+        #self.light = light.Light(x/2, y/2)
 
     def on_enter(self):
         super(GameLayer, self).on_enter()
         x, y = director.get_window_size()
-        self.light.set_position(x/2, y/2)
-        self.light.enable()
+        #self.light.set_position(x/2, y/2)
+        #self.light.enable()
 
     def on_exit(self):
         super(GameLayer, self).on_exit()
-        self.light.disable()
+        #self.light.disable()
 
     def on_resize(self, w, h):
         x, y = director.get_window_size()
-        self.light.set_position(w/2, h/2)
+        #self.light.set_position(w/2, h/2)
 
     def _create_agents(self, zombie_spawn):
         # get collision layer
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        father = Father(get_animation('father_idle'), (0,0), self)        
+        father = Father(get_animation('father_idle'), (0,0), self)
         self.player = father
         self.add(father)
         collision_layer.add(father, static=father.shape.static)
@@ -185,8 +185,8 @@ class GameLayer(Layer):
         boy = Boy(get_animation('boy_idle'), (100,100), self.player)
         self.add(boy)
         collision_layer.add(boy, static=boy.shape.static)
-        
-        
+
+
         if zombie_spawn:
             x, y = director.get_window_size()
             for c in zombie_spawn.get_children():
