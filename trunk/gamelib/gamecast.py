@@ -10,7 +10,7 @@ import sound
 
 
 def get_animation(anim_name):
-    return Animation([AnimationFrame(load(img_file), 0.3)
+    return Animation([AnimationFrame(load(img_file), 0.2)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
 
 
@@ -74,8 +74,8 @@ class Father(Agent):
         self.updating = False
         self.rotation_speed = 0
         self.collision = False
-        self.anims = {'idle': get_animation('tipito_idle'),
-                      'walk': get_animation('tipito_walk'),
+        self.anims = {'idle': get_animation('father_idle'),
+                      'walk': get_animation('father_walk'),
                       }
         self.current_anim = 'idle'
 

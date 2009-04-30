@@ -178,7 +178,7 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        agent = Father(get_animation('tipito_idle'), (0,0), self)        
+        agent = Father(get_animation('father_idle'), (0,0), self)        
         self.player = agent
         self.add(agent)
         collision_layer.add(agent, shape_name='circle', static=False, layers=1)
