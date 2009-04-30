@@ -76,7 +76,7 @@ class TestBedLayer(cocos.layer.Layer):
         b.y = y*scale+offset
         b.scale = 1.0/8.0
         self.add(b)
-        self.add_named('P%s %s',[b])
+        self.add_named(name,[b])
         
     def remove_named(self,name):
         li = self.named_grps[name]
@@ -84,8 +84,8 @@ class TestBedLayer(cocos.layer.Layer):
             self.remove(e)
         del self.named_grps[name]
 
-    def add_named(self,name,iterable): # the iterable deliver sprites
-        self.named_grps[name] = iterable
+    def add_named(self,name,li): 
+        self.named_grps[name] = li
         
 def test_testbed_layer():
     class TestLayer(TestBedLayer):
@@ -240,19 +240,27 @@ def test_inpection_short_paths():
                 a = b
                 if a==self.dest_i:
                     break
-            new_colored = new_colored - self.colored_paths
-            toGrey = self.colored_paths - new_colored
-            for a,b in new_colored:
+
+            common = new_colored.intersection(self.colored_paths)
+            toPaint = new_colored.difference(common)
+            self.colored_paths.difference_update(common)
+            toGrey = self.colored_paths
+            self.colored_paths = new_colored
+            print 'common:',common
+            print 'toPaint:',toPaint
+            print 'toGrey:',toGrey
+
+            if toGrey:                
+                for a,b in toGrey:
+                    print 'into loop toGrey'
+                    self.remove_named('LC%s %s'%(a,b))
+                    sprites = self.add_line(points[a], points[b])
+                    self.add_named('L%s %s'%(a,b),sprites)
+
+            for a,b in toPaint:
                 self.remove_named('L%s %s'%(a,b))
                 sprites = self.add_line(points[a], points[b], color=(255,0,0))
                 self.add_named('LC%s %s'%(a,b),sprites)
-
-            for a,b in toGrey:
-                self.remove_named('LC%s %s'%(a,b))
-                sprites = self.add_line(points[a], points[b], color=(255,0,0))
-                self.add_named('L%s %s'%(a,b),sprites)
-
-            self.colored_paths = (self.colored_paths - toGrey).update(new_colored)
 
             #update endpoints
             if self.start_i!=self.old_start_i:
@@ -261,9 +269,9 @@ def test_inpection_short_paths():
                     self.add_named_node('P%d %d'%tuple(points[self.old_start_i]),
                                         points[self.old_start_i])
                 self.remove_named('P%d %d'%tuple(points[self.start_i]))
-                self.old_start_i = self.start_i
                 self.add_named_node('PS%d %d'%tuple(points[self.start_i]),
                                     points[self.start_i],color=(255,0,0))
+                self.old_start_i = self.start_i
                 
             if self.dest_i!=self.old_dest_i:
                 if self.old_dest_i>=0:
@@ -327,4 +335,6 @@ if __name__ == "__main__":
     #test_visibles()
     #test_graph_build()
     test_inpection_short_paths()
+
+
     #test_arcs_walkables()
