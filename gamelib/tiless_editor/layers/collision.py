@@ -199,8 +199,6 @@ class Square(Polygon):
         _shape.draw()
 
 
-class Ray(Segment): pass
-
 
 class CollisionSpace(object):
     """
@@ -316,35 +314,6 @@ class CollisionSpace(object):
         if self.callback is not None:
             shapeA = self._get_shape(pm_shapeA)
             shapeB = self._get_shape(pm_shapeB)
-            #print 'shapeA: %s and shapeB: %s collided' % (shapeA, shapeB)
-            #print 'shapeA.pos: %s' % str(shapeA.position)
-            #try:
-            #    print 'shapeA.radius: %s' % shapeA.radius
-            #except:
-            #    pass
-            #try:
-            #    print 'shapeA.width: %s' % shapeA.width
-            #    print 'shapeA.height: %s' % shapeA.height
-            #except:
-            #    pass
-            #try:
-            #    print 'shapeA.length: %s' % shapeA.length
-            #except:
-            #    pass
-            #print 'shapeB.pos: %s' % str(shapeB.position)
-            #try:
-            #    print 'shapeB.radius: %s' % shapeB.radius
-            #except:
-            #    pass
-            #try:
-            #    print 'shapeB.width: %s' % shapeB.width
-            #    print 'shapeB.height: %s' % shapeB.height
-            #except:
-            #    pass
-            #try:
-            #    print 'shapeB.length: %s' % shapeB.length
-            #except:
-            #    pass
             shapeA.data['collided'] = True
             shapeB.data['collided'] = True
             self.callback(shapeA, shapeB)
@@ -421,26 +390,25 @@ class CollisionLayer(PickerBatchNode):
             callback = self._on_collision
         self.space = CollisionSpace(callback=callback)
 
-    def add(self, child, z=0, name=None, static=True, shape_name='', scale=1, layers=0):
+    def add(self, child, z=0, name=None, static=True, scale=1):
         super(CollisionLayer, self).add(child, z, name)
 
         # create a shape
-        shape = self._create_shape(child, shape_name, scale=scale, layers=layers)
-        self._shapes[child] = shape
-        self.space.add(shape, static)
+        self._shapes[child] = child.shape
+        self.space.add(child.shape, static)
 
-    def remove(self, obj, static=True):
-        shape = self._shapes[obj]
+    def remove(self, child, static=True):
+        shape = self._shapes[child]
         self.space.remove(shape, static)
-        del self._shapes[obj]
-        super(CollisionLayer, self).remove(obj)
+        del self._shapes[child]
+        super(CollisionLayer, self).remove(child)
 
-    def on_notify(self, node, attribute):
-        shape = self._shapes[node]
-        value = getattr(node, attribute)
+    def on_notify(self, child, attribute):
+        shape = self._shapes[child]
+        value = getattr(child, attribute)
         setattr(shape, attribute, value)
         self.space.update(shape)
-        super(CollisionLayer, self).on_notify(node, attribute)
+        super(CollisionLayer, self).on_notify(child, attribute)
 
     def visit(self):
         super(CollisionLayer, self).visit()

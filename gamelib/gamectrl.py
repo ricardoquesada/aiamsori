@@ -17,7 +17,6 @@ class KeyGameCtrl(Layer):
         if k in [key.UP, key.W]:
             self.game_layer.player.acceleration= 1
             self.game_layer.player.play_anim('walk')
-            
 
         if k in [key.DOWN, key.S]:
             self.game_layer.player.acceleration= -1
@@ -74,3 +73,7 @@ class MouseGameCtrl(Layer):
 
     def on_mouse_motion(self, px, py, dx, dy):
         self.game_layer.player.look_at(px, py)
+
+    def on_mouse_press(self, x, y, button, m):
+        if button == 1:
+            self.game_layer.player.fire((x, y))

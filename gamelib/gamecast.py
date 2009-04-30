@@ -6,6 +6,8 @@ from pyglet.image import Animation, AnimationFrame, load
 from cocos.sprite import NotifierSprite
 
 from boids import merge, seek, cap, avoid_group
+from shapes import Bullet, Ray, AgentShape, ZombieShape
+from tiless_editor.layers.collision import Circle
 import sound
 
 
@@ -19,7 +21,9 @@ class Agent(NotifierSprite):
         super(Agent, self).__init__(img, position)
         self.anims = {}
         self.current_anim = 'idle'
-    
+
+        self.shape = AgentShape(self)
+
     def update_position(self, position):
         # test for collisions
         self.old_position = self.position
@@ -55,16 +59,17 @@ class Agent(NotifierSprite):
         # called when we want to report a collision
         pass
 
-    def play_anim(self, anim_name):        
+    def play_anim(self, anim_name):
         self.image = self.anims[anim_name]
         self.image_anchor = (self.image.frames[0].image.width / 2,
                              self.image.frames[0].image.height / 2)
         self.current_anim = anim_name
-        
+
 
 class Father(Agent):
     def __init__(self, img, position, game_layer):
         super(Father, self).__init__(img, position)
+
         self._old_state = {'position': position}
         self.speed = 0
         self.position = position
@@ -178,6 +183,7 @@ class Zombie(Agent):
                       'walk': get_animation('zombie_walk'),
                       }
         self.current_anim = 'idle'
+        self.shape = ZombieShape(self)
 
     def update(self, dt):
         # save old position
