@@ -275,26 +275,26 @@ def test_inpection_short_paths():
                                     points[self.dest_i],color=(0,0,255))
                 self.old_dest_i = self.dest_i
 
-    def on_key_release(self, k, m):
-        print '<< on key release'
-        want = -1
-        if k==key.W:
-            want = (self.start_i + 1)%len(self.wpnav.points)
-        elif k==key.S:
-            want = (self.start_i - 1)%len(self.wpnav.points)
-        if want>=0 and want!=self.dest_i:
-            self.start_i = want
-            self.update_best_path()
-            return True
-            
-        if k==key.UP:
-            want = (self.dest_i + 1)%len(self.wpnav.points)
-        elif k==key.DOWN:
-            want = (self.dest_i - 1)%len(self.wpnav.points)
-        if want>=0 and want!=self.start_i:
-            self.dest_i = want
-            self.update_best_path()
-            return True
+        def on_key_release(self, k, m):
+            print '<< on key release'
+            want = -1
+            if k==key.W:
+                want = (self.start_i + 1)%len(self.wpnav.points)
+            elif k==key.S:
+                want = (self.start_i - 1)%len(self.wpnav.points)
+            if want>=0 and want!=self.dest_i:
+                self.start_i = want
+                self.update_best_path()
+                return True
+                
+            if k==key.UP:
+                want = (self.dest_i + 1)%len(self.wpnav.points)
+            elif k==key.DOWN:
+                want = (self.dest_i - 1)%len(self.wpnav.points)
+            if want>=0 and want!=self.start_i:
+                self.dest_i = want
+                self.update_best_path()
+                return True
 
     # fix pyglet resource path
     pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
