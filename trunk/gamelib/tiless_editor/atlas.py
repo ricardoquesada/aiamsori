@@ -134,6 +134,7 @@ class TextureAtlas(object):
                     im.putpixel( (x+1,y), pixel )
 
         im.save("atlas-fixed.png", "PNG")
+        self.output_coords()
 
     def output_coords( self ):
         im = Image.open( self.atlas_image_name )
