@@ -9,7 +9,7 @@ Basico:
   * que cuando te toquen los zombies te saquen energia (lwcyphr)
   * que cuando alguien o un zombie se queda sin energia se muere (lwcyphr)
   * que cuando se queda sin energia el UserAgente de game over
-  * que se pueda disparar
+  * que se pueda disparar (ricardo)
   * que los familiares puedan pegar con lo que tienen en la mano (lwcyphr)
   * que los disparos le saquen energia a los agentes
   * que se te acaben las balas
@@ -21,6 +21,11 @@ Basico:
 AI:
   * que tus familiares ataquen decentemente
   * que los zombies vayan a lugares que hacen sentido
+
+COLLISION:
+  * correcta colisiones entre distintos shapes (ricardo)
+  * colisión de rayos para line-of-sight (ricardo)
+  * colisión de balas para disparar (ricardo)
 
 GAMEPLAY:
   * definir mapa de la casa segun jugabilidad
