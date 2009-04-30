@@ -32,7 +32,7 @@ from shapes import Wall, COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
 import sound
 import light
-from gamecast import Agent, Father, Zombie, Boy, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 
 WIDTH, HEIGHT = 1024, 768
@@ -190,11 +190,18 @@ class GameLayer(Layer):
         self.add(boy)
         collision_layer.add(boy, static=boy.shape.static)
 
+        girl = Girl(get_animation('girl_idle'), (0,120), self.player)
+        self.add(girl)
+        collision_layer.add(girl, static=girl.shape.static)
+        
+        mother = Mother(get_animation('mother_idle'), (-100,-100), self.player)
+        self.add(mother)
+        collision_layer.add(mother, static=mother.shape.static)
 
         if zombie_spawn:
             x, y = director.get_window_size()
             for c in zombie_spawn.get_children():
-                z = Zombie(get_animation('zombie_idle'), self.player)
+                z = Zombie(get_animation('zombie1_idle'), self.player)
                 z.x = c.x
                 z.y = c.y
                 z.position = z.x, z.y
