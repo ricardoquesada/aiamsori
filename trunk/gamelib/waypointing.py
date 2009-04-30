@@ -151,7 +151,7 @@ class WaypointNav:
                     if ( m[i,k] + m[k,j] < m[i,j] ):
                         m[i,j] = m[i,k] + m[k,j]
 
-    def _next_waypoint(i,j):
+    def _next_waypoint(self,i,j):
         """
         returns the next index in a minimal path from i to j , i if i==j
         """
