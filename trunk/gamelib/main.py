@@ -22,9 +22,11 @@ from cocos.layer.base_layers import Layer
 from cocos.sprite import NotifierSprite, Sprite
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
-from tiless_editor.layers.collision import CollisionLayer, Ray
+from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
+from shapes import Bullet, Ray
+from shapes import Wall, COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
 import sound
 import light
@@ -34,6 +36,7 @@ from gamectrl import MouseGameCtrl, KeyGameCtrl
 WIDTH, HEIGHT = 1024, 768
 MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
+
 
 def main():
     # fix pyglet resource path
@@ -93,9 +96,6 @@ class LightLayer(cocos.cocosnode.CocosNode):
 def make_sprites_layer(layer_data, atlas):
     def build_sprite(img):
         rect = img['rect']
-#        s = NotifierSprite(str(img['filename']),
-#                   img['position'], img['rotation'], img['scale'], img['opacity'])
-
         region = pyglet.image.TextureRegion( rect[0], rect[1], 0, rect[2], rect[3], atlas.texture )
         s = NotifierSprite(region,
                    img['position'], img['rotation'], img['scale'], img['opacity'])
@@ -109,6 +109,7 @@ def make_sprites_layer(layer_data, atlas):
         sprite = build_sprite(item)
         layer.add(sprite)
     return layer
+
 
 class GameLayer(Layer):
     is_event_handler = True
@@ -171,8 +172,6 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         self.light.set_position(w/2, h/2)
 
-
-
     def _create_agents(self, zombie_spawn):
         # get collision layer
         collision_layer = self.map_node.get('collision')
@@ -181,11 +180,11 @@ class GameLayer(Layer):
         father = Father(get_animation('father_idle'), (0,0), self)        
         self.player = father
         self.add(father)
-        collision_layer.add(father, shape_name='circle', static=False, layers=1)
+        collision_layer.add(father, static=father.shape.static)
 
         boy = Boy(get_animation('boy_idle'), (100,100), self.player)
         self.add(boy)
-        collision_layer.add(boy, shape_name='circle', static=False, layers=1)
+        collision_layer.add(boy, static=boy.shape.static)
         
         
         if zombie_spawn:
@@ -196,78 +195,15 @@ class GameLayer(Layer):
                 z.y = c.y
                 z.position = z.x, z.y
                 self.map_node.add(z)
-                collision_layer.add(z, shape_name='circle', static=False,
-                                    scale=.75, layers=1)
-
-    def is_collide(self, origin, target):
-        collision_layer = self.map_node.get('collision')
-        radius = 0.5 * max(self.player.width, self.player.height) * self.player.scale
-        ray = Ray(radius, origin, target)
-        ray.layers = 6
-        #print 'created ray between points.. origin: %s, target: %s' % (origin, target)
-        #print 'ray.pos:  %s' % str(ray.position)
-        #print 'ray.radius:  %s' % ray.radius
-        #print 'ray.a:  %s' % str(ray.a)
-        #print 'ray.b:  %s' % str(ray.b)
-        #print 'ray.length:  %s' % ray.length
-        collision_layer.space.add(ray)
-        collision_layer.step()
-        collision_layer.space.remove(ray)
-        return ray.data['collided']
+                collision_layer.add(z, static=z.shape.static, scale=.75)
 
     def on_collision(self, shape_a, shape_b):
-        #        collision_layer = self.map_node.get('collision')
-        #        node = collision_layer._get_node(shape_a)
-        #        other = collision_layer._get_node(shape_b)
-        #        other.shape = shape_b
-        #        if isinstance(node, (Agent, Zombie)):
-        #            # reset agent position and set speed to zero
-        #            node._on_collision(other)
-        #
-        #        node = collision_layer._get_node(shape_b)
-        #        other = collision_layer._get_node(shape_a)
-        #        other.shape = shape_a
-        #        if isinstance(node, (Agent, Zombie)):
-        #            # reset agent position and set speed to zero
-        #            node._on_collision(other)
-        collision_layer = self.map_node.get('collision')
-        non_visual_shapes = (Ray,)
-        agent_shapes = (Agent, Zombie)
-        if isinstance(shape_a, non_visual_shapes):
-            try:
-                node = collision_layer._get_node(shape_b)
-                if isinstance(node, agent_shapes):
-                    node._on_collision()
-            except AttributeError:
-                # trying to collide two non-visual shapes... this should not happen
-                print 'Colliding two non-visual shapes... this should not be happening.'
-                print '-- shape_a: %s, shape_b: %s' % (shape_a, shape_b)
-                pass
-        elif isinstance(shape_b, non_visual_shapes):
-            try:
-                node = collision_layer._get_node(shape_a)
-                if isinstance(node, agent_shapes):
-                    node._on_collision()
-            except AttributeError:
-                # trying to collide two non-visual shapes... this should not happen
-                print 'Colliding two non-visual shapes... this should not be happening.'
-                print '-- shape_a: %s, shape_b: %s' % (shape_a, shape_b)
-                pass
-        else:
-            node = collision_layer._get_node(shape_a)
-            other = collision_layer._get_node(shape_b)
-            other.shape = shape_b
-            if isinstance(node, agent_shapes):
-                # reset agent position and set speed to zero
-                node._on_collision(other)
-
-            node = collision_layer._get_node(shape_b)
-            other = collision_layer._get_node(shape_a)
-            other.shape = shape_a
-            if isinstance(node, agent_shapes):
-                # reset agent position and set speed to zero
-                node._on_collision(other)
-
+        node = shape_a.sprite
+        other = shape_b.sprite
+        if isinstance(node, Agent):
+            node._on_collision(other)
+        if isinstance(other, Agent):
+            other._on_collision(node)
 
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
@@ -277,19 +213,21 @@ class GameLayer(Layer):
                 img = {'filename': child.path, 'position': child.position,
                        'rotation': child.rotation, 'scale': child.scale,
                        'opacity': child.opacity, 'rect': child.rect}
-                collision_child = self._create_child(img)
-                collision_layer.add(collision_child, shape_name='square', static=True, layers=5)
+                wall = self._create_wall(img)
+                collision_layer.add(wall, static=wall.shape.static)
         return collision_layer
 
-    def _create_child(self, img):
+
+    def _create_wall(self, img):
         sprite = NotifierSprite(str(img['filename']),
                                 img['position'], img['rotation'],
                                 img['scale'], img['opacity'])
         sprite.label = img['label'] if "label" in img else None
         sprite.path = img['filename']
         sprite.rect = img['rect']
-        return sprite
 
+        sprite.shape = Wall(sprite)
+        return sprite
 
     def update(self, dt):
         x, y = director.get_window_size()
