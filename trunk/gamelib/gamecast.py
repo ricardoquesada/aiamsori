@@ -75,7 +75,8 @@ class Agent(NotifierSprite):
             self.player.game_layer.remove_bullet(other)
 
     def die(self):
-        print self, 'DIED'
+        print self, 'at position', str(self.position), 'DIED'
+        print 'contacts', [contact.position for contact in self.shape.data['contacts']]
         #import pdb; pdb.set_trace()
         game_layer = self.player.game_layer
         collision_layer = game_layer.map_node.get('collision')
@@ -143,7 +144,7 @@ class Father(Agent):
         #direction.rotate(-self.rotation)
         #target = Vec2d(origin) + direction * WEAPON_RANGE
         #print 'firing from ', origin , 'to', target
-        bullet = Bullet(self)
+        bullet = Bullet(get_animation('bullet'), self)
         self.game_layer.add_bullet(bullet)
         #game_layer = self.game_layer
         #bullet = game_layer._create_bullet(origin, target)
@@ -368,26 +369,21 @@ class ZombieWpt(Agent):
 
 
 class Bullet(NotifierSprite):
-    def __init__(self, agent):
-        position = agent.position
-        img = {'filename': 'img/bullet.png', 'position': position,
-               'rotation': 0, 'scale': 1.0,
-               'opacity': 0, 'rect': [0, 0, 64, 64]}
-        super(Bullet, self).__init__(str(img['filename']), img['position'],
-                                     img['rotation'], img['scale'],
-                                     img['opacity'])
-        self.label = None
-        self.path = img['filename']
-        self.rect = img['rect']
+    def __init__(self, img, agent):
+        super(Bullet, self).__init__(img, agent.position, agent.rotation, agent.scale)
 
+        self.anims = {}
         self.agent = agent
-        WEAPON_RANGE = 500
+
+        position = agent.position
+        WEAPON_RANGE = 200
         from pymunk.vec2d import Vec2d
-        direction = Vec2d(1, 0)
-        direction.rotate(-agent.rotation)
+        direction = Vec2d(1, 0).rotated(-self.rotation)
+        print 'direction', direction
         target = Vec2d(position) + direction * WEAPON_RANGE
         print 'firing from ', position , 'to', target
         shape = BulletShape(self, position, target)
+        print 'segment from ', shape.a, 'to', shape.b
         shape.group = agent.shape.group
         self.shape = shape
 

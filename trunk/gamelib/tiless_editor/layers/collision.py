@@ -91,7 +91,7 @@ class Circle(Shape):
         import shape
         x, y = self.position
         width = height = self.radius * 2
-        rotation = -self.rotation
+        rotation = self.rotation
         _shape = shape.Ellipse(x=x, y=y,
                                width=width, height=height,
                                rotation=rotation,
@@ -114,16 +114,26 @@ class Segment(Shape):
         self.length *= factor
         self._rebuild_endpoints()
 
+    def _rotation_updated(self, angle):
+        import pdb; pdb.set_trace()
+        print 'rotation updated: ', angle
+
     def _rebuild_endpoints(self, origin=(0, 0), target=(0, 0), scale=1.0, rotation=0):
-        self.a = origin
-        self.b = target
+        print 'origin', origin, 'target', target
+        self.a = Vec2d(origin)
+        self.b = Vec2d(target)
+        print 'rotation', self.rotation
+        print 'a', self.a, 'b', self.b
+        #self.a.rotate(self.rotation)
+        #self.b.rotate(self.rotation)
+        #print 'a', self.a, 'b', self.b
 
     def draw(self):
         import shape
         x, y = self.position
         width = self.length
         height = self.radius * 2
-        rotation = -self.rotation
+        rotation = self.rotation
         _shape = shape.Rectangle(x=x, y=y,
                                width=width, height=height,
                                rotation=rotation,
@@ -191,7 +201,7 @@ class Square(Polygon):
         x, y = self.position
         width = self.width
         height = self.height
-        rotation = -self.rotation
+        rotation = self.rotation
         _shape = shape.Rectangle(x=x, y=y,
                                  width=width, height=height,
                                  rotation=rotation,
@@ -316,8 +326,10 @@ class CollisionSpace(object):
             shapeB = self._get_shape(pm_shapeB)
             shapeA.data['collided'] = True
             shapeA.data['other'] = shapeB
+            shapeA.data['contacts'] = contacts
             shapeB.data['collided'] = True
             shapeB.data['other'] = shapeA
+            shapeB.data['contacts'] = contacts
             self.callback(shapeA, shapeB)
         return True
 
