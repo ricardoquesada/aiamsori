@@ -23,6 +23,27 @@ from cocos.euclid import Vector2 as V2
 from geom import dist_point_to_segment
 bignum = 1.0e+40
 
+# mantener en sincronia con el loader/writer en wptlayer
+def wpt_from_privateX(fname):
+    # el mismo nombre que map agregada extension wpt
+    f=open(fname,'rb')        
+    linenum = -1
+    wpts = []
+    for line in f:
+        linenum += 1
+        line = line.strip(' ').rstrip(' \r\n')
+        print 'line:'
+        if len(line)==0:
+            continue
+        li = line.split(' ')
+        if len(li)!=2:
+            print 'err parsing %s at line %d: expected <num> <num>\\n'%(fname,linenum)
+        else:
+            x = int(li[0])
+            y = int(li[1])
+            wpts.append((x,y))
+    f.close()
+    return wpts
 
 class WaypointNav:
     def __init__(self,points,fn_visibles):
