@@ -58,12 +58,12 @@ class Bullet(Segment):
         self.damage_energy = BULLET_DAMAGE_ENERGY
 
     # README: uncomment this to debug collision shape
-    def draw(self):
-        import pyglet
-        batch = pyglet.graphics.Batch()
-        points = [self.a[0], self.a[1], self.b[0], self.b[1]]
-        batch.add(2, pyglet.gl.GL_LINES, None,
-                ('v2f', points),
-                ('c3B', [255,255,255]*2))
-        batch.draw()
+    #def draw(self):
+    #    import pyglet
+    #    batch = pyglet.graphics.Batch()
+    #    points = [self.a[0], self.a[1], self.b[0], self.b[1]]
+    #    batch.add(2, pyglet.gl.GL_LINES, None,
+    #            ('v2f', points),
+    #            ('c3B', [255,255,255]*2))
+    #    batch.draw()
 
