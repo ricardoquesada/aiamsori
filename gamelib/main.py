@@ -331,7 +331,8 @@ class GameLayer(Layer):
         self.bullets.remove(bullet)
 
     def _remove_bullets(self):
-        print self.bullets
+        pass
+        #print self.bullets
         #for bullet in self.bullets:
         #    self.remove_bullet(bullet)
         #print self.bullets
