@@ -242,6 +242,8 @@ class GameLayer(Layer):
 
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
+        # README: uncomment this to debug collision shapes
+        collision_layer.show_shapes = True
 
         for layer in layers:
             for z, child in layer.children:
@@ -289,6 +291,22 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
+
+        # remove any uncollisioned bullets from collision space
+        self._remove_bullets()
+
+    def _remove_bullets(self):
+        collision_layer = self.map_node.get('collision')
+        for z, child in self.children:
+            if isinstance(child, NotifierSprite) and isinstance(child.shape, Bullet):
+                # only remove uncollisioned bullets, as collisioned bullets get removed by
+                # the collisioned object
+                if not child.shape.data['collided']:
+                    print 'removing BULLET'
+                    collision_layer.remove(child, static=child.shape.static)
+                    self.remove(child)
+                else:
+                    print 'bullet collided. NOT REMOVING'
 
 
 if __name__ == '__main__':
