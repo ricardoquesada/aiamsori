@@ -6,7 +6,7 @@ from pyglet.image import Animation, AnimationFrame, load
 from cocos.sprite import NotifierSprite
 
 from boids import merge, seek, cap, avoid_group
-from shapes import Bullet, Ray, AgentShape, ZombieShape
+from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
 from tiless_editor.layers.collision import Circle
 import sound
 
@@ -58,15 +58,30 @@ class Agent(NotifierSprite):
             return
         self.collision = other
 
-    def on_collision(self, other):
-        # called when we want to report a collision
-        pass
+    #def on_collision(self, other):
+    #    # called when we want to report a collision
+    #    pass
 
     def play_anim(self, anim_name):
         self.image = self.anims[anim_name]
         self.image_anchor = (self.image.frames[0].image.width / 2,
                              self.image.frames[0].image.height / 2)
         self.current_anim = anim_name
+
+    def on_collision(self, other):
+        if isinstance(other, Bullet):
+            print 'Agent hit at position', self.position
+            self.die()
+            self.player.game_layer.remove_bullet(other)
+
+    def die(self):
+        print self, 'DIED'
+        #import pdb; pdb.set_trace()
+        game_layer = self.player.game_layer
+        collision_layer = game_layer.map_node.get('collision')
+        # remove agent
+        collision_layer.remove(self, static=self.shape.static)
+        game_layer.remove(self)
 
 
 class Father(Agent):
@@ -121,20 +136,21 @@ class Father(Agent):
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
     def fire(self):
-        origin = self.position
-        WEAPON_RANGE = 500
-        from pymunk.vec2d import Vec2d
-        direction = Vec2d(1, 0)
-        direction.rotate(-self.rotation)
-        target = Vec2d(origin) + direction * WEAPON_RANGE
-        print 'firing from ', origin , 'to', target
-
-        game_layer = self.game_layer
-        bullet = game_layer._create_bullet(origin, target)
-        bullet.shape.group = COLLISION_GROUP_FATHER
-        game_layer.add(bullet)
-        collision_layer = game_layer.map_node.get('collision')
-        collision_layer.add(bullet, static=bullet.shape.static)
+        #origin = self.position
+        #WEAPON_RANGE = 500
+        #from pymunk.vec2d import Vec2d
+        #direction = Vec2d(1, 0)
+        #direction.rotate(-self.rotation)
+        #target = Vec2d(origin) + direction * WEAPON_RANGE
+        #print 'firing from ', origin , 'to', target
+        bullet = Bullet(self)
+        self.game_layer.add_bullet(bullet)
+        #game_layer = self.game_layer
+        #bullet = game_layer._create_bullet(origin, target)
+        #bullet.shape.group = COLLISION_GROUP_FATHER
+        #game_layer.add(bullet)
+        #collision_layer = game_layer.map_node.get('collision')
+        #collision_layer.add(bullet, static=bullet.shape.static)
 
 
 
@@ -271,25 +287,6 @@ class ZombieBoid(Agent):
         else:
             if self.current_anim != 'idle':
                 self.play_anim('idle')
-    def on_collision(self, other):
-        #print 'Zombie on_collision', other
-        #if isinstance(self.collision, Bullet):
-        #    import pdb; pdb.set_trace()
-        #elif isinstance(other.shape, Bullet):
-        if isinstance(other.shape, Bullet):
-            print 'Zombie hit at position', self.position
-            self.die(other)
-
-    def die(self, bullet):
-        print 'Bullet DIED'
-        game_layer = self.player.game_layer
-        collision_layer = game_layer.map_node.get('collision')
-        # remove bullet
-        collision_layer.remove(bullet, static=bullet.shape.static)
-        game_layer.remove(bullet)
-        # remove zombie
-        collision_layer.remove(self, static=self.shape.static)
-        game_layer.map_node.remove(self)
 
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
 class ZombieWpt(Agent):
@@ -354,7 +351,7 @@ class ZombieWpt(Agent):
         #if isinstance(self.collision, Bullet):
         #    import pdb; pdb.set_trace()
         #elif isinstance(other.shape, Bullet):
-        if isinstance(other.shape, Bullet):
+        if isinstance(other, Bullet):
             print 'Zombie hit at position', self.position
             self.die(other)
 
@@ -368,6 +365,46 @@ class ZombieWpt(Agent):
         # remove zombie
         collision_layer.remove(self, static=self.shape.static)
         game_layer.map_node.remove(self)
+
+
+class Bullet(NotifierSprite):
+    def __init__(self, agent):
+        position = agent.position
+        img = {'filename': 'img/bullet.png', 'position': position,
+               'rotation': 0, 'scale': 1.0,
+               'opacity': 0, 'rect': [0, 0, 64, 64]}
+        super(Bullet, self).__init__(str(img['filename']), img['position'],
+                                     img['rotation'], img['scale'],
+                                     img['opacity'])
+        self.label = None
+        self.path = img['filename']
+        self.rect = img['rect']
+
+        self.agent = agent
+        WEAPON_RANGE = 500
+        from pymunk.vec2d import Vec2d
+        direction = Vec2d(1, 0)
+        direction.rotate(-agent.rotation)
+        target = Vec2d(position) + direction * WEAPON_RANGE
+        print 'firing from ', position , 'to', target
+        shape = BulletShape(self, position, target)
+        shape.group = agent.shape.group
+        self.shape = shape
+
+
+class Wall(NotifierSprite):
+    def __init__(self, child):
+        img = {'filename': child.path, 'position': child.position,
+               'rotation': child.rotation, 'scale': child.scale,
+               'opacity': child.opacity, 'rect': child.rect}
+        super(Wall, self).__init__(str(img['filename']), img['position'],
+                                   img['rotation'], img['scale'],
+                                   img['opacity'])
+        self.label = None
+        self.path = img['filename']
+        self.rect = img['rect']
+        self.shape = WallShape(self)
+
 
 #select here wich Zombie class
 Zombie = ZombieBoid

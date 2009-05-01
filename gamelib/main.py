@@ -28,14 +28,14 @@ from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from tiless_editor.atlas import SavedAtlas
 
-from shapes import Bullet, Ray
-from shapes import Wall, COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
+#from shapes import BulletShape, RayShape, WallShape
+#from shapes import COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
 import talk
 import hud
 import sound
 import light
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Bullet, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 
 #WIDTH, HEIGHT = 1024, 768
@@ -145,6 +145,7 @@ class GameLayer(Layer):
     def __init__(self, mapfile, hud):
         super(GameLayer, self).__init__()
         self.map_node = LayersNode()
+        self.bullets = []
 
         # get layers from map
         for_collision_layers = []
@@ -248,7 +249,8 @@ class GameLayer(Layer):
                 z.x = c.x
                 z.y = c.y
                 z.position = z.x, z.y
-                self.map_node.add(z)
+                #self.map_node.add(z)
+                self.add(z)
                 collision_layer.add(z, static=z.shape.static, scale=.75)
 
     def on_collision(self, shape_a, shape_b):
@@ -263,49 +265,50 @@ class GameLayer(Layer):
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
         # README: uncomment this to debug collision shapes
-        #collision_layer.show_shapes = True
+        collision_layer.show_shapes = True
 
         for layer in layers:
             for z, child in layer.children:
-                img = {'filename': child.path, 'position': child.position,
-                       'rotation': child.rotation, 'scale': child.scale,
-                       'opacity': child.opacity, 'rect': child.rect}
-                wall = self._create_wall(img)
+                #img = {'filename': child.path, 'position': child.position,
+                #       'rotation': child.rotation, 'scale': child.scale,
+                #       'opacity': child.opacity, 'rect': child.rect}
+                #wall = self._create_wall(img)
+                wall = Wall(child)
                 collision_layer.add(wall, static=wall.shape.static)
         return collision_layer
 
 
-    def _create_sprite(self, data, shape_cls=None):
-        img = data['img']
-        sprite = NotifierSprite(str(img['filename']),
-                                img['position'], img['rotation'],
-                                img['scale'], img['opacity'])
-        sprite.label = img['label'] if "label" in img else None
-        sprite.path = img['filename']
-        sprite.rect = img['rect']
-
-        args = (sprite,) + data.get('args', ())
-        kwargs = dict(data.get('kwargs', {}))
-
-        if shape_cls is not None:
-            shape = shape_cls(*args, **kwargs)
-        else:
-            shape = None
-        sprite.shape = shape
-        return sprite
-
-
-    def _create_wall(self, img):
-        data = {'img': img}
-        return self._create_sprite(data, Wall)
-
-    def _create_bullet(self, origin, target):
-        img = {'filename': 'img/bullet.png', 'position': origin,
-               'rotation': 0, 'scale': 1.0,
-               'opacity': 0, 'rect': [0, 0, 64, 64]}
-        args = (origin, target)
-        data = {'img': img, 'args': args}
-        return self._create_sprite(data, Bullet)
+#    def _create_sprite(self, data, shape_cls=None):
+#        img = data['img']
+#        sprite = NotifierSprite(str(img['filename']),
+#                                img['position'], img['rotation'],
+#                                img['scale'], img['opacity'])
+#        sprite.label = img['label'] if "label" in img else None
+#        sprite.path = img['filename']
+#        sprite.rect = img['rect']
+#
+#        args = (sprite,) + data.get('args', ())
+#        kwargs = dict(data.get('kwargs', {}))
+#
+#        if shape_cls is not None:
+#            shape = shape_cls(*args, **kwargs)
+#        else:
+#            shape = None
+#        sprite.shape = shape
+#        return sprite
+#
+#
+#    def _create_wall(self, img):
+#        data = {'img': img}
+#        return self._create_sprite(data, Wall)
+#
+#    def _create_bullet(self, origin, target):
+#        img = {'filename': 'img/bullet.png', 'position': origin,
+#               'rotation': 0, 'scale': 1.0,
+#               'opacity': 0, 'rect': [0, 0, 64, 64]}
+#        args = (origin, target)
+#        data = {'img': img, 'args': args}
+#        return self._create_sprite(data, Bullet)
 
     def update(self, dt):
         x, y = director.get_window_size()
@@ -315,19 +318,37 @@ class GameLayer(Layer):
         # clear out any non-collisioned bullets
         self._remove_bullets()
 
-    def _remove_bullets(self):
+    def add_bullet(self, bullet):
+        self.bullets.append(bullet)
+        self.add(bullet)
         collision_layer = self.map_node.get('collision')
-        for z, child in self.children:
-            if isinstance(child, NotifierSprite) and isinstance(child.shape, Bullet):
-                if not child.shape.data['collided']:
-                    # only remove non collided shapes, as collided shapes will be removed by
-                    # the collided object
-                    #print 'removing BULLET'
-                    collision_layer.remove(child, static=child.shape.static)
-                    self.remove(child)
-                else:
-                    #print 'bullet collided. NOT REMOVING'
-                    pass
+        collision_layer.add(bullet, static=bullet.shape.static)
+
+    def remove_bullet(self, bullet):
+        collision_layer = self.map_node.get('collision')
+        collision_layer.remove(bullet, static=bullet.shape.static)
+        self.remove(bullet)
+        self.bullets.remove(bullet)
+
+    def _remove_bullets(self):
+        print self.bullets
+        #for bullet in self.bullets:
+        #    self.remove_bullet(bullet)
+        #print self.bullets
+        #collision_layer = self.map_node.get('collision')
+        #for z, child in self.children:
+        #    if isinstance(child, NotifierSprite) and isinstance(child, Bullet):
+        #        if not child.shape.data['collided']:
+        #            # only remove non collided shapes, as collided shapes will be removed by
+        #            # the collided object
+        #            print 'removing BULLET'
+        #            #collision_layer.remove(child, static=child.shape.static)
+        #            self.remove(child)
+        #        else:
+        #            print 'bullet collided. NOT REMOVING'
+        #            print 'other:', child.shape.data['other'].sprite
+        #            pass
+
 
 
 if __name__ == '__main__':

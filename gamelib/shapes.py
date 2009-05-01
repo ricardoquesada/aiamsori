@@ -33,16 +33,16 @@ class ZombieShape(Circle):
         self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
 
 
-class Wall(Square):
+class WallShape(Square):
     def __init__(self, sprite):
-        super(Wall, self).__init__(sprite.width, sprite.height, position=sprite.position)
+        super(WallShape, self).__init__(sprite.width, sprite.height, position=sprite.position)
         self.sprite = sprite
         self.static = True
         #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
         self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
 
 
-class Ray(Segment):
+class RayShape(Segment):
     def __init__(self, radius, origin, target):
         super(Ray, self).__init__(radius, origin=origin, target=target)
         self.sprite = sprite
@@ -50,9 +50,9 @@ class Ray(Segment):
         #self.layers = COLLISION_LAYER_WALL | COLLISION_LAYER_RAY
 
 
-class Bullet(Segment):
+class BulletShape(Segment):
     def __init__(self, sprite, origin, target):
-        super(Bullet, self).__init__(BULLET_RADIUS, origin=origin, target=target)
+        super(BulletShape, self).__init__(BULLET_RADIUS, origin=origin, target=target)
         self.sprite = sprite
         self.static = False
         #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
@@ -60,12 +60,12 @@ class Bullet(Segment):
         self.damage_energy = BULLET_DAMAGE_ENERGY
 
     # README: uncomment this to debug collision shape
-    #def draw(self):
-    #    import pyglet
-    #    batch = pyglet.graphics.Batch()
-    #    points = [self.a[0], self.a[1], self.b[0], self.b[1]]
-    #    batch.add(2, pyglet.gl.GL_LINES, None,
-    #            ('v2f', points),
-    #            ('c3B', [255,255,255]*2))
-    #    batch.draw()
+    def draw(self):
+        import pyglet
+        batch = pyglet.graphics.Batch()
+        points = [self.a[0], self.a[1], self.b[0], self.b[1]]
+        batch.add(2, pyglet.gl.GL_LINES, None,
+                ('v2f', points),
+                ('c3B', [255,255,255]*2))
+        batch.draw()
 
