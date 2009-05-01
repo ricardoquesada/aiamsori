@@ -10,7 +10,7 @@ from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
 from tiless_editor.layers.collision import Circle
 import sound
 
-# NOTE: select wich class will be used as Zombie near EOF 
+# NOTE: select wich class will be used as Zombie near EOF
 
 COLLISION_GROUP_FATHER = 1
 
@@ -54,6 +54,8 @@ class Agent(NotifierSprite):
 
     def _on_collision(self, other):
         # used internally for collision testing
+        if isinstance(other, Bullet):
+            self.on_collision(other)
         if not self.updating:
             return
         self.collision = other
@@ -70,7 +72,9 @@ class Agent(NotifierSprite):
 
     def on_collision(self, other):
         if isinstance(other, Bullet):
-            print 'Agent hit at position', self.position
+            print 'Agent hit at position', self.position, self
+            print "self", self.shape.pm_obj.body.position,
+            print 'other', other.shape.pm_obj.a, other.shape.pm_obj.b
             self.die()
             self.player.game_layer.remove_bullet(other)
 
@@ -377,10 +381,11 @@ class Bullet(NotifierSprite):
 
         position = agent.position
         WEAPON_RANGE = 200
+
         from pymunk.vec2d import Vec2d
-        direction = Vec2d(1, 0).rotated(-self.rotation)
-        print 'direction', direction
-        target = Vec2d(position) + direction * WEAPON_RANGE
+        offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
+        print 'direction', offset
+        target = offset+position
         print 'firing from ', position , 'to', target
         shape = BulletShape(self, position, target)
         print 'segment from ', shape.a, 'to', shape.b

@@ -103,8 +103,7 @@ class Segment(Shape):
     def __init__(self, radius, origin=(0, 0), target=(0, 0), scale=1.0, rotation=0):
         super(Segment, self).__init__(origin, scale, rotation)
         self.radius = radius
-        self.length = (Vec2d(target) - Vec2d(origin)).length
-        self._rebuild_endpoints(origin, target, scale, rotation)
+        self._rebuild_endpoints(Vec2d(0,0), Vec2d(target)-Vec2d(origin), scale, rotation)
 
 #    def _position_updated(self, offset):
 #        self._rebuild_endpoints()
@@ -119,11 +118,9 @@ class Segment(Shape):
         print 'rotation updated: ', angle
 
     def _rebuild_endpoints(self, origin=(0, 0), target=(0, 0), scale=1.0, rotation=0):
-        print 'origin', origin, 'target', target
+        print 'in shape direction origin', origin, 'target', target
         self.a = Vec2d(origin)
         self.b = Vec2d(target)
-        print 'rotation', self.rotation
-        print 'a', self.a, 'b', self.b
         #self.a.rotate(self.rotation)
         #self.b.rotate(self.rotation)
         #print 'a', self.a, 'b', self.b
@@ -308,6 +305,7 @@ class CollisionSpace(object):
             # WARNING: the segment is assumed to be centered around its position
             # points a and b are equally distant from the segments center
             #print 'creating segment: pos:',  pm_body.position, 'from: ', shape.a,  'to: ', shape.b, 'radius: ', shape.radius
+
             pm_obj = pm.Segment(pm_body, shape.a, shape.b, shape.radius)
         elif isinstance(shape, Polygon):
             vertices = shape.vertices
@@ -317,7 +315,7 @@ class CollisionSpace(object):
             moment = pm.moment_for_poly(mass, vertices, offset)
             pm_body = pm.Body(mass, moment)
             pm_obj = pm.Poly(pm_body, vertices, offset)
-
+        shape.pm_obj = pm_obj
         return pm_obj
 
     def _on_collide(self, pm_shapeA, pm_shapeB, contacts, normal_coef, data):
@@ -433,32 +431,7 @@ class CollisionLayer(PickerBatchNode):
     def step(self, dt=0):
         self.space.step(dt)
 
-    def _create_shape(self, child, shape_name='', scale=1, layers=0):
-        def get_shape_name(child):
-            image_name = os.path.basename(child.path)
-            shape_name = image_name.split('.')[0]
-            return shape_name
 
-        if shape_name:
-            _shape = shape_name
-        else:
-            _shape = get_shape_name(child)
-        if _shape == 'circle':
-            radius = 0.5 * max(child.width, child.height) * scale
-            shape = Circle(radius, child.position, child.scale, child.rotation)
-        elif _shape == 'segment':
-            radius = 0.5 * child.height * scale
-            length = child.width * scale
-            shape = Segment(radius, length, child.position, child.scale,
-                            child.rotation)
-        elif _shape == 'square':
-            shape = Square(child.width*scale, child.height*scale, child.position,
-                           child.scale, child.rotation)
-        else:
-            raise ValueError("Child has invalid shape", _shape)
-
-        shape.layers = layers
-        return shape
 
     #################
     # Helper methods (for debugging collisions)
