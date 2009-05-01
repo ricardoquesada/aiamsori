@@ -24,7 +24,7 @@ class AgentShape(Circle):
         self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
 
 
-class ZombieShape(Circle): 
+class ZombieShape(Circle):
     def __init__(self, sprite):
         radius = 0.5 * max(sprite.width, sprite.height) * sprite.scale
         super(ZombieShape, self).__init__(radius, position=sprite.position)

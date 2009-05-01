@@ -120,9 +120,9 @@ class Father(Agent):
         origin = self.position
         WEAPON_RANGE = 500
         from pymunk.vec2d import Vec2d
-        direction = Vec2d(WEAPON_RANGE, 0)
+        direction = Vec2d(1, 0)
         direction.rotate(-self.rotation)
-        target = Vec2d(origin) + direction
+        target = Vec2d(origin) + direction * WEAPON_RANGE
         print 'firing from ', origin , 'to', target
 
         game_layer = self.game_layer
@@ -277,6 +277,7 @@ class Zombie(Agent):
             self.die(other)
 
     def die(self, bullet):
+        print 'Bullet DIED'
         game_layer = self.player.game_layer
         collision_layer = game_layer.map_node.get('collision')
         # remove bullet
