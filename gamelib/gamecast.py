@@ -118,10 +118,10 @@ class Father(Agent):
 
     def fire(self):
         origin = self.position
-        WEAPON_RANGE = 1000
+        WEAPON_RANGE = 500
         from pymunk.vec2d import Vec2d
         direction = Vec2d(WEAPON_RANGE, 0)
-        direction.rotate(self.rotation)
+        direction.rotate(-self.rotation)
         target = Vec2d(origin) + direction
         print 'firing from ', origin , 'to', target
 
