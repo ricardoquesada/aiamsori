@@ -1,6 +1,4 @@
 import math
-screen = None
-import pygame
 
 fe = 1.0e-4
 def create_ray_to_wall_collision(wallmask, tilesize):
@@ -144,7 +142,6 @@ def wait_keypress():
 
 def test_create_ray_to_wall_collision():
     import pygame
-    global screen
     
     wallmask = {}
     for i in xrange(10):
