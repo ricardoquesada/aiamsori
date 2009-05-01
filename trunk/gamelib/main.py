@@ -31,6 +31,7 @@ from tiless_editor.atlas import SavedAtlas
 from shapes import Bullet, Ray
 from shapes import Wall, COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
+import talk
 import sound
 import light
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, get_animation
@@ -192,77 +193,14 @@ class GameLayer(Layer):
 
         # talk queue
         self.hud = hud
-        self.talking = []
-        self.talk_layer = cocos.layer.Layer()
+        self.talk_layer = talk.TalkLayer()
         self.hud.add(self.talk_layer, z=10)
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Dad", "hello hello hello"*5)
-        self.talk("Bee", "Bye Bye"*5, False)
+        self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
 
-    def talk(self, who, message, transient=True):
-        # transient messages get discarded if we are talking
-        # non transient messages are queued.
-        if transient and self.talking:
-                return
-        if self.talking:
-            self.talking.append((who, message))
-        else:
-            self.talking.append((who, message))
-            self.update_talk()
-
-    def end_talking(self):
-        self.talking = self.talking[1:]
-        ch = list(self.talk_layer.get_children())
-        for c in ch:
-            self.talk_layer.remove(c)
-        self.update_talk()
-
-    def update_talk(self):
-        if not self.talking:
-            return
-        who, text = self.talking[0]
-        x, y = director.get_window_size()
-
-        face = Sprite('faces/%s.png'%who)
-        self.talk_layer.add(face)
-        face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
-
-        balloon_l = Sprite('faces/balloon-left.png')
-        balloon_r = Sprite('faces/balloon-right.png')
-        balloon_c = Sprite('faces/balloon-center.png')
-
-        self.talk_layer.add(balloon_l)
-        self.talk_layer.add(balloon_c)
-        self.talk_layer.add(balloon_r)
-
-        x1 = face.image.width*face.scale
-        y1 = y - face.image.height * face.scale
-        x2 = x1+balloon_l.image.width
-        y2 = y-3
-        balloon_l._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
-
-        x1 = x-5-balloon_r.image.width
-        y1 = y1
-        x2 = x-5
-        y2 = y-3
-        balloon_r._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
-
-        x1 = face.image.width*face.scale+balloon_l.image.width
-        y1 = y1
-        x2 = x-5-balloon_r.image.width
-        y2 = y-3
-        balloon_c._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
-
-
-
-        label = cocos.text.Label(text,
-            font_name='Times New Roman',
-            font_size=32,
-            x=x1, y=y-20,
-            anchor_x='left', anchor_y='top', width=x-face.image.width*face.scale-40, multiline=True)
-        label.element.color = 0,0,0,255
-        self.talk_layer.add(label, z=1)
-        self.do( Delay(5) + CallFunc(self.end_talking) )
+    def talk(self, who, what, duration=5, transient=False):
+        self.talk_layer.talk(who, what, duration=duration, transient=transient)
 
     def on_enter(self):
         super(GameLayer, self).on_enter()
