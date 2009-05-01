@@ -53,10 +53,10 @@ def main():
                       help="set window width", metavar="WIDTH")
     parser.add_option("-y", "--height", type="int", dest="height", default='768',
                       help="set window height", metavar="HEIGHT")
-    # need no enemies while waypointing, and another on_key 
+    # need no enemies while waypointing, and another on_key
     global options
     (options, args) = parser.parse_args()
-    
+
     # fix pyglet resource path
     pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
     pyglet.resource.reindex()
@@ -77,7 +77,8 @@ def main():
     director.init(options.width, options.height, resizable=True)
     sound.init()
     # create game scene
-    game_layer = GameLayer(MAPFILE)
+    hud_layer = cocos.layer.Layer()
+    game_layer = GameLayer(MAPFILE, hud_layer)
 #    game_layer.position = (400, 300)
 
     director.set_3d_projection()
@@ -85,6 +86,7 @@ def main():
 
     main_scene = Scene()
     main_scene.add(game_layer)
+    main_scene.add(hud_layer, z = 1)
     if options.wpt_on:
         from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
     else:
@@ -138,7 +140,7 @@ def make_sprites_layer(layer_data, atlas):
 class GameLayer(Layer):
     is_event_handler = True
 
-    def __init__(self, mapfile):
+    def __init__(self, mapfile, hud):
         super(GameLayer, self).__init__()
         self.map_node = LayersNode()
 
@@ -188,6 +190,53 @@ class GameLayer(Layer):
             self.wptlayer = WptLayer(mapfile)
             self.map_node.add_layer('wptedit',1,self.wptlayer) # ?
 
+        # talk queue
+        self.hud = hud
+        self.talking = []
+        self.talk_layer = cocos.layer.Layer()
+        self.hud.add(self.talk_layer, z=10)
+        self.talk("Dad", "hello hello hello"*5)
+        self.talk("Dad", "hello hello hello"*5)
+        self.talk("Bee", "Bye Bye"*5, False)
+
+    def talk(self, who, message, transient=True):
+        # transient messages get discarded if we are talking
+        # non transient messages are queued.
+        if transient and self.talking:
+                return
+        if self.talking:
+            self.talking.append((who, message))
+        else:
+            self.talking.append((who, message))
+            self.update_talk()
+
+    def end_talking(self):
+        self.talking = self.talking[1:]
+        ch = list(self.talk_layer.get_children())
+        for c in ch:
+            self.talk_layer.remove(c)
+        self.update_talk()
+
+    def update_talk(self):
+        if not self.talking:
+            return
+        who, text = self.talking[0]
+        x, y = director.get_window_size()
+
+        face = Sprite('faces/%s.png'%who)
+        self.talk_layer.add(face)
+        print face.image.width
+        face.scale = 0.2
+        face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
+        label = cocos.text.Label(text,
+            font_name='Times New Roman',
+            font_size=32,
+            x=face.image.width*face.scale+20, y=y-20,
+            anchor_x='left', anchor_y='top', width=x-face.image.width*face.scale-40, multiline=True)
+
+        self.talk_layer.add(label)
+        self.do( Delay(5) + CallFunc(self.end_talking) )
+
     def on_enter(self):
         super(GameLayer, self).on_enter()
         x, y = director.get_window_size()
@@ -222,7 +271,7 @@ class GameLayer(Layer):
             girl = Girl(get_animation('girl_idle'), (-250,120), self.player)
             self.add(girl)
             collision_layer.add(girl, static=girl.shape.static)
-            
+
             mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
             self.add(mother)
             collision_layer.add(mother, static=mother.shape.static)
