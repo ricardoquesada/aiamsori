@@ -226,7 +226,7 @@ class GameLayer(Layer):
         face = Sprite('faces/%s.png'%who)
         self.talk_layer.add(face)
         print face.image.width
-        face.scale = 0.2
+        #face.scale = 0.2
         face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
         label = cocos.text.Label(text,
             font_name='Times New Roman',
