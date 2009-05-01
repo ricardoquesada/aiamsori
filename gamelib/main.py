@@ -225,16 +225,43 @@ class GameLayer(Layer):
 
         face = Sprite('faces/%s.png'%who)
         self.talk_layer.add(face)
-        print face.image.width
-        #face.scale = 0.2
         face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
+
+        balloon_l = Sprite('faces/balloon-left.png')
+        balloon_r = Sprite('faces/balloon-right.png')
+        balloon_c = Sprite('faces/balloon-center.png')
+
+        self.talk_layer.add(balloon_l)
+        self.talk_layer.add(balloon_c)
+        self.talk_layer.add(balloon_r)
+
+        x1 = face.image.width*face.scale
+        y1 = y - face.image.height * face.scale
+        x2 = x1+balloon_l.image.width
+        y2 = y-3
+        balloon_l._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
+
+        x1 = x-5-balloon_r.image.width
+        y1 = y1
+        x2 = x-5
+        y2 = y-3
+        balloon_r._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
+
+        x1 = face.image.width*face.scale+balloon_l.image.width
+        y1 = y1
+        x2 = x-5-balloon_r.image.width
+        y2 = y-3
+        balloon_c._vertex_list.vertices[:] = [x1, y1, x2, y1, x2, y2, x1, y2]
+
+
+
         label = cocos.text.Label(text,
             font_name='Times New Roman',
             font_size=32,
-            x=face.image.width*face.scale+20, y=y-20,
+            x=x1, y=y-20,
             anchor_x='left', anchor_y='top', width=x-face.image.width*face.scale-40, multiline=True)
-
-        self.talk_layer.add(label)
+        label.element.color = 0,0,0,255
+        self.talk_layer.add(label, z=1)
         self.do( Delay(5) + CallFunc(self.end_talking) )
 
     def on_enter(self):
