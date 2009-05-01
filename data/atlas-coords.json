@@ -1,62 +1,134 @@
 {
-    "tiles/alambre.png": [
-        396, 
+    "newtiles/pared2.png": [
+        260, 
+        652, 
+        128, 
+        128
+    ], 
+    "newtiles/piso_ceramico.png": [
+        130, 
+        652, 
+        128, 
+        128
+    ], 
+    "newtiles/sombra.png": [
+        908, 
+        522, 
+        128, 
+        128
+    ], 
+    "newtiles/luz_ventana.png": [
+        0, 
+        0, 
+        520, 
+        520
+    ], 
+    "newtiles/sofa.png": [
+        801, 
+        652, 
+        383, 
+        127
+    ], 
+    "newtiles/cama3.png": [
+        654, 
+        0, 
+        130, 
+        302
+    ], 
+    "newtiles/puerta.png": [
+        520, 
+        522, 
+        128, 
+        128
+    ], 
+    "newtiles/cama1.png": [
+        786, 
+        0, 
+        258, 
+        302
+    ], 
+    "newtiles/pared.png": [
+        1168, 
+        522, 
+        64, 
+        64
+    ], 
+    "newtiles/zombie-spawm.png": [
+        1176, 
         0, 
         64, 
         64
     ], 
-    "tiles/checker.png": [
-        66, 
-        0, 
-        64, 
-        64
+    "newtiles/mesita.png": [
+        390, 
+        522, 
+        128, 
+        128
     ], 
-    "tiles/piso_piedra1.jpg": [
-        330, 
-        0, 
-        64, 
-        64
+    "newtiles/columna.png": [
+        130, 
+        522, 
+        128, 
+        128
     ], 
-    "tiles/ventana.png": [
-        132, 
-        194, 
-        192, 
-        64
+    "newtiles/ventana.png": [
+        260, 
+        522, 
+        128, 
+        128
     ], 
-    "tiles/piso_madera2.jpg": [
-        66, 
-        194, 
-        64, 
-        64
+    "newtiles/mesa.png": [
+        390, 
+        652, 
+        256, 
+        128
     ], 
-    "tiles/pared.jpg": [
-        264, 
+    "newtiles/piso_tapete.png": [
         0, 
-        64, 
-        64
+        782, 
+        128, 
+        90
     ], 
-    "tiles/pasto.jpg": [
+    "newtiles/cama2.png": [
+        522, 
         0, 
-        194, 
-        64, 
-        64
+        130, 
+        302
     ], 
-    "tiles/zombie-spawm.png": [
-        198, 
+    "newtiles/mesada-2.png": [
         0, 
-        64, 
-        64
+        652, 
+        128, 
+        128
     ], 
-    "tiles/piso_madera1.jpg": [
-        132, 
-        0, 
-        64, 
-        64
+    "newtiles/piso_madera.png": [
+        1038, 
+        522, 
+        128, 
+        128
     ], 
-    "tiles/ventana_rot.png": [
+    "newtiles/mesada.png": [
+        650, 
+        522, 
+        256, 
+        128
+    ], 
+    "newtiles/sofa_chico.png": [
+        648, 
+        652, 
+        151, 
+        127
+    ], 
+    "newtiles/piso_pasto.png": [
         0, 
+        522, 
+        128, 
+        128
+    ], 
+    "newtiles/piso_alfombra.png": [
+        1046, 
         0, 
-        64, 
-        192
+        128, 
+        128
     ]
 }

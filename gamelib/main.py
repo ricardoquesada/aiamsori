@@ -160,10 +160,10 @@ class GameLayer(Layer):
             layer_label = layer_data['label']
             if layer_type == 'sprite':
                 sprite_layer = make_sprites_layer(layer_data['data'], self.atlas)
-                if layer_label in ["piso"]:
+                if layer_label in ["floor", "furninture"]:
                     self.map_node.add_layer(layer_data['label'], layer_data['z'],
                                        sprite_layer)
-                if layer_label in ['walls']:
+                if layer_label in ['walls', 'furninture']:
                     for_collision_layers.append(sprite_layer)
                 if layer_label in ['walls', 'gates']:
                     walls_layers.append(sprite_layer)
@@ -207,7 +207,7 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        father = Father(get_animation('father_idle'), (0,0), self)
+        father = Father(get_animation('father_idle'), (-250,0), self)
         self.player = father
         self.add(father)
         collision_layer.add(father, static=father.shape.static)
@@ -215,15 +215,15 @@ class GameLayer(Layer):
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
         if not options.wpt_on:
-            boy = Boy(get_animation('boy_idle'), (100,100), self.player)
+            boy = Boy(get_animation('boy_idle'), (-150,100), self.player)
             self.add(boy)
             collision_layer.add(boy, static=boy.shape.static)
 
-            girl = Girl(get_animation('girl_idle'), (0,120), self.player)
+            girl = Girl(get_animation('girl_idle'), (-250,120), self.player)
             self.add(girl)
             collision_layer.add(girl, static=girl.shape.static)
             
-            mother = Mother(get_animation('mother_idle'), (-100,-100), self.player)
+            mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
             self.add(mother)
             collision_layer.add(mother, static=mother.shape.static)
 

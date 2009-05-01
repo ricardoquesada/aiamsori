@@ -1,1 +1,1 @@
-( cd data; python ../gamelib/tiless_editor/tiless_editor.py -t tiles map.json )
+( cd data; python ../gamelib/tiless_editor/tiless_editor.py -t newtiles map.json )
