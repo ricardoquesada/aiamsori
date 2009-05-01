@@ -9,7 +9,7 @@ COLLISION_LAYER_BULLET = 16
 COLLISION_GROUP_AGENT = 1
 COLLISION_GROUP_ZOMBIE = 2
 
-# bullet shape radius is a little smaller than the agent/zombie body so as to 
+# bullet shape radius is a little smaller than the agent/zombie body so as to
 # hit almost everywhere on the body
 BULLET_RADIUS = 30
 BULLET_DAMAGE_ENERGY = 10
@@ -61,6 +61,7 @@ class BulletShape(Segment):
 
     # README: uncomment this to debug collision shape
     def draw(self):
+        return
         import pyglet
         from pymunk.vec2d import Vec2d
         batch = pyglet.graphics.Batch()
@@ -74,28 +75,27 @@ class BulletShape(Segment):
         target_1 = self.b + v2.rotated(-rotation)
         target_2 = self.b + v1.rotated(-rotation)
         #print 'rotation', self.sprite.agent.rotation
-        print '---'*20
-        print 'origin', self.a, 'target', self.b
-        print 'rotation', self.rotation
-        print 'sprite rotation ', self.sprite.rotation
-        print 'agent rotation ', self.sprite.agent.rotation
+        #print '---'*20
+        #print 'origin', self.a, 'target', self.b
+        #print 'rotation', self.rotation
+        #print 'sprite rotation ', self.sprite.rotation
+        #print 'agent rotation ', self.sprite.agent.rotation
         collision_layer = self.sprite.parent
-        print 'pymunk a', collision_layer.space._active_objects[self].a
-        print 'pymunk b', collision_layer.space._active_objects[self].b
-        print 'pymunk rotation', collision_layer.space._active_objects[self].rotation
+        #print 'pymunk a', collision_layer.space._active_objects[self].a
+        #print 'pymunk b', collision_layer.space._active_objects[self].b
+        #print 'pymunk rotation', collision_layer.space._active_objects[self].rotation
         points = [origin_1[0], origin_1[1], origin_2[0], origin_2[1], target_1[0], target_1[1], target_2[0], target_2[1]]
         batch.add(4, pyglet.gl.GL_LINE_LOOP, None,
                 ('v2f', points),
                 ('c3B', [255,255,255]*4))
         batch.draw()
 
-        print self.sprite.agent
-        print 'agent position', self.sprite.agent.position
-        print 'agent shape position', self.sprite.agent.shape.position
-        print 'agent rotation', self.sprite.agent.rotation
-        print 'agent shape rotation', self.sprite.agent.shape.rotation
-        print 'agent shape radius', self.sprite.agent.shape.radius
-        print 'pymunk agent pos', self.sprite.parent.space._active_objects[self.sprite.agent.shape].body.position
-        print 'pymunk agent rot', self.sprite.parent.space._active_objects[self.sprite.agent.shape].rotation
-        print 'pymunk agent rad', self.sprite.parent.space._active_objects[self.sprite.agent.shape].radius
-
+        #print self.sprite.agent
+        #print 'agent position', self.sprite.agent.position
+        #print 'agent shape position', self.sprite.agent.shape.position
+        #print 'agent rotation', self.sprite.agent.rotation
+        #print 'agent shape rotation', self.sprite.agent.shape.rotation
+        #print 'agent shape radius', self.sprite.agent.shape.radius
+        #print 'pymunk agent pos', self.sprite.parent.space._active_objects[self.sprite.agent.shape].body.position
+        #print 'pymunk agent rot', self.sprite.parent.space._active_objects[self.sprite.agent.shape].rotation
+        #print 'pymunk agent rad', self.sprite.parent.space._active_objects[self.sprite.agent.shape].radius

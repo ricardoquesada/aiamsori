@@ -265,7 +265,7 @@ class GameLayer(Layer):
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
         # README: uncomment this to debug collision shapes
-        collision_layer.show_shapes = True
+        collision_layer.show_shapes = False
 
         for layer in layers:
             for z, child in layer.children:
@@ -276,39 +276,6 @@ class GameLayer(Layer):
                 wall = Wall(child)
                 collision_layer.add(wall, static=wall.shape.static)
         return collision_layer
-
-
-#    def _create_sprite(self, data, shape_cls=None):
-#        img = data['img']
-#        sprite = NotifierSprite(str(img['filename']),
-#                                img['position'], img['rotation'],
-#                                img['scale'], img['opacity'])
-#        sprite.label = img['label'] if "label" in img else None
-#        sprite.path = img['filename']
-#        sprite.rect = img['rect']
-#
-#        args = (sprite,) + data.get('args', ())
-#        kwargs = dict(data.get('kwargs', {}))
-#
-#        if shape_cls is not None:
-#            shape = shape_cls(*args, **kwargs)
-#        else:
-#            shape = None
-#        sprite.shape = shape
-#        return sprite
-#
-#
-#    def _create_wall(self, img):
-#        data = {'img': img}
-#        return self._create_sprite(data, Wall)
-#
-#    def _create_bullet(self, origin, target):
-#        img = {'filename': 'img/bullet.png', 'position': origin,
-#               'rotation': 0, 'scale': 1.0,
-#               'opacity': 0, 'rect': [0, 0, 64, 64]}
-#        args = (origin, target)
-#        data = {'img': img, 'args': args}
-#        return self._create_sprite(data, Bullet)
 
     def update(self, dt):
         x, y = director.get_window_size()
