@@ -1,1 +1,8 @@
-{"tiles/pared.jpg": [396, 0, 64, 64], "tiles/alambre_v.png": [66, 258, 64, 64], "tiles/ventana_v.png": [198, 0, 196, 256]}
+{
+    "newtiles/pared.png": [
+        0, 
+        0, 
+        64, 
+        64
+    ]
+}
