@@ -36,7 +36,7 @@ import light
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 
-WIDTH, HEIGHT = 1024, 768
+#WIDTH, HEIGHT = 1024, 768
 MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
@@ -49,6 +49,10 @@ def main():
     parser.add_option("-w", "--wpting",
                       action="store_true", dest="wpt_on", default=False,
                       help="waypointing mode on")
+    parser.add_option("-x", "--width", type='int', dest="width", default='1024',
+                      help="set window width", metavar="WIDTH")
+    parser.add_option("-y", "--height", type="int", dest="height", default='768',
+                      help="set window height", metavar="HEIGHT")
     # need no enemies while waypointing, and another on_key 
     global options
     (options, args) = parser.parse_args()
@@ -70,7 +74,7 @@ def main():
 
     # initialize cocos director
     #director.init(fullscreen=True)
-    director.init(WIDTH, HEIGHT, resizable=True)
+    director.init(options.width, options.height, resizable=True)
     sound.init()
     # create game scene
     game_layer = GameLayer(MAPFILE)
