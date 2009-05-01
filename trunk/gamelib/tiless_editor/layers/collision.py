@@ -315,7 +315,9 @@ class CollisionSpace(object):
             shapeA = self._get_shape(pm_shapeA)
             shapeB = self._get_shape(pm_shapeB)
             shapeA.data['collided'] = True
+            shapeA.data['other'] = shapeB
             shapeB.data['collided'] = True
+            shapeB.data['other'] = shapeA
             self.callback(shapeA, shapeB)
         return True
 

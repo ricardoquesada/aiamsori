@@ -12,6 +12,8 @@ import sound
 
 # NOTE: select wich class will be used as Zombie near EOF 
 
+COLLISION_GROUP_FATHER = 1
+
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.2)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
@@ -70,6 +72,7 @@ class Agent(NotifierSprite):
 class Father(Agent):
     def __init__(self, img, position, game_layer):
         super(Father, self).__init__(img, position)
+        self.shape.group = COLLISION_GROUP_FATHER
 
         self._old_state = {'position': position}
         self.speed = 0
@@ -128,10 +131,10 @@ class Father(Agent):
 
         game_layer = self.game_layer
         bullet = game_layer._create_bullet(origin, target)
+        bullet.shape.group = COLLISION_GROUP_FATHER
         game_layer.add(bullet)
         collision_layer = game_layer.map_node.get('collision')
         collision_layer.add(bullet, static=bullet.shape.static)
-        #collision_layer.step()
 
 
 

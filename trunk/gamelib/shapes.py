@@ -11,7 +11,7 @@ COLLISION_GROUP_ZOMBIE = 2
 
 # bullet shape radius is a little smaller than the agent/zombie body so as to 
 # hit almost everywhere on the body
-BULLET_RADIUS = 50
+BULLET_RADIUS = 30
 BULLET_DAMAGE_ENERGY = 10
 
 
@@ -38,7 +38,8 @@ class Wall(Square):
         super(Wall, self).__init__(sprite.width, sprite.height, position=sprite.position)
         self.sprite = sprite
         self.static = True
-        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
+        #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
+        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
 
 
 class Ray(Segment):
@@ -54,7 +55,8 @@ class Bullet(Segment):
         super(Bullet, self).__init__(BULLET_RADIUS, origin=origin, target=target)
         self.sprite = sprite
         self.static = False
-        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
+        #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
+        self.layers = COLLISION_LAYER_ZOMBIE
         self.damage_energy = BULLET_DAMAGE_ENERGY
 
     # README: uncomment this to debug collision shape
