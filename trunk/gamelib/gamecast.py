@@ -2,6 +2,7 @@ from glob import glob
 import geom
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from pyglet.image import Animation, AnimationFrame, load
+from pymunk.vec2d import Vec2d
 
 from cocos.sprite import NotifierSprite
 
@@ -60,10 +61,6 @@ class Agent(NotifierSprite):
             return
         self.collision = other
 
-    #def on_collision(self, other):
-    #    # called when we want to report a collision
-    #    pass
-
     def play_anim(self, anim_name):
         self.image = self.anims[anim_name]
         self.image_anchor = (self.image.frames[0].image.width / 2,
@@ -72,21 +69,13 @@ class Agent(NotifierSprite):
 
     def on_collision(self, other):
         if isinstance(other, Bullet):
-            print 'Agent hit at position', self.position, self
-            print "self", self.shape.pm_obj.body.position,
-            print 'other', other.shape.pm_obj.a, other.shape.pm_obj.b
             self.die()
-            self.player.game_layer.remove_bullet(other)
 
     def die(self):
-        print self, 'at position', str(self.position), 'DIED'
-        print 'contacts', [contact.position for contact in self.shape.data['contacts']]
-        #import pdb; pdb.set_trace()
+        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
+        # as segfaults might occur
         game_layer = self.player.game_layer
-        collision_layer = game_layer.map_node.get('collision')
-        # remove agent
-        collision_layer.remove(self, static=self.shape.static)
-        game_layer.remove(self)
+        game_layer.dead_items.add(self)
 
 
 class Father(Agent):
@@ -119,7 +108,6 @@ class Father(Agent):
         if self.acceleration != 0 and abs(self.speed) < 130:
             self.speed += self.acceleration*100*dt
 
-
         self.rotation += 110 * self.rotation_speed * dt
         # update the position, based on the speed
         nx = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
@@ -141,22 +129,8 @@ class Father(Agent):
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
     def fire(self):
-        #origin = self.position
-        #WEAPON_RANGE = 500
-        #from pymunk.vec2d import Vec2d
-        #direction = Vec2d(1, 0)
-        #direction.rotate(-self.rotation)
-        #target = Vec2d(origin) + direction * WEAPON_RANGE
-        #print 'firing from ', origin , 'to', target
         bullet = Bullet(get_animation('bullet'), self)
         self.game_layer.add_bullet(bullet)
-        #game_layer = self.game_layer
-        #bullet = game_layer._create_bullet(origin, target)
-        #bullet.shape.group = COLLISION_GROUP_FATHER
-        #game_layer.add(bullet)
-        #collision_layer = game_layer.map_node.get('collision')
-        #collision_layer.add(bullet, static=bullet.shape.static)
-
 
 
 class Relative(Agent):
@@ -361,15 +335,10 @@ class ZombieWpt(Agent):
             self.die(other)
 
     def die(self, bullet):
-        print 'Bullet DIED'
+        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
+        # as segfaults might occur
         game_layer = self.player.game_layer
-        collision_layer = game_layer.map_node.get('collision')
-        # remove bullet
-        collision_layer.remove(bullet, static=bullet.shape.static)
-        game_layer.remove(bullet)
-        # remove zombie
-        collision_layer.remove(self, static=self.shape.static)
-        game_layer.map_node.remove(self)
+        game_layer.dead_items.add(self)
 
 
 class Bullet(NotifierSprite):
@@ -382,13 +351,9 @@ class Bullet(NotifierSprite):
         position = agent.position
         WEAPON_RANGE = 200
 
-        from pymunk.vec2d import Vec2d
         offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
-        print 'direction', offset
         target = offset+position
-        print 'firing from ', position , 'to', target
         shape = BulletShape(self, position, target)
-        print 'segment from ', shape.a, 'to', shape.b
         shape.group = agent.shape.group
         self.shape = shape
 
