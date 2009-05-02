@@ -442,7 +442,7 @@ class GameLayer(Layer):
         if not msg:
             msg = "I think I remember seeing "
             if item:
-                msg += item 
+                msg += item
             else:
                 msg += 'something'
             if place:
@@ -493,7 +493,7 @@ class GameLayer(Layer):
         # create agent sprite
         father = Father(self, get_animation('father_idle'), (0,-800))
         self.player = father
-        self.hud.set_life(father.life)
+        self.hud.set_life("Dad", father.life)
         if hasattr(father.weapon, 'ammo'):
             self.hud.set_bullets(father.weapon.ammo)
         else:
