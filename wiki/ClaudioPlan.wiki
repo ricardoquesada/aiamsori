@@ -6,11 +6,11 @@ claudio .plan
 ...<br>
 *done*	create_ray_to_wall_collision(wallmask, tilesize)<br>
 *done*	ray_to_wall_collision((x0,y0),(hx,hy)) ; first pair origin, second direction<br>
-
-need:
-curr	build wallmask at loadmap
-curr	obtain tilesize at loadmap
-
+<br>
+need:<br>
+curr	build wallmask at loadmap<br>
+curr	obtain tilesize at loadmap<br>
+<br>
 Later:
 	augment ray_to_wall_collision to 
 	fatray_to_wall_collision((x0,y0),(hx,hy),r) # r ray diameter
