@@ -52,7 +52,7 @@ RETREAT_DELAY = 0.1
 ZOMBIE_WAVE_COUNT = 5
 ZOMBIE_WAVE_DURATION = 60
 
-RANDOM_DELTA = 70
+RANDOM_DELTA = 128
 UNKNOWN_ITEM_PROBABILTY = 0.1
 UNKNOWN_PLACE_PROBABILTY = 0.1
 
@@ -240,7 +240,7 @@ class GameLayer(Layer):
         self.hud = hud
         self.talk_layer = talk.TalkLayer()
         self.hud.add(self.talk_layer, z=10)
-        self.talk("Dad", "DAMN ZOMBIES!!!! Where's my shotgun!!!")
+        #self.talk("Dad", "DAMN ZOMBIES!!!! Where's my shotgun!!!")
         #self.talk("Dad", "hello hello hello"*5)
         #self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
 
@@ -364,23 +364,31 @@ class GameLayer(Layer):
         self.item_spawn = []
         for c in layer.get_children():
             self.item_spawn.append( c.position )
-        self.spawn_powerup()
+        self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")
+        self.spawn_powerup('shotgun')
 
-    def spawn_powerup(self):
-        def _spawn_powerup():
-            position = random.choice(self.item_spawn)
-            type = random.choice(['bullets', 'life'])
-            powerup = PowerUp(type, position, self)
-            self.agents_node.add(powerup)
-            if type == 'life':
-                item = 'food'
-            elif type == 'bullets':
-                item = 'ammo'
-            if random.random() < UNKNOWN_ITEM_PROBABILTY:
-                item = ''
-            place = powerup.label if hasattr(powerup, 'label') else ''
-            if random.random() < UNKNOWN_PLACE_PROBABILTY:
-                place = ''
+    def spawn_powerup(self, type=''):
+        delay = random.randrange(10, 30)
+        self.do(Delay(delay) + CallFunc(lambda: self.spawn_powerup(type)))
+
+    def add_powerup(self, type='', msg=''):
+        position = random.choice(self.item_spawn)
+        if not type:
+            type = random.choice(['bullets', 'life', 'shotgun'])
+        powerup = PowerUp(type, position, self)
+        self.agents_node.add(powerup)
+        if type == 'life':
+            item = 'food'
+        elif type == 'bullets':
+            item = 'ammo'
+        else:
+            item = ''
+        if random.random() < UNKNOWN_ITEM_PROBABILTY:
+            item = ''
+        place = powerup.label if hasattr(powerup, 'label') else ''
+        if random.random() < UNKNOWN_PLACE_PROBABILTY:
+            place = ''
+        if not msg:
             msg = "I think I remember seeing "
             if item:
                 msg += item 
@@ -390,25 +398,19 @@ class GameLayer(Layer):
                 msg += " in the %s." % place
             else:
                 msg += ' somewhere.'
-            self.talk("Dad", msg, transient=False)
-            #print "powerup ", powerup, 'at', place, position
-
-        delay = random.randrange(10, 30)
-        self.do(Delay(delay) + CallFunc(_spawn_powerup))
+        self.talk("Dad", msg, transient=False)
+        #print "powerup ", powerup, 'at', place, position
 
     def respawn_zombies(self, dt):
         self.z_spawn_lifetime += dt
         if self.z_spawn_lifetime == 0 or self.z_spawn_lifetime >= ZOMBIE_WAVE_DURATION:
-            ###collision_layer = self.map_node.get('collision')
             for i in range(ZOMBIE_WAVE_COUNT):
                 for c in self.zombie_spawn.get_children():
                     z = Zombie(self, get_animation('zombie1_idle'), self.player)
                     z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
                     z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
                     z.position = z.x, z.y
-                    #self.map_node.add(z)
                     self.agents_node.add(z)
-                    ###collision_layer.add(z, static=z.shape.static, scale=.75)
             self.z_spawn_lifetime = 0
 
 
@@ -436,7 +438,6 @@ class GameLayer(Layer):
 
     def _create_agents(self):
         # get collision layer
-        ###collision_layer = self.map_node.get('collision')
 
         # create agent sprite
         father = Father(self, get_animation('father_idle'), (0,-800))
@@ -448,7 +449,6 @@ class GameLayer(Layer):
             # fist weapon has no bullets
             self.hud.set_bullets(0)
         self.agents_node.add(father)
-        ###collision_layer.add(father, static=father.shape.static)
 
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
@@ -456,39 +456,14 @@ class GameLayer(Layer):
             position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
             boy = Boy(self, get_animation('boy_idle'), position, self.player)
             self.agents_node.add(boy)
-            ###collision_layer.add(boy, static=boy.shape.static)
 
             position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
             girl = Girl(self, get_animation('girl_idle'), position, self.player)
             self.agents_node.add(girl)
-            ###collision_layer.add(girl, static=girl.shape.static)
 
             position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
             mother = Mother(self, get_animation('mother_idle'), position, self.player)
-#            mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
             self.agents_node.add(mother)
-            ###collision_layer.add(mother, static=mother.shape.static)
-
-    ###def on_collision(self, shape_a, shape_b):
-    ###    node = shape_a.sprite
-    ###    other = shape_b.sprite
-    ###    if isinstance(node, Agent):
-    ###        node._on_collision(other)
-    ###    if isinstance(other, Agent):
-    ###        other._on_collision(node)
-
-
-    ###def _create_collision_layer(self, layers):
-    ###    return
-    ###    collision_layer = CollisionLayer(self.on_collision)
-    ###    # README: uncomment this to debug collision shapes
-    ###    #collision_layer.show_shapes = False
-
-    ###    for layer in layers:
-    ###        for z, child in layer.children:
-    ###            wall = Wall(child)
-    ###            collision_layer.add(wall, static=wall.shape.static)
-    ###    return collision_layer
 
     def update(self, dt):
         x, y = director.get_window_size()

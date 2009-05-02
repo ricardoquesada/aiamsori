@@ -5,7 +5,7 @@ from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from pyglet.image import Animation, AnimationFrame, load
 #from pymunk.vec2d import Vec2d
 
-RANDOM_DELTA = 70
+RANDOM_DELTA = 128
 
 from cocos.sprite import Sprite
 
@@ -23,10 +23,12 @@ COLLISION_DISTANCE_SQUARED = 64**2
 TOP_SPEED = 430
 ACCEL_FACTOR = 300
 
+POWERUP_TYPE_WEAPON_LIST = ['shotgun']
 POWERUP_TYPE_BULLETS = 'bullets'
 POWERUP_TYPE_LIFE = 'life'
 POWERUP_BULLETS = 5
 POWERUP_LIFE = 20
+FULL_LOAD_BULLETS = 50
 
 PLAYER_MAX_LIFE = 100
 
@@ -71,6 +73,7 @@ class Agent(Sprite):
                 #print self, 'COLLISION', agent
                 # objects collided
                 if self.just_born:
+                    print 'newborn collision', self.position
                     ###distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
                     ###collision = distance <= COLLISION_DISTANCE_SQUARED
                     ###while collision:
@@ -189,6 +192,12 @@ class Father(Agent):
                     self.life = PLAYER_MAX_LIFE
                 print 'new life', self.life
                 hud.set_life(self.life)
+            elif other.type in POWERUP_TYPE_WEAPON_LIST:
+                weapon = self.weapons[other.type]
+                if hasattr(weapon, 'ammo'):
+                    weapon.ammo += FULL_LOAD_BULLETS
+                    hud.set_bullets(weapon.ammo)
+                self.switch_weapon(other.type)
 
     def update(self, dt):
         # update speed
