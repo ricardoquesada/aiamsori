@@ -302,7 +302,8 @@ class Father(Family):
         if self.acceleration != 0 and abs(self.speed) < TOP_SPEED:
             self.speed += self.acceleration*ACCEL_FACTOR*dt
 
-        self.rotation += 110 * self.rotation_speed * dt
+##        self.rotation += 110 * self.rotation_speed * dt
+            
         # update the position, based on the speed
         nx = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
         ny = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
