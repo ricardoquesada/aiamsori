@@ -43,8 +43,7 @@ import sound
 from light import Light
 import waypointing
 
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
-from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, PowerUp, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
 
@@ -193,7 +192,7 @@ class ImageLayer(Layer):
             s.do(Hide())
 
         # grossini abajo a la izquierda
-        grossini.position = self.w - grossini.image.width, grossini.image.height / 2
+        grossini.position = self.w - grossini.image.width, grossini.image.height
         texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']
 
         labels = []
@@ -206,9 +205,6 @@ class ImageLayer(Layer):
             self.add(l, z=1)
             l.do(Hide())
 
-        # centrar texto
-        labels[0].position = self.w / 2 - 490 , self.h / 2
-        labels[5].position = self.w / 2 - 25 , self.h / 2
         delay = 1
         for l,s in zip(labels, sprites):
             l.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
@@ -220,6 +216,7 @@ class ImageLayer(Layer):
 
         self.borrar = labels + sprites
         self.do(Delay(delay) + CallFunc(lambda: self.on_key_press(0,0)))
+        sound.play("intro_music")
 
     def on_key_press(self, k, m):
         print "aprento una tecla"
@@ -550,10 +547,15 @@ class GameLayer(Layer):
     def add_powerup(self, type='', msg=''):
         position = random.choice(self.item_spawn)
         if not type:
-            type = random.choice(POWERUP_TYPE_AMMO_LIST + POWERUP_TYPE_LIFE_LIST)
+            type = random.choice(['bullets', 'life'])
         powerup = PowerUp(type, position, self)
         self.agents_node.add(powerup)
-        item = type
+        if type == 'life':
+            item = 'food'
+        elif type == 'bullets':
+            item = 'ammo'
+        else:
+            item = ''
         if random.random() < UNKNOWN_ITEM_PROBABILTY:
             item = ''
         place = powerup.label if hasattr(powerup, 'label') else ''
@@ -698,10 +700,20 @@ class GameLayer(Layer):
         #print self.projectiles
 
     def _remove_dead_items(self):
+        ###collision_layer = self.map_node.get('collision')
         for item in self.dead_items:
+            ###collision_layer.remove(item, static=item.shape.static)
             if item in self.agents_node:
                 self.agents_node.remove(item)
         self.dead_items.clear()
+
+    def is_clear_path(self, origin, target):
+        ray = Ray(self.player, target)
+        ###collision_layer = self.map_node.get('collision')
+        ###collision_layer.add(ray, static=ray.shape.static)
+        ###collision_layer.step()
+        ###collision_layer.remove(ray)
+        return not ray.shape.data['collided']
 
     def is_empty(self,x,y):
         # note: ATM only walls, not muebles

@@ -13,7 +13,7 @@ sound_resources =  {
     'pickup_helth': 'sounds/pickup_health.wav',
     'pickup_shotgun': 'sounds/pickup_shotgun.wav',
 ##    'game_music': 'sounds/player_die.mp3',
-##    'intro_music': 'sounds/player_die.mp3',
+   'intro_music': 'sounds/Musictitle.ogg',
 ##    'zombie_eat': 'sounds/player_die.mp3'
 }
 
