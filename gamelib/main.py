@@ -140,8 +140,8 @@ def main():
         has_grabber = False
 
     # initialize cocos director
-    #director.init(fullscreen=True)
-    director.init(options.width, options.height, resizable=True)
+    director.init(fullscreen=True)
+#    director.init(options.width, options.height, resizable=True)
     sound.init()
 
     director.set_3d_projection()
@@ -238,30 +238,30 @@ class ImageLayer(Layer):
 
 
         self.borrar = labels + sprites
-        self.do(Delay(delay+5.2) + CallFunc(lambda: self.on_key_press(0,0)))
+        self.do(Delay(delay+5.2) + CallFunc(lambda: self.goto_title()))
         sound.play_music("intro_music")
 
-    def on_key_press(self, k, m):
-        print "aprento una tecla"
-        if self.state == 0:
-            [self.remove(h) for h in self.borrar]
-            x,y = self.w, self.h
-            labelkey = Label('press any key to start', font_name='Times New Roman', font_size=28, bold=True, anchor_x='center')
-            labelkey.position = self.w / 2  , 150
-            labelkey.element.color = 0,0,0,180
-            self.add(labelkey, z=1)
-            labelkey.do(Hide())
+#    def on_key_press(self, k, m):
+    def goto_title(self):
+        [self.remove(h) for h in self.borrar]
+        x,y = self.w, self.h
+##        labelkey = Label('press any key to start', font_name='Times New Roman', font_size=28, bold=True, anchor_x='center')
+##         labelkey.position = self.w / 2  , 150
+##         labelkey.element.color = 0,0,0,180
+##         self.add(labelkey, z=1)
+##         labelkey.do(Hide())
 
-            bg = Sprite('data/img/ppl.png')
-            self.add(bg)
-            bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
-            labelkey.do(Delay(5) + Show() + FadeIn(2))
+        bg = Sprite('data/img/ppl.png')
+        self.add(bg)
+        bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
+#        labelkey.do(Delay(5) + Show() + FadeIn(2))
+        self.do(Delay(3) + CallFunc(lambda: self.goto_game()))
 
-            self.state = 1
-        elif self.state == 1:
-            sound.stop_music()
-            director.replace(get_game_scene())
-            self.state = 2
+
+    def goto_game(self):
+        sound.stop_music()
+        director.replace(get_game_scene())
+        self.state = 2
 
 
 class GameOverLayer(Layer):
