@@ -412,7 +412,7 @@ class GameLayer(Layer):
 
         def visible(a, b):
             r = _visible(a, b)
-            print "visible", a, b, r
+            #print "visible", a, b, r
             return r
         print "Found", len(visible_map), "connections"
         self.ways = waypointing.WaypointNav(points, visible)
@@ -422,17 +422,18 @@ class GameLayer(Layer):
         self.item_spawn = []
         for c in layer.get_children():
             self.item_spawn.append( c.position )
-        self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")
+        # wait 4 seconds before displaying first message
+        self.do(Delay(4) + CallFunc(lambda: self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")))
         self.spawn_powerup('shotgun')
 
     def spawn_powerup(self, type=''):
         delay = random.randrange(10, 30)
-        self.do(Delay(delay) + CallFunc(lambda: self.spawn_powerup(type)))
+        self.do(Delay(delay) + CallFunc(lambda: self.add_powerup(type)))
 
     def add_powerup(self, type='', msg=''):
         position = random.choice(self.item_spawn)
         if not type:
-            type = random.choice(['bullets', 'life', 'shotgun'])
+            type = random.choice(['bullets', 'life'])
         powerup = PowerUp(type, position, self)
         self.agents_node.add(powerup)
         if type == 'life':
