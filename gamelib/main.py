@@ -14,8 +14,9 @@ import random
 import optparse
 import avbin
 
-from pyglet import gl
+from pyglet import gl, font
 from pyglet.window import key
+
 import cocos
 from cocos import euclid
 from cocos import framegrabber
@@ -118,6 +119,11 @@ def main():
     pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
     pyglet.resource.reindex()
 
+    #Fonts stuff
+    fonts_path = os.path.abspath('data/fonts')
+    print fonts_path
+    font.add_directory(fonts_path)
+
     #Load avbin
 
 #    avbin.init_avbin() #warn: if uncomented windows crash
@@ -188,8 +194,7 @@ class ImageLayer(Layer):
 
     def on_key_press(self, k, m):
         print "aprento una tecla"
-        game_scene = get_game_scene()
-        director.replace(game_scene)
+        director.replace(get_game_scene())
 
 
 class GameOverLayer(Layer):
@@ -198,13 +203,13 @@ class GameOverLayer(Layer):
     def __init__(self):
         super(GameOverLayer, self).__init__()
         w, h = director.get_window_size()
-        label = Label('Game Over, you sucker...', font_name='Times New Roman', font_size=52, bold=True)
+        label = Label('Game Over, you sucker...', font_name='youmurdererbb_reg', font_size=52, bold=True)
         label.position = w / 2 - 340 , h / 2 + 100
         label.element.color = 40,179,75,180
-        label2 = Label('do you want to play again?', font_name='Times New Roman', font_size=52, bold=True)
+        label2 = Label('do you want to play again?', font_name='youmurderer', font_size=52, bold=True)
         label2.position = w / 2 - 420 , h / 2 
         label2.element.color = 40,179,75,180
-        label3 = Label('(Y/N)', font_name='Times New Roman', font_size=52, bold=True)
+        label3 = Label('(Y/N)', font_name='youmurdererbb', font_size=52, bold=True)
         label3.position = w / 2 - 40, h / 2 - 100
         label3.element.color = 40,179,75,180
         self.add(label, z=1)
