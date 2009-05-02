@@ -147,7 +147,7 @@ class Agent(Sprite):
         #print 'self', self, 'other', other
         if isinstance(other, Bullet):
 #            if not isinstance(self, Father):
-            if isinstance(self, ZombieBoid):
+            if isinstance(self, Zombie):
                 bullet = other
                 self.receive_damage(bullet.player.weapon.damage, bullet)
         elif isinstance(other, Agent):
@@ -242,13 +242,13 @@ class Father(Family):
             if other.type == POWERUP_TYPE_BULLETS:
                 weapon = self.weapons['shotgun']
                 weapon.ammo += POWERUP_BULLETS
-                print 'new ammo', weapon.ammo
+#                print 'new ammo', weapon.ammo
                 hud.set_bullets(weapon.ammo)
             elif other.type == POWERUP_TYPE_LIFE:
                 self.life += POWERUP_LIFE
                 if self.life > PLAYER_MAX_LIFE:
                     self.life = PLAYER_MAX_LIFE
-                print 'new life', self.life
+#                print 'new life', self.life
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
@@ -346,12 +346,12 @@ class MeleeWeapon(Weapon):
         super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
 
     def attack(self):
-        print "ATTACK"
+#        print "ATTACK"
         if BLOODY_HANDS_EASTEREGG:
             self.player.add_gore(Blood, self.player, duration=.5)
 
         if self.player.collided_agent != None:
-            print 'morite!!', self.player.collided_agent
+#            print 'morite!!', self.player.collided_agent
             died = self.player.collided_agent.receive_damage(self.damage, self.player)
             if died:
                 self.player.collided_agent = None
@@ -449,8 +449,7 @@ class Mother(Relative):
         player.family['mother'] = self
 
 
-# ZombieBoid , the old zombie class
-class ZombieBoid(Agent):
+class Zombie(Agent):
     def __init__(self, game_layer, img, player):
         super(Zombie, self).__init__(game_layer, img)
         self._old_state = {}
@@ -474,7 +473,7 @@ class ZombieBoid(Agent):
 
 
     def on_enter(self):
-        super(ZombieBoid, self).on_enter()
+        super(Zombie, self).on_enter()
         family = [ p for p in self.parent.get_children() if isinstance(p, Family) ]
         if family:
             self.target = random.choice(
@@ -544,7 +543,7 @@ class ZombieBoid(Agent):
             self.time_since_attack = 0
 
     def on_collision(self, other):
-        super(ZombieBoid, self).on_collision(other)
+        super(Zombie, self).on_collision(other)
         if isinstance(other, Family):
             # zombies don't attach each other
             self.attack()
@@ -559,81 +558,7 @@ class ZombieBoid(Agent):
         return self.player.game_layer
 
 
-# actualmente es copia de ZombieBoid, esto es preparacion para implantar
-class ZombieWpt(Agent):
-    def __init__(self, game_layer, img, player):
-        super(Zombie, self).__init__(game_layer, img)
-        self._old_state = {}
-        self.speed = 100
-        self.schedule(self.update)
-        self.player = player
-        self.updating = False
-        self.collision = False
-        self.anims = {'idle': get_animation('zombie1_idle'),
-                      'walk': get_animation('zombie1_walk'),
-                      }
-        self.current_anim = 'idle'
-        ###self.shape = ZombieShape(self)
 
-    def update(self, dt):
-        # save old position
-        self._old_state = {'position': self.position, 'rotation': self.rotation}
-
-        locals = []
-        b = self
-        goal = seek(b.x, b.y, self.player.x, self.player.y)
-        #print "GOAL", goal
-        escape, danger = avoid_group(b.x, b.y, locals)
-        #print "danger", danger, escape
-        if danger < 50:
-            #print "escape"
-            chosen = escape
-        elif danger > 100:
-            #print "goal"
-            chosen = goal
-        else:
-            d = (danger-50)/50
-            chosen = merge([(goal, d), (escape, 1-d)])
-
-        delta = geom.angle_rotation(radians(b.rotation), radians(chosen))
-        delta = degrees(delta)
-        max_r = 270
-        delta = cap(delta, -max_r, max_r) * dt
-        b.rotation += delta
-
-        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
-        b.position = (b.x, b.y)
-        b.rotation = b.rotation % 360
-        # update position
-        a = -b.rotation
-        nx = (b.x + cos( radians(a) ) * b.speed * dt)
-        ny = (b.y + sin( radians(a) ) * b.speed * dt)
-
-        self.update_position((nx, ny))
-
-        if self.position != self.old_position:
-            self.play_anim('walk')
-
-        else:
-            if self.current_anim != 'idle':
-                self.play_anim('idle')
-    def on_collision(self, other):
-        #print 'Zombie on_collision', other
-        #if isinstance(self.collision, Bullet):
-        #    import pdb; pdb.set_trace()
-        #elif isinstance(other.shape, Bullet):
-        if isinstance(other, Bullet):
-            #print 'Zombie hit at position', self.position
-            self.die(other)
-
-    def die(self, bullet):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
-        game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
-
-    def _get_game_layer(self):
-        return self.player.game_layer
 
 class Bullet(Sprite):
     def __init__(self, img, player):
@@ -641,7 +566,7 @@ class Bullet(Sprite):
 
         self.anims = {}
         self.player = player
-        self.speed = 1500
+        self.speed = 1000
         self.schedule(self.update)
 
 
@@ -675,8 +600,8 @@ class Bullet(Sprite):
         #print 'updating bullet position', self.position, (nx,ny)
         self.update_position((nx, ny))
         # FIXME: this goes away as soon as bullets collide agains walls
-        if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
-            self.die()
+##         if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
+##             self.hit()
 
     def update_position(self, position):
         self.position = position
@@ -685,9 +610,11 @@ class Bullet(Sprite):
         #print 'BULLET DIED'
         #print self, self.position, other, other.position
         if self.player != other:
-            self.die()
+            self.hit()
+            
 
-    def die(self):
+#    def die(self):
+    def hit(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
         # as segfaults might occur
         game_layer = self.player.game_layer
@@ -730,6 +657,3 @@ class PowerUp(Sprite):
         self.game_layer.dead_items.add(self)
         self.game_layer.spawn_powerup()
 
-
-#select here wich Zombie class
-Zombie = ZombieBoid

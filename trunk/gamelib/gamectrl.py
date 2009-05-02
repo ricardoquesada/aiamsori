@@ -35,9 +35,11 @@ class KeyGameCtrl(Layer):
             target = self.game_layer.player.target
             is_clear = self.game_layer.is_clear_path(origin, target)
             if not is_clear:
-                print 'OBSTACLE'
+                pass
+#                print 'OBSTACLE'
             else:
-                print 'FREE PATH'
+                pass
+#                print 'FREE PATH'
 
         if k == key._1:
             self.game_layer.player.switch_weapon('fist')
