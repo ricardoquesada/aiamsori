@@ -54,7 +54,7 @@ class Sounds(object):
         if self.have_avbin and self.sfx:
             self.sounds[s].play().volume *= vol
 
-    def set_music(self, name):
+    def set_music(self, name, volumen=1):
         global current_music
 
         if not self.have_avbin:
@@ -72,7 +72,7 @@ class Sounds(object):
         self.music_player.queue(pyglet.resource.media(sound_resources[name], streaming=True))
         self.music_player.play()
         # pyglet bug
-        self.music_player.volume = self.music_player.volume
+        self.music_player.volume = volumen
         self.music_player.eos_action = 'loop'
 
     def stop_music(self):
