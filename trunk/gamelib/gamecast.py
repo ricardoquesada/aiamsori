@@ -23,6 +23,11 @@ COLLISION_DISTANCE_SQUARED = 64**2
 TOP_SPEED = 230
 ACCEL_FACTOR = 200
 
+POWERUP_TYPE_BULLETS = 'bullets'
+POWERUP_TYPE_LIFE = 'life'
+POWERUP_BULLETS = 5
+POWERUP_LIFE = 20
+
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.2)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
@@ -98,7 +103,6 @@ class Agent(Sprite):
 
         self.position = position
 
-
     def _on_collision(self, other):
         # used internally for collision testing
         if isinstance(other, Bullet):
@@ -159,12 +163,18 @@ class Father(Agent):
         self.weapon = self.weapons['shotgun']
         self.time_since_attack = 0
 
-
-##     def on_collision(self, other):
-##         pass
-##         if isinstance(other, Agent):
-##             self.collided_agent = other
-## #            pass#sound.play("player_punch")
+    def on_collision(self, other):
+        if isinstance(other, PowerUp):
+            hud = self.game_layer.hud
+            if other.type == POWERUP_TYPE_BULLETS:
+                weapon = self.weapons['shotgun']
+                weapon.ammo += POWERUP_BULLETS
+                print 'new ammo', weapon.ammo
+                hud.set_bullets(weapon.ammo)
+            elif other.type == POWERUP_TYPE_LIFE:
+                self.life += POWERUP_LIFE
+                print 'new life', self.life
+                hud.set_life(self.life)
 
     def update(self, dt):
         # update speed
@@ -556,6 +566,21 @@ class Wall(Sprite):
         self.path = img['filename']
         self.rect = img['rect']
         ###self.shape = WallShape(self)
+
+class PowerUp(Sprite):
+    def __init__(self, type, position, game_layer):
+        image = 'hud/%s.png' % type
+        super(PowerUp, self).__init__(image, position)
+        self.type = type
+        self.game_layer = game_layer
+
+    def on_collision(self, other):
+        # remove powerup as we consumed it
+        self.die()
+
+    def die(self):
+        self.game_layer.dead_items.add(self)
+        self.game_layer.spawn_powerup()
 
 
 #select here wich Zombie class
