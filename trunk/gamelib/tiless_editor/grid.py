@@ -26,8 +26,8 @@ class SpriteGrid(cocos.cocosnode.CocosNode):
 
             self.width = sprite.width
             self.height = sprite.height
-            sx = sprite.x - self.width/2
-            sy = sprite.y - self.height/2
+            sx = sprite.x - int(self.width/2)
+            sy = sprite.y - int(self.height/2)
 
             self.position = sprite.position
             self.build_lines()

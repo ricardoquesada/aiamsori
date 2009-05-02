@@ -101,7 +101,6 @@ class Agent(Sprite):
                     self.just_born = False
 
 
-        self.position = position
 
     def _on_collision(self, other):
         # used internally for collision testing
@@ -254,7 +253,7 @@ class MeleeWeapon(Weapon):
             print 'morite!!', self.player.collided_agent
             died = self.player.collided_agent.receive_damage(self.damage)
             if died:
-                self.player.collided_agent = None            
+                self.player.collided_agent = None
             self._play_sound()
 
 
@@ -488,7 +487,7 @@ class ZombieWpt(Agent):
         return self.player.game_layer
 
 class Bullet(Sprite):
-    def __init__(self, img, player):        
+    def __init__(self, img, player):
         super(Bullet, self).__init__(img, player.position, player.rotation, player.scale)
 
         self.anims = {}
