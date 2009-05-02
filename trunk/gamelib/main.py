@@ -20,7 +20,7 @@ from pyglet.window import key
 import cocos
 from cocos import euclid
 from cocos import framegrabber
-from cocos.actions import Delay, CallFunc, FadeTo, FadeOut
+from cocos.actions import Delay, CallFunc, FadeTo, FadeOut, Show, Hide, FadeIn, FadeOut
 from cocos.director import director
 from cocos.batch import BatchNode
 from cocos.scene import Scene
@@ -29,8 +29,6 @@ from cocos.sprite import Sprite
 from cocos.scenes.transitions import TransitionScene
 from cocos.text import Label
 from cocos.sprite import Sprite
-from cocos.actions.instant_actions import Hide, Show
-from cocos.actions.interval_actions import Delay
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 #from tiless_editor.layers.collision import CollisionLayer
@@ -151,6 +149,8 @@ def main():
     #scene = get_end_scene()
     director.run(scene)
 
+    director.run(main_scene)
+    #director.run(first_scene)
 
 def make_sprites_layer(layer_data, atlas):
     saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
@@ -178,19 +178,60 @@ class ImageLayer(Layer):
         super(ImageLayer, self).__init__()
         self.w = x
         self.h = y
-        bg = Sprite('data/img/ppl.png')
-        bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
-        self.add(bg)
+        self.state = 0
+        
+        grossini = Sprite('data/img/grossini.png')
+        mom = Sprite('data/img/Mom.png')
+        bee = Sprite('data/img/Bee.png')
+        zack = Sprite('data/img/Zack.png')
+        dad = Sprite('data/img/Dad.png')
+        sprites = [grossini, mom, bee, zack, dad]
+        for s in sprites:
+            self.add(s)
+            s.position = self.w / 2, self.h / 2
+            s.do(Hide())
+        
+        texts = ['aiamsori productions presents...', 'Mom...', 'Bee...', 'Zack...', 'and Dad!', 'in', 'Zombies Galore']                
+        labels = []
+        for t in texts:
+            l = Label(t, font_name='Times New Roman', font_size=52, bold=True)
+            #l.position = self.w / 2 - 340 , 15
+            l.element.color = 255,255,255,255
+            labels.append(l)
+            self.add(l, z=1)
+            l.do(Hide())
+        
+        delay = 1
+        for l,s in zip(labels, sprites):
+            l.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
+            s.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
+            delay += 5
+        
+        labels[5].do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
+        delay += 5
 
-        label = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
-        label.position = self.w / 2 - 340 , self.h / 2
-        label.element.color = 40,179,75,180
-        self.add(label, z=1)
-        label.do(Hide() + Delay(10) + Show())
-
+        self.borrar = labels + sprites
+        self.do(Delay(delay), CallFunc(self.on_key_press, [self, 0,0], {}))
+        
     def on_key_press(self, k, m):
         print "aprento una tecla"
-        director.replace(get_game_scene())
+        if self.state == 0:
+            [self.remove(h) for h in self.borrar]
+            x,y = self.w, self.h
+            labelkey = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
+            labelkey.position = self.w / 2 - 340 , self.h / 2
+            labelkey.element.color = 40,179,75,180
+            self.add(labelkey, z=1)
+            labelkey.do(Hide())
+                
+            bg = Sprite('data/img/ppl.png')
+            self.add(bg)
+            bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
+            labelkey.do(Delay(10) + Show() + FadeIn(2))
+        
+            self.state = 1
+        else:        
+            director.replace(get_game_scene())
 
 class GameOverLayer(Layer):
     is_event_handler = True
