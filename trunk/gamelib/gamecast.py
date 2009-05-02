@@ -158,6 +158,10 @@ class Father(Agent):
         self.family = {}
         self.selected_relative = None
         self.just_born = False
+        self.weapons = {'shotgun': RangedWeapon(self),
+                        'fist': MeleeWeapon(self)}
+        self.weapon = self.weapons['fist']
+        self.time_since_attack = 0
 
     def on_collision(self, other):
         if isinstance(self.collision, Agent):
@@ -179,6 +183,7 @@ class Father(Agent):
 
         # update layer position (center camera)
         self.game_layer.update(dt)
+        self.time_since_attack += dt
 
     def look_at(self, px, py):
         # translate mouse position to world
@@ -188,18 +193,47 @@ class Father(Agent):
         pl_x, pl_y = self.position[0], self.position[1]
         self.rotation = -(atan2(py - pl_y, px - pl_x) / pi * 180)
 
-    def fire(self):
-        bullet = Bullet(get_animation('bullet'), self)
-        #print 'bullet:', bullet.position
-        self.game_layer.add_bullet(bullet)
+    def attack(self):
+        if self.time_since_attack > self.weapon.frequency:
+            if self.weapon.range > 0:
+                print "RANGED"
+                projectile = self.weapon.get_projectile()
+                self.game_layer.add_projectile(projectile)
+            else:
+                print "MELEE"
 
+            self.time_since_attack = 0
     def die(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
         # as segfaults might occur
         game_layer = self.game_layer
         game_layer.dead_items.add(self)
+            
+
+class Weapon(object):
+    def __init__(self, player, damage, atk_range, frequency, sound=None):
+        self.player = player
+        self.damage = damage
+        self.range = atk_range
+        self.frequency = frequency
+        self.sound = sound
+
+##     def play_sound():
 
 
+class RangedWeapon(Weapon):
+    def __init__(self, player, damage=100, atk_range=1000, frequency=1.2):
+        super(RangedWeapon, self).__init__(player, damage, atk_range, frequency)
+
+    def get_projectile(self):
+        return Bullet(get_animation('bullet'), self.player)
+        
+
+class MeleeWeapon(Weapon):
+    def __init__(self, player, damage=30, atk_range=0, frequency=0.5):
+        super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency)
+        
+    
 class Relative(Agent):
     def __init__(self, img, position, player):
         super(Relative, self).__init__(img, position)
@@ -423,7 +457,7 @@ class ZombieWpt(Agent):
 
 
 class Bullet(Sprite):
-    def __init__(self, img, agent):
+    def __init__(self, img, agent):        
         super(Bullet, self).__init__(img, agent.position, agent.rotation, agent.scale)
 
         self.anims = {}

@@ -38,7 +38,7 @@ import talk
 import gamehud
 import sound
 import light
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Bullet, Ray, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
 
@@ -114,7 +114,7 @@ def main():
     main_scene.add(MouseGameCtrl(game_layer))
 
     director.run(main_scene)
-    #director.run(first_scene)
+#    director.run(first_scene)
 
 class LightLayer(cocos.batch.BatchNode):
     def __init__(self):
@@ -182,7 +182,7 @@ class GameLayer(Layer):
         self.grabber = framegrabber.TextureGrabber()
         self.grabber.grab(self.texture)
         self.map_node = LayersNode()
-        self.bullets = []
+        self.projectiles = []
         self.dead_items = set()
         self.wallmask = WallMask('newtiles/pared.png',64) # UPDATE!
         self.agents_node = LayersNode()
@@ -264,6 +264,7 @@ class GameLayer(Layer):
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
+
 
     def on_resize(self, w, h):
         if self.has_grabber:
@@ -369,6 +370,12 @@ class GameLayer(Layer):
     def on_enter(self):
         super(GameLayer, self).on_enter()
         x, y = director.get_window_size()
+
+        sound.play('zombie_eat')
+
+        self.do( Delay(3) + CallFunc(lambda: sound.play_music('game_music')) )
+        
+        
         #self.light.set_position(x/2, y/2)
         #self.light.enable()
 
@@ -433,31 +440,28 @@ class GameLayer(Layer):
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
         #self.lights.sprite.position = self.player.position
-        # clear out any non-collisioned bullets
-        #self._remove_bullets()
+
+        # clear out any non-collisioned projectiles
+#        self._remove_projectiles()
 
         # clear out any dead items
         self._remove_dead_items()
 
-    def add_bullet(self, bullet):
-        #print 'adding bullet'
-        self.bullets.append(bullet)
-        self.agents_node.add(bullet)
-        #print '---  '
-        #print self.agents_node.children
 
-        ###collision_layer = self.map_node.get('collision')
-        ###collision_layer.add(bullet, static=bullet.shape.static)
+    def add_projectile(self, projectile):
+        self.projectiles.append(projectile)
+        self.agents_node.add(projectile)
 
-    def remove_bullet(self, bullet):
-        self.bullets.remove(bullet)
+
+    def remove_projectile(self, projectile):
+        self.projectiles.remove(projectile)
         # delay objects deletion until later, to avoid segfaults
-        self.dead_items.add(bullet)
+        self.dead_items.add(projectile)
 
-    def _remove_bullets(self):
-        for bullet in self.bullets:
-            self.remove_bullet(bullet)
-        #print self.bullets
+    def _remove_projectiles(self):
+        for projectile in self.projectiles:
+            self.remove_projectile(projectile)
+        #print self.projectiles
 
     def _remove_dead_items(self):
         ###collision_layer = self.map_node.get('collision')

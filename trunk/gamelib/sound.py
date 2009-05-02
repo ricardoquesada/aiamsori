@@ -1,11 +1,16 @@
 import pyglet
 
 sound_resources =  {
-    'zombie_attack': 'sounds/zombie_attack.wav',
-    'player_defend': 'sounds/player_defend.mp3',
-    'player_die':    'sounds/player_die.mp3',
-    'player_punch':  'sounds/player_punch.ogg',
+#    'zombie_attack': 'sounds/zombie_attack.wav',
+#    'player_defend': 'sounds/player_defend.mp3',
+#    'player_die':    'sounds/player_die.mp3',
+#    'player_punch':  'sounds/player_punch.ogg',
+    'game_music': 'sounds/Music01.ogg',
+    'intro_music': 'sounds/Musictitle.ogg',
+    'zombie_eat': 'sounds/ZombieEat.ogg'
 }
+
+music_player =  pyglet.media.Player()
 
 class Sounds(object):
     """
@@ -36,11 +41,21 @@ class Sounds(object):
             self.sounds = dict([(k,  pyglet.resource.media(v, streaming=False)) for k, v in sound_resources.items() ])
 
 
-    def play(self, s):
+    def play(self, s, vol=1):
         if self.have_avbin and self.sfx:
-            self.sounds[s].play().volume *= 1
+            self.sounds[s].play().volume *= vol
+
+    def play_music(self, m, vol=0.3):
+        if self.have_avbin and self.music:
+            if m :
+                music_player.queue(self.sounds[m])
+            music_player.play()
+            music_player.volume = vol
+            music_player.eos_action = 'loop'   
 
 play = None
 def init():
     global play
     play = Sounds().play
+    global play_music
+    play_music = Sounds().play_music
