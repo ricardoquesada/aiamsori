@@ -53,7 +53,7 @@ MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
 ZOMBIE_WAVE_COUNT = 4
-ZOMBIE_DEBUG = 0        
+ZOMBIE_DEBUG = 0
 ZOMBIE_WAVE_DURATION = 60
 
 RANDOM_DELTA = 128
@@ -240,7 +240,7 @@ class ImageLayer(Layer):
 
         self.borrar = labels + sprites
         self.do(Delay(delay+5.2) + CallFunc(lambda: self.on_key_press(0,0)))
-        sound.play("intro_music")
+        sound.play_music("intro_music")
 
     def on_key_press(self, k, m):
         print "aprento una tecla"
@@ -260,6 +260,7 @@ class ImageLayer(Layer):
 
             self.state = 1
         elif self.state == 1:
+            sound.stop_music()
             director.replace(get_game_scene())
             self.state = 2
 
@@ -652,7 +653,8 @@ class GameLayer(Layer):
         self.lights.on_enter()
         sound.play('zombie_eat')
 
-        self.do( Delay(3) + CallFunc(lambda: sound.play_music('game_music')) )
+        self.do( Delay(3) + CallFunc(lambda: sound.stop_music()) +
+                CallFunc(lambda: sound.play_music('game_music')) )
 
 
         #self.light.set_position(x/2, y/2)
