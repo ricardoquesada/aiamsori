@@ -274,6 +274,7 @@ class Father(Family):
         # as segfaults might occur
         game_layer = self.game_layer
         game_layer.dead_items.add(self)
+        game_layer.game_over()
 
     def _get_game_layer(self):
         return self.game_layer
