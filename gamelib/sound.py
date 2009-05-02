@@ -50,7 +50,7 @@ class Sounds(object):
         if self.have_avbin and self.sfx:
             self.sounds[s].play().volume *= vol
 
-    def play_music(self, m, vol=0.3):
+    def play_music(self, m, vol=0.15):
         if self.have_avbin and self.music:
             if m :
                 music_player.queue(self.sounds[m])

@@ -20,8 +20,8 @@ COLLISION_GROUP_FATHER = 1
 
 COLLISION_DISTANCE_SQUARED = 64**2
 
-TOP_SPEED = 230
-ACCEL_FACTOR = 200
+TOP_SPEED = 430
+ACCEL_FACTOR = 300
 
 POWERUP_TYPE_BULLETS = 'bullets'
 POWERUP_TYPE_LIFE = 'life'
@@ -29,7 +29,7 @@ POWERUP_BULLETS = 5
 POWERUP_LIFE = 20
 
 def get_animation(anim_name):
-    return Animation([AnimationFrame(load(img_file), 0.2)
+    return Animation([AnimationFrame(load(img_file), 0.15)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
 
 
@@ -508,12 +508,12 @@ class Bullet(Sprite):
 
         self.anims = {}
         self.player = player
-        self.speed = 400
+        self.speed = 1500
         self.schedule(self.update)
 
 
         # get target
-        WEAPON_RANGE = 200
+        WEAPON_RANGE = self.player.weapon.range
 
         #from pymunk.vec2d import Vec2d
         #offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
