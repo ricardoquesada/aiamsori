@@ -11,10 +11,10 @@ class WallMask(object):
     def add(self,sprite): #only if apropiate
         if sprite.path!=self.fname: #TODO: verify adjust OS compatibility
             return
-        if ((sprite.width!=tilesize) or
-            (sprite.height!=tilesize)):
+        if ((sprite.width!=self.tilesize) or
+            (sprite.height!=self.tilesize)):
             print '*** Unexpected : wall tile is not square!!!'
-        self.wallmask[floor(child.x/tilesize),floor(child.y/tilesize)]=1
+        self.wallmask[floor(sprite.x/self.tilesize),floor(sprite.y/self.tilesize)]=1
 
     def _fill_gaps(self): # asumes no holes
         #calc bounds
