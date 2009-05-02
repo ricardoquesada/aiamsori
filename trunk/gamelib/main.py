@@ -287,6 +287,9 @@ class GameLayer(Layer):
         # capture after drawing
         self.grabber.after_render(self.texture)
 
+        ambient = 0.1
+        gl.glClearColor(ambient,ambient,ambient,ambient)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
         # after render
         # blit lights
         pyglet.gl.glPushMatrix()
