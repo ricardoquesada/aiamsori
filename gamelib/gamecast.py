@@ -111,7 +111,6 @@ class Agent(Sprite):
         if not self.updating:
             return
 
-
     def play_anim(self, anim_name):
         self.image = self.anims[anim_name]
         self.image_anchor = (self.image.frames[0].image.width / 2,
@@ -176,6 +175,7 @@ class Father(Agent):
         self.time_since_attack = 0
 
     def on_collision(self, other):
+        super(Father, self).on_collision(other)
         if isinstance(other, PowerUp):
             hud = self.game_layer.hud
             if other.type == POWERUP_TYPE_BULLETS:
@@ -241,6 +241,7 @@ class Father(Agent):
         self.play_anim('idle')
                 
 
+
 class Weapon(object):
     def __init__(self, player, damage, atk_range, frequency, sound=None):
         self.player = player
@@ -255,7 +256,7 @@ class Weapon(object):
 
 
 class RangedWeapon(Weapon):
-    def __init__(self, player, damage=50, atk_range=1000, frequency=1.2, sound='fire_shotgun'):
+    def __init__(self, player, damage=60, atk_range=1000, frequency=1, sound='fire_shotgun'):
         super(RangedWeapon, self).__init__(player, damage, atk_range, frequency, sound)
         self.ammo = 0
 
@@ -272,10 +273,11 @@ class RangedWeapon(Weapon):
 
 
 class MeleeWeapon(Weapon):
-    def __init__(self, player, damage=35, atk_range=0, frequency=0.5, sound='melee'):
+    def __init__(self, player, damage=35, atk_range=0, frequency=0.2, sound='melee'):
         super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
 
     def attack(self):
+        print "ATTACK"
         if self.player.collided_agent != None:
             print 'morite!!', self.player.collided_agent
             died = self.player.collided_agent.receive_damage(self.damage)
@@ -382,6 +384,7 @@ class ZombieBoid(Agent):
                       'walk': get_animation('zombie1_walk'),
                       }
         self.current_anim = 'idle'
+        self.gore = ['cacho1.png', 'cacho2.png', 'cacho4.png']
         ###self.shape = ZombieShape(self)
 
     def update(self, dt):
@@ -435,6 +438,14 @@ class ZombieBoid(Agent):
 
     def _get_game_layer(self):
         return self.player.game_layer
+
+
+    def receive_damage(self, damage):        
+        gore_piece = Sprite(load('data/img/'+random.choice(self.gore)),
+                                     (self.player.position))
+        self.add(gore_piece)
+        print gore_piece
+        return super(Zombie, self).receive_damage(damage)
 
 
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
