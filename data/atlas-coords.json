@@ -41,6 +41,12 @@
         128, 
         128
     ], 
+    "newtiles/alambre_rot.png": [
+        133, 
+        1427, 
+        128, 
+        4
+    ], 
     "newtiles/alambre.png": [
         1440, 
         0, 
