@@ -158,9 +158,12 @@ class Agent(Sprite):
 
 
 class Family(Agent):
-    pass
+    def receive_damage(self, damage, other):
+        super(Family, self).receive_damage(damage, other)
+        self.game_layer.hud.set_life(self.name, self.life)
 
 class Father(Family):
+    name = "Dad"
     def __init__(self, game_layer, img, position):
         super(Father, self).__init__(game_layer, img, position)
         ###self.shape.group = COLLISION_GROUP_FATHER
@@ -212,7 +215,7 @@ class Father(Family):
                 if self.life > PLAYER_MAX_LIFE:
                     self.life = PLAYER_MAX_LIFE
                 print 'new life', self.life
-                hud.set_life(self.life)
+                hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
                 weapon = self.weapons[other.type]
                 if hasattr(weapon, 'ammo'):
@@ -370,6 +373,7 @@ class Relative(Family):
 
 
 class Boy(Relative):
+    name = "Zack"
     def __init__(self, game_layer, img, position, player):
         super(Boy, self).__init__(game_layer, img, position, player)
         self.anims = {'idle': get_animation('boy_idle'),
@@ -380,6 +384,7 @@ class Boy(Relative):
 
 
 class Girl(Relative):
+    name = "Bee"
     def __init__(self, game_layer, img, position, player):
         super(Girl, self).__init__(game_layer, img, position, player)
         self.anims = {'idle': get_animation('girl_idle'),
@@ -390,6 +395,7 @@ class Girl(Relative):
 
 
 class Mother(Relative):
+    name = "Mom"
     def __init__(self, game_layer, img, position, player):
         super(Mother, self).__init__(game_layer, img, position, player)
         self.anims = {'idle': get_animation('mother_idle'),
