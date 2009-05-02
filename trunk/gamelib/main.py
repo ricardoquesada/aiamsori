@@ -193,12 +193,13 @@ class ImageLayer(Layer):
 
         # grossini abajo a la izquierda
         grossini.position = self.w - grossini.image.width, grossini.image.height / 2
-        texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']                
+        texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']
 
         labels = []
         for t in texts:
-            l = Label(t, font_name='Times New Roman', font_size=52, bold=True)
-            #l.position = self.w / 2 - 340 , self.h / 2
+            l = Label(t, font_name='Times New Roman', font_size=52, bold=True,
+                      anchor_x='center', anchor_y='center')
+            l.position = self.w / 2, self.h / 2
             l.element.color = 255,255,255,255
             labels.append(l)
             self.add(l, z=1)
@@ -217,7 +218,7 @@ class ImageLayer(Layer):
         delay += 5
 
         self.borrar = labels + sprites
-        self.do(Delay(delay), CallFunc(self.on_key_press, [self, 0,0], {}))
+        self.do(Delay(delay) + CallFunc(lambda: self.on_key_press(0,0)))
 
     def on_key_press(self, k, m):
         print "aprento una tecla"
