@@ -39,7 +39,8 @@ from walls import create_wall_layer
 import talk
 import gamehud
 import sound
-import light
+from light import Light
+
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, PowerUp, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
