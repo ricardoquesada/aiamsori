@@ -1,5 +1,6 @@
 from glob import glob
 import geom
+import random
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from pyglet.image import Animation, AnimationFrame, load
 from pymunk.vec2d import Vec2d
@@ -27,6 +28,7 @@ class Agent(NotifierSprite):
         self.current_anim = 'idle'
 
         self.shape = AgentShape(self)
+        self.just_born = True
 
     def update_position(self, position):
         # test for collisions
@@ -38,6 +40,13 @@ class Agent(NotifierSprite):
         self.collision = None
         collision_layer.step()
         if self.collision:
+            if self.just_born:
+                self.x += random.choice([-1,1])*70
+                self.y += random.choice([-1,1])*70
+                self.target = self.position = (self.x, self.y)
+                self.target = self.position
+                return
+            
             self.on_collision(self.collision)
             f = getattr(self.collision, "on_collision", None)
             if f is not None:
@@ -52,6 +61,9 @@ class Agent(NotifierSprite):
                 collision_layer.step()
                 if self.collision:
                     self.position = self.old_position
+        else:
+            if self.just_born:
+                self.just_born = False
 
     def _on_collision(self, other):
         # used internally for collision testing
@@ -98,6 +110,7 @@ class Father(Agent):
         self.current_anim = 'idle'
         self.family = {}
         self.selected_relative = None
+        self.just_born = False
 
     def on_collision(self, other):
         if isinstance(self.collision, Agent):

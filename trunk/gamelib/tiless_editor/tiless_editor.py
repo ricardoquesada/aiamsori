@@ -417,9 +417,9 @@ if __name__ == '__main__':
                       help="tiles folder", metavar="FOLDER")
     parser.add_option("-F", "--fullscreen", dest="fullscreen", default=False,
                       help="set fullscreen mode on", action="store_true")
-    parser.add_option("-x", "--width", dest="width", default='800',
+    parser.add_option("-x", "--width", dest="width", default='1280',
                       help="set window width", metavar="WIDTH")
-    parser.add_option("-y", "--height", dest="height", default='600',
+    parser.add_option("-y", "--height", dest="height", default='1024',
                       help="set window height", metavar="HEIGHT")
 
     parser.add_option("-q", "--quiet",
