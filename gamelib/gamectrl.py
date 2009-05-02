@@ -85,18 +85,50 @@ class MouseGameCtrl(Layer):
 
         ## select a relative or set target for the one already selected
         if button == 1:
-            if self.game_layer.player.selected_relative:
-                self.game_layer.player.selected_relative.target = (px, py)
-                self.game_layer.player.selected_relative = None
-
+            hud = self.game_layer.hud
+            current_selected_relative = self.game_layer.player.selected_relative
+            new_selected_relative = self._get_hud_face(px, py, hud)
+            print new_selected_relative, current_selected_relative
+            if current_selected_relative is not None:
+                if new_selected_relative is not None:
+                    self.game_layer.player.selected_relative = None
+                    hud.faces[current_selected_relative.name].color = (255, 255, 255)
+                    if new_selected_relative != current_selected_relative:
+                        self.game_layer.player.selected_relative = new_selected_relative
+                        hud.faces[new_selected_relative.name].color = (0,172, 0)
+                else:
+                    self.game_layer.player.selected_relative.target = (px, py)
+                    #self.game_layer.player.selected_relative = None
             else:
-                for relative in self.game_layer.player.family.values():
-                    x, y = relative.x, relative.y
-                    mouse_over = (px-x)**2+(py-y)**2 < 100**2
-                    if mouse_over:
-                        self.game_layer.player.selected_relative = relative
+                if new_selected_relative is not None:
+                    self.game_layer.player.selected_relative = new_selected_relative
+                    hud.faces[new_selected_relative.name].color = (0,172, 0)
+                #for relative in self.game_layer.player.family.values():
+                #    x, y = relative.x, relative.y
+                #    mouse_over = (px-x)**2+(py-y)**2 < 100**2
+                #    if mouse_over:
+                #        self.game_layer.player.selected_relative = relative
 
         ## test for is empty, cambien el button cuando quieran(pero avisen)
         ## te aviso: lo cambie :P
         if button == 4:
             print '** is_empty:',self.game_layer.is_empty(px,py)
+
+    def _get_hud_face(self, px, py, hud):
+        for relative in self.game_layer.player.family.values():
+            # test for mouse over on the relative
+            x, y = relative.x, relative.y
+            mouse_over = (px-x)**2+(py-y)**2 < 100**2
+            if mouse_over:
+                #self.game_layer.player.selected_relative = relative
+                return relative
+
+            # test for mouse over on the faces
+            face = hud.faces[relative.name]
+            x, y = face.position
+            print x, y, px, py
+            mouse_over = (px-x)**2+(py-y)**2 < 100**2
+            if mouse_over:
+                return relative
+            
+
