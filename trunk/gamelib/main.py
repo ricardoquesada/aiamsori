@@ -14,7 +14,9 @@ import random
 import optparse
 import avbin
 
+from pyglet import gl
 import cocos
+from cocos import framegrabber
 from cocos.actions import Delay, CallFunc
 from cocos.director import director
 from cocos.batch import BatchNode
@@ -72,10 +74,13 @@ def main():
     try:
         import cocos.gl_framebuffer_object as FG
         FG.FramebufferObject().check_status()
+        has_grabber = True
     except Exception:
         print 'ERROR: You should install your video card drivers.'
         print 'If you already have, your video card doesn\'t support this game\'s effects.'
-        return
+        print "press enter to play without effects"
+        raw_input()
+        has_grabber = False
 
     # initialize cocos director
     #director.init(fullscreen=True)
@@ -83,11 +88,11 @@ def main():
     sound.init()
     # create game scene
     hud_layer = gamehud.HudLayer()
-    game_layer = GameLayer(MAPFILE, hud_layer)
+    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
 #    game_layer.position = (400, 300)
     x,y = director.get_window_size()
     image_layer = ImageLayer(x,y)
-    
+
     director.set_3d_projection()
 #    director.set_2d_projection()
 
@@ -108,25 +113,13 @@ def main():
     director.run(first_scene)
 
 class LightLayer(cocos.cocosnode.CocosNode):
-    def __init__(self, main):
+    def __init__(self):
         super(LightLayer, self).__init__()
-        self.main = main
         self.sprite = Sprite('light.png')
+        self.sprite.position = -0,-800
+        self.sprite.scale = 1.5
+        self.add(self.sprite)
 
-    def draw(self):
-        pyglet.gl.glPushMatrix()
-        self.transform()
-
-
-        pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        pyglet.gl.glBlendFunc(pyglet.gl.GL_ZERO, pyglet.gl.GL_SRC_ALPHA)
-        #pyglet.gl.glBlendEquation(pyglet.gl.GL_FUNC_ADD)
-
-        self.sprite.image.blit(self.main.player.x, self.main.player.y)
-        pyglet.gl.glPopMatrix()
-
-        pyglet.gl.glBlendFunc(pyglet.gl.GL_SRC_ALPHA, pyglet.gl.GL_ONE_MINUS_SRC_ALPHA)
-        #pyglet.gl.glBlendEquation(pyglet.gl.GL_FUNC_ADD)
 
 def make_sprites_layer(layer_data, atlas):
     saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
@@ -157,22 +150,33 @@ class ImageLayer(Layer):
         bg = Sprite('data/img/ppl.png')
         bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
         self.add(bg)
-        
+
         label = Label('Press any key to start!', font_name='Times New Roman', font_size=32)
         label.position = self.w / 2 ,10
         label.element.color = 0,0,0,255
         self.add(label, z=1)
-        
+
     def on_key_press(self, k, m):
         print "aprento una tecla"
         director, scene = self.next
         director.replace(scene)
-        
+
 class GameLayer(Layer):
     is_event_handler = True
 
-    def __init__(self, mapfile, hud):
+    def __init__(self, mapfile, hud, has_grabber):
         super(GameLayer, self).__init__()
+        self.has_grabber = has_grabber
+        if has_grabber:
+            width, height = director.get_window_size()
+
+            self.texture = pyglet.image.Texture.create_for_size(
+                    gl.GL_TEXTURE_2D, width,
+                    height, gl.GL_RGBA)
+            self.lights = LightLayer()
+
+        self.grabber = framegrabber.TextureGrabber()
+        self.grabber.grab(self.texture)
         self.map_node = LayersNode()
         self.bullets = []
         self.dead_items = set()
@@ -228,7 +232,7 @@ class GameLayer(Layer):
         #self.light = light.Light(x/2, y/2)
 
         # ends wallmask preparation, makes available service .is_empty(x,y)
-        #self.wallmask.get_mask() #called for side effect _fill_gaps
+        self.wallmask.get_mask() #called for side effect _fill_gaps
         # now is safe to call self.is_empty()
 
         # if waypoint editing mode, create waypoints
@@ -237,12 +241,11 @@ class GameLayer(Layer):
             self.wptlayer = WptLayer(mapfile)
             self.map_node.add_layer('wptedit',1,self.wptlayer) # ?
         else:
-            # LATER: 
+            # LATER:
             # obtain wpts, instantiation need to wait until is safe to call
             # ray functions..
-            #wpts = [ (s.x,s.y) for s in waypoints] #Esta bien asi Lucio?
+            wpts = [ (s.x,s.y) for s in waypoints.get_children()] #Esta bien asi Lucio?
             # a seguir
-            pass
 
         # talk queue
         self.hud = hud
@@ -251,6 +254,69 @@ class GameLayer(Layer):
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
+
+    def on_resize(self, w, h):
+        if self.has_grabber:
+            width, height = w, h
+            print "RESETING TEXTURE", width, height
+
+
+            self.texture = pyglet.image.Texture.create_for_size(
+                    gl.GL_TEXTURE_2D, width,
+                    height, gl.GL_RGBA)
+
+
+    def visit(self):
+        if not self.has_grabber:
+            super(GameLayer, self).visit()
+            return
+        #do lights
+
+        # before render
+
+        # capture before drawing
+        self.grabber.before_render(self.texture)
+
+        # render scene
+        super(GameLayer, self).visit()
+
+        # psot render
+        # capture after drawing
+        self.grabber.after_render(self.texture)
+
+        # after render
+        # blit lights
+        pyglet.gl.glPushMatrix()
+        self.transform()
+        #pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+        #gl.glBlendFunc( gl.GL_ONE, gl.GL_ONE );
+        #gl.glBlendEquation(gl.GL_MAX);
+
+        self.lights.visit()
+
+        gl.glPopMatrix()
+
+        gl.glBlendFunc( gl.GL_DST_COLOR, gl.GL_ONE_MINUS_SRC_ALPHA );
+        gl.glBlendEquation(gl.GL_FUNC_ADD);
+
+        #gl.glBlendFunc( gl.GL_DST_COLOR, gl.GL_ONE_MINUS_SRC_ALPHA );
+        #gl.glBlendEquation(gl.GL_FUNC_ADD);
+
+        # blit
+        gl.glEnable(self.texture.target)
+        gl.glBindTexture(self.texture.target, self.texture.id)
+
+        gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
+
+        self.texture.blit(0,0)
+
+        gl.glPopAttrib()
+        gl.glDisable(self.texture.target)
+
+
+    def on_key_press( self, symbol, modifiers ):
+        if symbol == pyglet.window.key.F and (modifiers & pyglet.window.key.MOD_ACCEL):
+            return True
 
     def setup_waypoints(self, layer):
         for c in layer.get_children():
@@ -282,7 +348,7 @@ class GameLayer(Layer):
                     self.add(z)
                     collision_layer.add(z, static=z.shape.static, scale=.75)
             self.z_spawn_lifetime = 0
-                
+
 
     def talk(self, who, what, duration=5, transient=False):
         self.talk_layer.talk(who, what, duration=duration, transient=transient)
@@ -297,9 +363,7 @@ class GameLayer(Layer):
         super(GameLayer, self).on_exit()
         #self.light.disable()
 
-    def on_resize(self, w, h):
-        x, y = director.get_window_size()
-        #self.light.set_position(w/2, h/2)
+
 
     def _create_agents(self):
         # get collision layer
@@ -328,7 +392,7 @@ class GameLayer(Layer):
             collision_layer.add(mother, static=mother.shape.static)
 
             x, y = director.get_window_size()
-            
+
 
     def on_collision(self, shape_a, shape_b):
         node = shape_a.sprite
@@ -355,7 +419,7 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
-
+        self.lights.sprite.position = self.player.position
         # clear out any non-collisioned bullets
         self._remove_bullets()
 
