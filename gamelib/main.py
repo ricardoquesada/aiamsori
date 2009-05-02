@@ -221,8 +221,8 @@ class ImageLayer(Layer):
             [self.remove(h) for h in self.borrar]
             x,y = self.w, self.h
             labelkey = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
-            labelkey.position = self.w / 2 - 340 , self.h / 2
-            labelkey.element.color = 40,179,75,50
+            labelkey.position = self.w / 2 - 340 , 150
+            labelkey.element.color = 40,179,75,180
             self.add(labelkey, z=1)
             labelkey.do(Hide())
                 
