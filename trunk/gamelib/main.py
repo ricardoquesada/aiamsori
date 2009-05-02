@@ -75,7 +75,7 @@ def main():
     pyglet.resource.reindex()
 
     #Load avbin
-    avbin.init_avbin()
+#    avbin.init_avbin() #warn: if uncomented windows crash
 
     try:
         import cocos.gl_framebuffer_object as FG
