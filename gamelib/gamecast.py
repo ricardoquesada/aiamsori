@@ -358,6 +358,14 @@ class Bullet(NotifierSprite):
         self.shape = shape
 
 
+class Ray(NotifierSprite):
+    def __init__(self, agent, target):
+        super(Ray, self).__init__('img/bullet.png', agent.position, agent.rotation, agent.scale)
+        shape = RayShape(self, agent.position, target)
+        shape.group = agent.shape.group
+        self.shape = shape
+
+
 class Wall(NotifierSprite):
     def __init__(self, child):
         img = {'filename': child.path, 'position': child.position,
