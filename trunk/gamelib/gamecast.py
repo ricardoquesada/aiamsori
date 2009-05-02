@@ -270,10 +270,12 @@ class Father(Family):
         #                'fist': MeleeWeapon(self)}
         self.weapons = {'fist': MeleeWeapon(self)}
         self.weapon = self.weapons['fist']
+        self.ammo = 0
         self.time_since_attack = 0
         self.player = self #shortcut
 
     def on_collision(self, other):
+        super(Father, self).on_collision(other)
         hud = self.game_layer.hud
         if isinstance(other, PowerUp):
             if other.type in POWERUP_TYPE_AMMO_LIST:
@@ -284,7 +286,8 @@ class Father(Family):
                     self.switch_weapon('shotgun')
                     sound.play('pickup_shotgun')
                 else:
-                    return
+                    self.ammo += POWERUP_AMMO
+                    hud.set_bullets(self.ammo)
             elif other.type in POWERUP_TYPE_LIFE_LIST:
                 self.life += POWERUP_LIFE[other.type]
                 if self.life > PLAYER_MAX_LIFE:
@@ -300,8 +303,13 @@ class Father(Family):
                     else:
                         return
                 elif other.type == 'shotgun':
-                    self.weapons['shotgun'] = RangedWeapon(self)
-                self.switch_weapon(other.type)
+                    weapon = RangedWeapon(self)
+                    weapon.ammo += self.ammo
+                    self.ammo = 0
+                    weapon.ammo += WEAPON_FULL_AMMO
+                    hud.set_bullets(weapon.ammo)
+                    self.weapons['shotgun'] = weapon
+                self.switch_weapon('shotgun')
                 sound.play('pickup_shotgun')
         elif isinstance(other, Relative):
             if self.weapons.has_key('shotgun'):
@@ -311,7 +319,6 @@ class Father(Family):
                 hud.set_bullets(weapon.ammo)
                 self.switch_weapon('shotgun')
                 sound.play('pickup_shotgun')
-        super(Father, self).on_collision(other)
             
 
     def update(self, dt):
