@@ -1,7 +1,7 @@
 {
     "newtiles/pared2.png": [
-        913, 
-        645, 
+        926, 
+        1162, 
         128, 
         128
     ], 
@@ -18,25 +18,25 @@
         64
     ], 
     "newtiles/arbusto1.png": [
-        674, 
+        518, 
         1295, 
         132, 
         119
     ], 
     "newtiles/piso_ceramico.png": [
-        780, 
-        645, 
-        128, 
-        128
-    ], 
-    "newtiles/piso_camino.png": [
-        660, 
+        793, 
         1162, 
         128, 
         128
     ], 
+    "newtiles/piso_camino.png": [
+        1179, 
+        645, 
+        128, 
+        128
+    ], 
     "newtiles/sombra.png": [
-        926, 
+        394, 
         1162, 
         128, 
         128
@@ -66,8 +66,8 @@
         302
     ], 
     "newtiles/puerta.png": [
-        1312, 
-        645, 
+        0, 
+        1162, 
         128, 
         128
     ], 
@@ -78,7 +78,7 @@
         302
     ], 
     "newtiles/waypoint.png": [
-        1453, 
+        1476, 
         1162, 
         40, 
         40
@@ -90,13 +90,13 @@
         64
     ], 
     "newtiles/item-spawn.png": [
-        1067, 
+        911, 
         1295, 
         100, 
         100
     ], 
     "newtiles/planta_interior.png": [
-        939, 
+        783, 
         1295, 
         123, 
         106
@@ -108,25 +108,25 @@
         302
     ], 
     "newtiles/mesita.png": [
-        0, 
-        1162, 
+        1312, 
+        645, 
         128, 
         128
     ], 
     "newtiles/columna.png": [
-        793, 
-        1162, 
+        1046, 
+        645, 
         128, 
         128
     ], 
     "newtiles/dog_idle0.png": [
-        1305, 
-        1295, 
+        0, 
+        1427, 
         128, 
         42
     ], 
     "newtiles/mesa.png": [
-        266, 
+        1059, 
         1162, 
         256, 
         128
@@ -138,62 +138,62 @@
         640
     ], 
     "newtiles/piso_tapete.png": [
-        1172, 
+        1016, 
         1295, 
         128, 
         90
     ], 
     "newtiles/ventana.png": [
-        1320, 
+        1149, 
+        1295, 
+        256, 
+        64
+    ], 
+    "newtiles/mesada-2.png": [
+        660, 
         1162, 
         128, 
         128
     ], 
-    "newtiles/mesada-2.png": [
-        1179, 
-        645, 
-        128, 
-        128
-    ], 
     "newtiles/piso_madera.png": [
-        133, 
+        527, 
         1162, 
         128, 
         128
     ], 
     "newtiles/arbusto2.png": [
-        811, 
+        655, 
         1295, 
         123, 
         114
     ], 
     "newtiles/mesada.png": [
-        1059, 
+        133, 
         1162, 
         256, 
         128
     ], 
     "newtiles/frutera.png": [
-        544, 
+        388, 
         1295, 
         125, 
         126
     ], 
     "newtiles/sofa_chico.png": [
-        388, 
-        1295, 
+        1320, 
+        1162, 
         151, 
         127
     ], 
     "newtiles/piso_pasto.png": [
-        1046, 
+        913, 
         645, 
         128, 
         128
     ], 
     "newtiles/piso_alfombra.png": [
-        527, 
-        1162, 
+        780, 
+        645, 
         128, 
         128
     ]
