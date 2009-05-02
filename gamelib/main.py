@@ -235,8 +235,9 @@ class ImageLayer(Layer):
             labelkey.do(Delay(10) + Show() + FadeIn(2))
 
             self.state = 1
-        else:
+        elif self.state == 1:
             director.replace(get_game_scene())
+            self.state = 2
 
 class GameOverLayer(Layer):
     is_event_handler = True
