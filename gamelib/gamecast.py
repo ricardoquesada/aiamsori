@@ -405,7 +405,7 @@ class Relative(Family):
     def __init__(self, game_layer, img, position, player):
         super(Relative, self).__init__(game_layer, img, position)
         self._old_state = {}
-        self.speed = 100
+        self.speed = 300
         self.schedule(self.update)
         self.player = player
         self.updating = False
