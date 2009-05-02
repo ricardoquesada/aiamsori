@@ -1,40 +1,32 @@
-import shader
+import random
+from math import sin
 
-light_f = '''
-uniform sampler2D tex;
-uniform vec2 light;
 
-void main() {
-    vec2 pos = gl_TexCoord[0].st;
-    vec4 col = texture2D(tex, pos).rgba;
+from cocos.batch import BatchNode
+from cocos.sprite import Sprite
 
-    vec2 v = light - gl_FragCoord.xy;
-    float d = length(v);
-    float a = clamp(52.0/d, 0., 1.);
+def cap(value, min_v, max_v):
+    return max(min(value, max_v), min_v)
 
-    gl_FragColor = vec4(col.rgb, min(col.a, a));
-}
-'''
+class Light(BatchNode):
+    def __init__(self, layer):
+        super(Light, self).__init__()
+        for c in layer.get_children():
+            sp = Sprite(c.image)
+            sp.source_position = c.position
+            sp.position = c.position
+            sp.scale = c.scale
+            sp.source_scale = c.scale
+            sp.rotation = c.rotation
+            sp.opacity = c.opacity
+            sp.dx = 0
+            sp.dy = 0
+            sp.dt = random.random()*3.15
+            self.add( sp )
+        self.schedule(self.update)
 
-class Light(object):
-    def __init__(self, x, y):
-        self.position = x, y
-        self.shader = shader.ShaderProgram()
-        self.shader.setShader(shader.FragmentShader('light_f', light_f))
-        self.enabled = False
-
-    def set_position(self, x, y):
-        self.position = x, y
-        if self.enabled:
-            print "setting new position", x, y
-            self.shader.uset2F('light', float(x), float(y))
-
-    def enable(self):
-        self.enabled = True
-        self.shader.install()
-        x, y = self.position
-        self.shader.uset2F('light', float(x), float(y))
-
-    def disable(self):
-        self.enabled = False
-        self.shader.uninstall()
+    def update(self, dt):
+        for c in self.get_children():
+            c.dt += dt
+            c.scale = c.source_scale + 0.1*sin(c.dt)
+        print c.position, c.dx, c.dy
