@@ -7,10 +7,17 @@ class WallMask(object):
 
     def add(self,sprite): #only if apropiate
         padding = 2
-        sx = (sprite.x - sprite.width/2)/self.tilesize - padding
-        sy = (sprite.y - sprite.height/2)/self.tilesize - padding
-        for x in range(sprite.width/self.tilesize+1 + padding*2):
-            for y in range(sprite.height/self.tilesize+1 + padding*2):
+        a = sprite.rotation%360
+        if abs(a-90) < 45 or abs(a-270) < 45:
+            w = sprite.height
+            h = sprite.width
+        else:
+            w = sprite.width
+            h = sprite.height
+        sx = (sprite.x - w/2)/self.tilesize - padding
+        sy = (sprite.y - h/2)/self.tilesize - padding
+        for x in range(w/self.tilesize+1 + padding*2):
+            for y in range(h/self.tilesize+1 + padding*2):
                 key = int(sx+x),int(sy+y)
                 self.wallmask.add(key)
 

@@ -16,6 +16,7 @@ import avbin
 
 from pyglet import gl
 import cocos
+from cocos import euclid
 from cocos import framegrabber
 from cocos.actions import Delay, CallFunc, FadeTo
 from cocos.director import director
@@ -40,6 +41,7 @@ import talk
 import gamehud
 import sound
 from light import Light
+import waypointing
 
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, PowerUp, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
@@ -185,6 +187,7 @@ class GameLayer(Layer):
         self.dead_items = set()
         self.wallmask = WallMask()
         self.agents_node = LayersNode()
+
 
         # get layers from map
         collision_layers = []
@@ -357,8 +360,41 @@ class GameLayer(Layer):
             return True
 
     def setup_waypoints(self, layer):
-        for c in layer.get_children():
-            print "waypoint", c.position
+        print "Setting up navigation..."
+        points = [ c.position for c in layer.get_children() ]
+        def is_visible(p, q):
+            if p == q:
+                return True
+
+            p = euclid.Vector2(*p)
+            q = euclid.Vector2(*q)
+            d = p-q
+
+            steps = d.magnitude()/15
+            for i in range(int(steps+1)):
+                c = q+d*(i/float(steps))
+                if not self.is_empty(*c):
+                    return False
+            return True
+
+        visible_map = set()
+        not_visible_map = set()
+        for a in points:
+            for b in points:
+                if is_visible(a, b):
+                    visible_map.add((a,b))
+                else:
+                    not_visible_map.add((a,b))
+        def visible(a, b):
+            if (a,b) in visible_map:
+                return True
+            if (a,b) in not_visible_map:
+                return False
+            return is_visible(a, b)
+
+        print "Found", len(visible_map), "connections"
+        self.ways = waypointing.WaypointNav(points, visible)
+        print "Navigation setup done."
 
     def setup_powerups(self, layer):
         self.item_spawn = []

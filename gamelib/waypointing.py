@@ -26,7 +26,7 @@ bignum = 1.0e+40
 # mantener en sincronia con el loader/writer en wptlayer
 def wpt_from_privateX(fname):
     # el mismo nombre que map agregada extension wpt
-    f=open(fname,'rb')        
+    f=open(fname,'rb')
     linenum = -1
     wpts = []
     for line in f:
@@ -55,17 +55,17 @@ class WaypointNav:
         .get_dest(a,b): give a good intermediate point for going from a to b
                         warn: it is better to use the voucher interfase
 
-        InterfaseVoucher: ( talk to the voucher object to navigate )  
+        InterfaseVoucher: ( talk to the voucher object to navigate )
         CreateVoucherChase( chaser_actor, chaser_pos_getter,
                             target_actor, target_pos_getter )
         CreateVoucherMoveTo( actor, actor_pos_getter, target_point)
 
-        Later crowding info can be available. 
+        Later crowding info can be available.
         """
         self.fn_visibles = fn_visibles
-        self.points = [V2(x,y) for x,y in points] 
+        self.points = [V2(x,y) for x,y in points]
         self.min_dist = {}
-        self.adj = [] # adj[i] -> list of nodes directly reacheables from i 
+        self.adj = [] # adj[i] -> list of nodes directly reacheables from i
         self._init_min_dist()
         self._floyd()
         #self.voucher_refs=
@@ -78,7 +78,7 @@ class WaypointNav:
         target_pos = target.position # reemplazar por el miembro/method-call adecuado
         is_moving_target = True #maybe actor can have .is_steady_position
         voucher = Voucher(self, chaser_actor, start_pos,
-                                target_actor, target_pos, is_moving_target) 
+                                target_actor, target_pos, is_moving_target)
         #? register the voucher in self to track crowding ?
         return voucher
 
@@ -93,10 +93,10 @@ class WaypointNav:
         target_actor = None
         is_moving_target = False
         voucher = Voucher(self, actor, start_pos,
-                                target_actor, target_point, is_moving_target) 
+                                target_actor, target_point, is_moving_target)
         #? register the voucher in self to track crowding ?
         return voucher
-    
+
     def _init_min_dist(self):
         """
         builds the graph, joining those points with clear line of sight
@@ -140,7 +140,7 @@ class WaypointNav:
                        (points[jx0]==points[jx2]))
 
             self.adj.append(adj_j)
-##            m[j,j] = 0.0 
+##            m[j,j] = 0.0
 ##        m[n,n] = 0.0
         print 'colinear_drops:',colinear_drops
         cnt_segments = 0
@@ -157,15 +157,15 @@ class WaypointNav:
                     print '%8.2f'%(int(z*100.0)/float(100)),
         print
         print
-                
-        
+
+
     def _floyd(self):
         """
         knowing the distance between adjacents, the Floyd-Warshalls algo
         calcs the min distance between any two pair of nodes. O(n^3)
         """
         n = len(self.points)
-        m = self.min_dist        
+        m = self.min_dist
         for k in xrange(n):
             for i in xrange(n):
                 for j in xrange(n):
@@ -186,7 +186,7 @@ class WaypointNav:
         #must not get there
         assert(0) #TODO: remove for release
         return i
-                   
+
     def get_near_wps(self,a):
         if not isinstance(a,V2):
             a = V2(a[0],a[1])
@@ -199,24 +199,25 @@ class WaypointNav:
             if self.fn_visibles(a, points[i]):
                 candidates_a.append(i)
                 cnt += 1
-                if cnt>=3:
+                if cnt>=1:
                     break
         return candidates_a
         if not len(candidates_a):
-            print '*** WARNING: no waypoint near', a
+            #print '*** WARNING: no waypoint near', a
             return a
-        
+
     def best_pair(self, a, candidates_a, b, candidates_b):
+
         paths = []
         for i in candidates_a:
             for j in candidates_b:
-                kpath = (abs(a-point[i])+self.min_dist[i,j]+abs(self.points[j]-b),
+                kpath = (abs(a-self.points[i])+self.min_dist[i,j]+abs(self.points[j]-b),
                          i,j)
                 paths.append(kpath)
-        path.sort()
-        d, i, j = path[0]
+        paths.sort()
+        d, i, j = paths[0]
         return d, i, j
-        
+
     def get_dest(self, a, b):
         """
         for direct use without voucher, inneficient.
@@ -235,18 +236,18 @@ class WaypointNav:
         #get 3 ( if posible ) waypoints near a
         candidates_a = self.get_near_wps(a)
         if not len(candidates_a):
-            print '*** WARNING: no waypoint near', a
-            return a
+            #print '*** WARNING: no waypoint near SOURCE', a
+            return b
 
         #get 3 ( if posible ) waypoints near b
         candidates_b = self.get_near_wps(b)
         if not len(candidates_b):
-            print '*** WARNING: no waypoint near', b
-            return a
+            #print '*** WARNING: no waypoint near GOAL', b
+            return b
 
         #choose the best combo
         d, i, j = self.best_pair( a, candidates_a, b, candidates_b)
-        
+
         #advance in the waypoint route to b while waypoint is visible
         while 1:
             last_visible = i
@@ -254,7 +255,7 @@ class WaypointNav:
             if self.fn_visibles(points[i],points[j]):
                 break
         return points[last_visible]
-        
+
 class Voucher:
     """routing state. allows savings in get_dest."""
     def __init__(self, wpnav, chaser_actor, target_actor, target_pos,
@@ -263,7 +264,7 @@ class Voucher:
         services:
         .deviation() : distance to the planed path
         .get_dest() : point toward the actor must move to arrive at target
-        
+
         state of possible interest:
         .comming : last position where a retarget was done
         .going : temporal target pos, usually a waypoint or target_actor last known position
@@ -279,14 +280,14 @@ class Voucher:
         self.chaser_actor = chaser_actor
         self.target_actor = target_actor
 
-        start_pos = chaser_actor.position # reemplazar por el miembro/method-call adecuado 
+        start_pos = chaser_actor.position # reemplazar por el miembro/method-call adecuado
         self.comming = start_pos
-        
+
         if initial_wpt is None:
             candidates_a = wpnav.get_near_wps(start_pos)
         else:
             candidates_a = [initial_wpt]
-            
+
         if dest_wpt is None:
             candidates_b = wpnav.get_near_wps(target_pos)
         else:
@@ -297,15 +298,15 @@ class Voucher:
         self.path_dist = d
         self.going_wpt = i
         self.going = wpnav.points[i]
-        self.ultimate_wpt = j    
+        self.ultimate_wpt = j
 
-    ##point to segment distance (dumbed down here to point to line) 
+    ##point to segment distance (dumbed down here to point to line)
     ##http://www.codeguru.com/forum/showthread.php?t=194400
     ##Philip Nicoletti
     ##A= comming, B=going, C=apos
     def deviation(self):
             "distance from chaser to _line_ comming-going"
-            apos = self.chaser_actor.position 
+            apos = self.chaser_actor.position
             if not isinstance(apos,V2):
                 apos = V2(apos[0],apos[1])
             segl2 = (self.going-self.comming).magnitude_squared()
@@ -313,8 +314,8 @@ class Voucher:
                 return abs(apos-self.comming)
             #r = (apos-self.acomming).dot(self.going-self.comming)/segl2
             return abs((self.comming-apos).cross().dot(self.going-self.comming)/math.sqrt(segl2))
-        
-        
+
+
     def get_dest(self):
         return self.going
 
@@ -355,7 +356,7 @@ class Voucher:
             self.target_pos = wpnav.points[dest_wpt]
             candidates_b = [dest_wpt]
         else:
-            self.target_pos = new_target_position            
+            self.target_pos = new_target_position
             candidates_b = wpnav.get_near_wps(self.target_pos)
         d,i,j = self.best_pair(self.chaser_actor_position, candidates_a, self.target_pos,candidates_b)
         self.path_dist = d
@@ -363,5 +364,3 @@ class Voucher:
         self.going = wpnav.points[i]
         self.ultimate_wpt = j
         return self.going
-
-
