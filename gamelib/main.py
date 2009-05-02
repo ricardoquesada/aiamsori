@@ -172,6 +172,7 @@ class GameLayer(Layer):
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
+            self.fire_lights = Layer()
 
         self.grabber = framegrabber.TextureGrabber()
         self.grabber.grab(self.texture)
@@ -194,6 +195,9 @@ class GameLayer(Layer):
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_S, pyglet.gl.GL_CLAMP_TO_EDGE )
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_T, pyglet.gl.GL_CLAMP_TO_EDGE )
 
+        self.show_fire_frames = 0
+        self.fire_light = Sprite("data/newtiles/light.png")
+        self.fire_lights.add(self.fire_light)
 
         layers = simplejson.load(open(mapfile))['layers']
         for layer_data in layers:
@@ -319,6 +323,9 @@ class GameLayer(Layer):
         #gl.glBlendEquation(gl.GL_MAX);
 
         self.lights.visit()
+        if self.show_fire_frames > 0:
+            self.fire_lights.visit()
+            self.show_fire_frames -= 1
 
         gl.glPopMatrix()
 
@@ -464,6 +471,9 @@ class GameLayer(Layer):
         self.projectiles.append(projectile)
         self.agents_node.add(projectile)
 
+        self.fire_light.x = self.player.x
+        self.fire_light.y = self.player.y
+        self.show_fire_frames = 3
 
     def remove_projectile(self, projectile):
         self.projectiles.remove(projectile)
