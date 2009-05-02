@@ -78,6 +78,8 @@ class Sounds(object):
     def stop_music(self):
         #self.music_player.eos_action = 'next'
         #self.music_player.next()
+        if not self.have_avbin:
+            return
         self.music_player.pause()
 
 def init():
