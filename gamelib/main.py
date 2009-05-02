@@ -94,8 +94,10 @@ def get_end_scene():
     scene.add(GameOverLayer())
     return scene
 
-WAVE_DELAY = [5, 50, 47, 45, 44, 43, 32, 31, 30, 19, 18, 17, 16, 15, 10]
-WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
+WAVE_DELAY = [5, 35, 27, 25, 24, 23, 22, 21, 20, 18, 16, 14, 12, 10, 8]
+WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  3, 3, 3, 3, 3, 3, 3]
+
+MAX_ZOMBIE_COUNT = 20
 
 def main():
     # make available options
@@ -533,9 +535,13 @@ class GameLayer(Layer):
 
 
             self.z_spawn_lifetime += 1
+
         else:
-            self.z_spawn_lifetime += dt
             waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
+#            if zombie_count + WAVE_NUM[waveno] >= MAX_ZOMBIE_COUNT:
+#                return
+
+            self.z_spawn_lifetime += dt
             delay = WAVE_DELAY[ waveno ]
             if self.z_spawn_lifetime >= delay:
                 # we have a zombie wave
@@ -547,12 +553,17 @@ class GameLayer(Layer):
                 ])
                 self.talk("zombie", msg)
                 for i in range(WAVE_NUM[ waveno ]):
+                    print "Wave Number: ", self.zombie_wave_number
                     for c in self.zombie_spawn.get_children():
-                        z = Zombie(self, get_animation('zombie1_idle'), self.player)
+                        z = Zombie(self, get_animation('zombie1_walk'), self.player)
                         z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
                         z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
                         z.position = z.x, z.y
                         self.agents_node.add(z)
+
+                zombie_count = len([z for z in self.agents_node.get_children() if isinstance(z, Zombie)])
+                print "Zombie Count", zombie_count
+
                 self.z_spawn_lifetime = 0
                 self.zombie_wave_number += 1
 
