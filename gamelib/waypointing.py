@@ -5,9 +5,6 @@ un poco de test heuristicos para debugear.
 considerando mejorar algunas cosas, hay partes bastante brute force
 """
 
-DCOLINEAR = 0.25 #? thats for testing in world 4x4 units, scale up if
-                    # using a world 1000x1000
-# w 0.1 12 nodos, 288 paths ; con 125 lo mismo
 
 ##FLOYD'S ALGORITHM (int **m, int size)
 ##{
@@ -20,30 +17,8 @@ DCOLINEAR = 0.25 #? thats for testing in world 4x4 units, scale up if
 ##}
 import math
 from cocos.euclid import Vector2 as V2
-from geom import dist_point_to_segment
 bignum = 1.0e+40
 
-# mantener en sincronia con el loader/writer en wptlayer
-def wpt_from_privateX(fname):
-    # el mismo nombre que map agregada extension wpt
-    f=open(fname,'rb')
-    linenum = -1
-    wpts = []
-    for line in f:
-        linenum += 1
-        line = line.strip(' ').rstrip(' \r\n')
-        print 'line:'
-        if len(line)==0:
-            continue
-        li = line.split(' ')
-        if len(li)!=2:
-            print 'err parsing %s at line %d: expected <num> <num>\\n'%(fname,linenum)
-        else:
-            x = int(li[0])
-            y = int(li[1])
-            wpts.append((x,y))
-    f.close()
-    return wpts
 
 class WaypointNav:
     def __init__(self,points,fn_visibles):
@@ -68,34 +43,7 @@ class WaypointNav:
         self.adj = [] # adj[i] -> list of nodes directly reacheables from i
         self._init_min_dist()
         self._floyd()
-        #self.voucher_refs=
 
-    def CreateVoucherChase( self, chaser_actor, target_actor, initial_wpt=None):
-        """
-        initial_wpt: if the spawn point is a waypoint, you can provide the
-            waypoint to save cpu
-        """
-        target_pos = target.position # reemplazar por el miembro/method-call adecuado
-        is_moving_target = True #maybe actor can have .is_steady_position
-        voucher = Voucher(self, chaser_actor, start_pos,
-                                target_actor, target_pos, is_moving_target)
-        #? register the voucher in self to track crowding ?
-        return voucher
-
-    def CreateVoucherMoveTo( self, actor, target_point, initial_waypoint=None, dest_waypoint=None):
-        """
-        initial_wpt: if the spawn point is a waypoint, you can provide the
-            waypoint to save cpu
-        dest_wpt: if the target would not move and is a waypoint and the index
-            is known,  you can provide de wpt to save CPU. (then the param
-            target_point will be set to points[dest_wpt] )
-        """
-        target_actor = None
-        is_moving_target = False
-        voucher = Voucher(self, actor, start_pos,
-                                target_actor, target_point, is_moving_target)
-        #? register the voucher in self to track crowding ?
-        return voucher
 
     def _init_min_dist(self):
         """
@@ -106,10 +54,8 @@ class WaypointNav:
         n = len(points)
         fn = self.fn_visibles
         m = self.min_dist
-        colinear_drops = 0
         for j in xrange(n):
             adj_j = []
-            print '\n*** j:',j
             for i in xrange(n):
                 if i==j:
                     m[i,j]=0
@@ -119,45 +65,11 @@ class WaypointNav:
                     ix1, jx1 = i,j
                     assert((points[ix0]==points[ix1]) and
                            (points[jx0]==points[jx1]))
-                    # points visible, but dont want to add a quasi colinear, so
-                    # check no node diferent from i,j is at distance <epsilon from
-                    # segment
-                    cuasi_colinear = False
-                    for k in xrange(len(points)):
-                        if ( not (k in [i,j])
-                             and dist_point_to_segment(points[k],points[i],points[j])<DCOLINEAR):
-                            cuasi_colinear = True
-                    if not cuasi_colinear:
-                        m[i,j] =  abs(points[i]-points[j])
-                        adj_j.append(i)
-                    else:
-                        colinear_drops += 1
-                        m[i,j] = bignum
+                    m[i,j] =  abs(points[i]-points[j])
+                    adj_j.append(i)
                 else:
                     m[i,j] = bignum
-                ix2, jx2 = i,j
-                assert((points[ix0]==points[ix2]) and
-                       (points[jx0]==points[jx2]))
-
             self.adj.append(adj_j)
-##            m[j,j] = 0.0
-##        m[n,n] = 0.0
-        print 'colinear_drops:',colinear_drops
-        cnt_segments = 0
-        for li in self.adj:
-            cnt_segments += len(li)
-        print 'cnt_segments:',cnt_segments
-        for i in xrange(n):
-            print
-            for j in xrange(n):
-                z = m[i,j]
-                if z>=bignum:
-                    print '        ',
-                else:
-                    print '%8.2f'%(int(z*100.0)/float(100)),
-        print
-        print
-
 
     def _floyd(self):
         """
@@ -177,6 +89,7 @@ class WaypointNav:
         returns the next index in a minimal path from i to j , i if i==j
         """
         if i==j:
+            print "last node"
             return i
         dmin = self.min_dist[i,j]
         for k in self.adj[i]:
@@ -218,6 +131,22 @@ class WaypointNav:
         d, i, j = paths[0]
         return d, i, j
 
+    def get_path(self, a, b):
+        a = self.points.index(a)
+        b = self.points.index(b)
+        return self.get_path_indexed(self, a, b)
+
+    def get_path_indexed(self, a, b):
+        path = []
+        path.append(a)
+        while 1:
+            a = self._next_waypoint(a,b)
+            path.append(a)
+            if a == b:
+                break
+
+        return path
+
     def get_dest(self, a, b):
         """
         for direct use without voucher, inneficient.
@@ -236,131 +165,25 @@ class WaypointNav:
         #get 3 ( if posible ) waypoints near a
         candidates_a = self.get_near_wps(a)
         if not len(candidates_a):
-            #print '*** WARNING: no waypoint near SOURCE', a
+            print '*** WARNING: no waypoint near SOURCE', a
             return b
-
+        print "first", candidates_a
         #get 3 ( if posible ) waypoints near b
         candidates_b = self.get_near_wps(b)
         if not len(candidates_b):
-            #print '*** WARNING: no waypoint near GOAL', b
+            print '*** WARNING: no waypoint near GOAL', b
             return b
 
         #choose the best combo
         d, i, j = self.best_pair( a, candidates_a, b, candidates_b)
-
+        print "dij", d, i, j
         #advance in the waypoint route to b while waypoint is visible
+        print "PATH", self.get_path_indexed(i, j)
         while 1:
             last_visible = i
             i = self._next_waypoint(i,j)
-            if self.fn_visibles(points[i],points[j]):
+            if not self.fn_visibles(a,points[i]):
+                break
+            if i == j:
                 break
         return points[last_visible]
-
-class Voucher:
-    """routing state. allows savings in get_dest."""
-    def __init__(self, wpnav, chaser_actor, target_actor, target_pos,
-                 steady_target, initial_waypoint, dest_waypoint, allow_direct_walk ):
-        """
-        services:
-        .deviation() : distance to the planed path
-        .get_dest() : point toward the actor must move to arrive at target
-
-        state of possible interest:
-        .comming : last position where a retarget was done
-        .going : temporal target pos, usually a waypoint or target_actor last known position
-        .going_wpt : if headed to a waypoint, the wpt index, else None
-        .path_dist : distance along the path at the last retarget
-        .ultimate_wpt : last wpt before reaching target
-        .target_actor : None if not chasing, else the actor chased
-        .target_pos : the ultimate target position
-        """
-        self.allow_direct_walk = True
-        self.wpnav = wpnav
-        self.steady_target = steady_target
-        self.chaser_actor = chaser_actor
-        self.target_actor = target_actor
-
-        start_pos = chaser_actor.position # reemplazar por el miembro/method-call adecuado
-        self.comming = start_pos
-
-        if initial_wpt is None:
-            candidates_a = wpnav.get_near_wps(start_pos)
-        else:
-            candidates_a = [initial_wpt]
-
-        if dest_wpt is None:
-            candidates_b = wpnav.get_near_wps(target_pos)
-        else:
-            target_pos = wpnav.points[dest_wpt]
-        self.target_pos = target_pos
-
-        d,i,j = self.best_pair(a, candidates_a, b,candidates_b)
-        self.path_dist = d
-        self.going_wpt = i
-        self.going = wpnav.points[i]
-        self.ultimate_wpt = j
-
-    ##point to segment distance (dumbed down here to point to line)
-    ##http://www.codeguru.com/forum/showthread.php?t=194400
-    ##Philip Nicoletti
-    ##A= comming, B=going, C=apos
-    def deviation(self):
-            "distance from chaser to _line_ comming-going"
-            apos = self.chaser_actor.position
-            if not isinstance(apos,V2):
-                apos = V2(apos[0],apos[1])
-            segl2 = (self.going-self.comming).magnitude_squared()
-            if segl2<1.0e-3:
-                return abs(apos-self.comming)
-            #r = (apos-self.acomming).dot(self.going-self.comming)/segl2
-            return abs((self.comming-apos).cross().dot(self.going-self.comming)/math.sqrt(segl2))
-
-
-    def get_dest(self):
-        return self.going
-
-    def retarget_to_chase(new_target_actor,steady_actor=None):
-        self.steady_actor = steady_actor
-        if id(target_actor)==id(new_target_actor):
-            return self.going
-        self.target_actor = new_target_actor
-        self.target_pos = new_target_actor.position
-        #? fast, if time allow we recycle some info
-        if ( self.allow_direct_walk
-             and wpnav.fn_visibles(self.chaser_actor_position,self.target_actor)):
-            self.going = self.target_actor
-            self.visual_chase = True
-            return self.going
-        candidates_a = wpnav.get_near_wps(self.chaser_actor.position)
-        candidates_b = wpnav.get_near_wps(self.target_pos)
-        d,i,j = self.best_pair(self.chaser_actor_position, candidates_a, self.target_pos,candidates_b)
-        self.path_dist = d
-        self.going_wpt = i
-        self.going = wpnav.points[i]
-        self.ultimate_wpt = j
-        self.visual_chase = False
-        if ( abs(self.target_actor_position-self.chaser_position)<abs(self.going-self.chaser_position) and
-             wpnav.fn_visibles(self.target_position, self.chaser_position)):
-            self.going = self.target_position
-            self.visual_chase = True
-        return self.going
-
-    def retarget_to_moveto(new_target_position, dest_wpt=None):
-        self.steady_actor = steady_actor
-        if id(target_actor)==id(new_target_actor):
-            return
-        self.target_actor = None
-        #? provisional code, if time allow we recycle some info
-        candidates_a = wpnav.get_near_wps(self.chaser_actor.position)
-        if not (dest_wpt is None):
-            self.target_pos = wpnav.points[dest_wpt]
-            candidates_b = [dest_wpt]
-        else:
-            self.target_pos = new_target_position
-            candidates_b = wpnav.get_near_wps(self.target_pos)
-        d,i,j = self.best_pair(self.chaser_actor_position, candidates_a, self.target_pos,candidates_b)
-        self.path_dist = d
-        self.going_wpt = i
-        self.going = wpnav.points[i]
-        self.ultimate_wpt = j
-        return self.going

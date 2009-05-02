@@ -45,7 +45,7 @@ class HudLayer(cocos.layer.Layer):
 
     def set_life(self, who, life):
         pic = self.faces[who]
-        pic.opacity = life/100.0 * 255
+        pic.opacity = max(20, life/100.0 * 255)
         pic.stop()
 
         pic.do( ScaleTo(self.face_scale*0.8, 0.2) + ScaleTo(self.face_scale, 0.2))
