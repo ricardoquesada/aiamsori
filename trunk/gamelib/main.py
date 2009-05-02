@@ -18,7 +18,7 @@ from pyglet import gl
 import cocos
 from cocos import euclid
 from cocos import framegrabber
-from cocos.actions import Delay, CallFunc, FadeTo
+from cocos.actions import Delay, CallFunc, FadeTo, FadeOut
 from cocos.director import director
 from cocos.batch import BatchNode
 from cocos.scene import Scene
@@ -111,7 +111,7 @@ def main():
     main_scene = Scene()
     first_scene = Scene()
     first_scene.add(image_layer)
-    image_layer.next = (director, main_scene)   #ugly?
+    image_layer.next = (director, main_scene)   #ugly?.. WHO CARES!
     main_scene.add(game_layer)
     main_scene.add(hud_layer, z = 1)
     if options.wpt_on:
@@ -165,6 +165,16 @@ class ImageLayer(Layer):
         print "aprento una tecla"
         director, scene = self.next
         director.replace(scene)
+
+class DeadStuffLayer(cocos.cocosnode.CocosNode):
+    """Everything added to this node disappears a few seconds later"""
+
+    def __init__(self):
+        super(DeadStuffLayer, self).__init__()
+
+    def add(self, child, duration=5, **kw):
+        super(DeadStuffLayer, self).add(child, **kw)
+        child.do(Delay(duration) + FadeOut(1) + CallFunc(lambda: self.remove(child)))
 
 class GameLayer(Layer):
     is_event_handler = True
@@ -229,6 +239,11 @@ class GameLayer(Layer):
                 if layer_label in ['lights']:
                     self.lights = Light(sprite_layer)
 
+
+        # temporary dead stuff layer
+        # it should be above the furniture, but below the walls
+        self.deadstuff_layer = DeadStuffLayer()
+        self.map_node.add(self.deadstuff_layer)
 
         # create collision shapes
         ###collision_layer = self._create_collision_layer(for_collision_layers)

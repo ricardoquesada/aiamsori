@@ -36,6 +36,16 @@ def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.15)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
 
+class Gore(Sprite):
+    def __init__(self, *a, **kw):
+        img = random.choice(self.images)
+        super(Gore, self).__init__(img, *a, **kw)
+
+class Blood(Gore):
+    images = glob("data/img/sangre[0-9]*.png")
+
+class BodyParts(Gore):
+    images = glob("data/img/cacho[0-9]*.png")
 
 class Agent(Sprite):
     def __init__(self, game_layer, img, position=(0,0)):
@@ -125,20 +135,27 @@ class Agent(Sprite):
         if isinstance(other, Bullet):
             if not isinstance(self, Father):
                 bullet = other
-                self.receive_damage(bullet.player.weapon.damage)
+                self.receive_damage(bullet.player.weapon.damage, bullet)
         elif isinstance(other, Agent):
             self.collided_agent = other
 
     def _get_game_layer(self):
         raise NotImplementedError
 
-    def receive_damage(self, damage):
+    def receive_damage(self, damage, other):
         self.life -= damage
         ## return True if died
         if self.life <= 0:
             self.die()
+            self.add_gore(BodyParts, other, duration=5)
             return True
+        self.add_gore(Blood, other, duration=.5)
         return False
+
+    def add_gore(self, gore_class, other, duration=5):
+        gore = gore_class((self.x, self.y), other.rotation)
+        self.player.game_layer.deadstuff_layer.add(gore, duration)
+
 
 class Family(Agent):
     pass
@@ -179,6 +196,7 @@ class Father(Family):
                         'fist': MeleeWeapon(self)}
         self.weapon = self.weapons['fist']
         self.time_since_attack = 0
+        self.player = self #shortcut
 
     def on_collision(self, other):
         super(Father, self).on_collision(other)
@@ -291,7 +309,7 @@ class MeleeWeapon(Weapon):
         print "ATTACK"
         if self.player.collided_agent != None:
             print 'morite!!', self.player.collided_agent
-            died = self.player.collided_agent.receive_damage(self.damage)
+            died = self.player.collided_agent.receive_damage(self.damage, self.player)
             if died:
                 self.player.collided_agent = None
             self._play_sound()
@@ -467,8 +485,6 @@ class ZombieBoid(Agent):
 
     def _get_game_layer(self):
         return self.player.game_layer
-
-
 
 
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
