@@ -522,6 +522,7 @@ class Bullet(Sprite):
 
         #print 'updating bullet position', self.position, (nx,ny)
         self.update_position((nx, ny))
+        # FIXME: this goes away as soon as bullets collide agains walls
         if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
             self.die()
 
