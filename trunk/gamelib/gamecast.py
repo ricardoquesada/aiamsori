@@ -9,7 +9,7 @@ RANDOM_DELTA = 128
 
 from cocos.sprite import Sprite
 from cocos.actions.interval_actions import MoveBy
-
+from cocos.euclid import Point2
 from boids import merge, seek, cap, avoid_group
 #from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
 #from tiless_editor.layers.collision import Circle
@@ -303,7 +303,7 @@ class Father(Family):
             self.speed += self.acceleration*ACCEL_FACTOR*dt
 
 ##        self.rotation += 110 * self.rotation_speed * dt
-            
+
         # update the position, based on the speed
         nx = (self.x + cos( radians(-self.rotation) ) * self.speed * dt)
         ny = (self.y + sin( radians(-self.rotation) ) * self.speed * dt)
@@ -412,9 +412,10 @@ class Relative(Family):
         self.collision = False
         self.current_anim = 'idle'
         #self.target = self.position
-        self.target = player
+        self.target = self.position
         self.updatecounter = 200
         self.mm = 0
+
     def update(self, dt):
         # move to designated target or stay and fight
 
@@ -422,29 +423,29 @@ class Relative(Family):
         self._old_state = {'position': self.position, 'rotation': self.rotation}
 
         locals = []
-        if self.updatecounter > 50:
-            self.mm = random.choice([50, 100, 150, 200, 250]) * random.choice([1, -1])
-            self.updatecounter = 0
+        if self.target and abs(Point2(*self.position) - Point2(*self.target) ) < 100:
+            self.target = None
+
+        if self.target:
+            goal = seek(self.x, self.y, self.target[0], self.target[1])
+
+            delta = geom.angle_rotation(radians(self.rotation), radians(goal))
+            delta = degrees(delta)
+            max_r = 270
+            delta = cap(delta, -max_r, max_r) * dt
+            self.rotation += delta
+
+            # FIXME: for some reason the x/y attributes don't update the position attribute correctly
+            self.position = (self.x, self.y)
+            self.rotation = self.rotation % 360
+            # update position
+            a = -self.rotation
+            nx = (self.x + cos( radians(a) ) * self.speed * dt)
+            ny = (self.y + sin( radians(a) ) * self.speed * dt)
+
+            self.update_position((nx, ny))
         else:
-            self.updatecounter += 1
-        print self.updatecounter
-        goal = seek(self.x, self.y, self.target.position[0]  * self.mm, self.target.position[1] - self.mm)
-
-        delta = geom.angle_rotation(radians(self.rotation), radians(goal))
-        delta = degrees(delta)
-        max_r = 270
-        delta = cap(delta, -max_r, max_r) * dt
-        self.rotation += delta
-
-        # FIXME: for some reason the x/y attributes don't update the position attribute correctly
-        self.position = (self.x, self.y)
-        self.rotation = self.rotation % 360
-        # update position
-        a = -self.rotation
-        nx = (self.x + cos( radians(a) ) * self.speed * dt)
-        ny = (self.y + sin( radians(a) ) * self.speed * dt)
-
-        self.update_position((nx, ny))
+            self.update_position(self.position)
 
         if self.position != self.old_position:
             self.play_anim('walk')
@@ -459,7 +460,7 @@ class Relative(Family):
         game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
-	# check if whole family is dead
+        # check if whole family is dead
         if not self.player.family:
             game_layer.game_over()
 
