@@ -450,6 +450,10 @@ class Relative(Family):
         game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
+	# check if whole family is dead
+        if not self.player.family:
+            game_layer.game_over()
+
     def _get_game_layer(self):
         return self.player.game_layer
 
@@ -464,6 +468,10 @@ class Boy(Relative):
         self.sounds = {}
         player.family['boy'] = self
 
+    def die(self):
+        del self.player.family['boy']
+        super(Boy, self).die()
+
 
 class Girl(Relative):
     name = "Bee"
@@ -475,6 +483,10 @@ class Girl(Relative):
         self.sounds = {}
         player.family['girl'] = self
 
+    def die(self):
+        del self.player.family['girl']
+        super(Girl, self).die()
+
 
 class Mother(Relative):
     name = "Mom"
@@ -485,6 +497,10 @@ class Mother(Relative):
                       }
         self.sounds = {}
         player.family['mother'] = self
+
+    def die(self):
+        del self.player.family['mother']
+        super(Mother, self).die()
 
 
 class Zombie(Agent):
