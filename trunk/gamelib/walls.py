@@ -113,10 +113,10 @@ def create_wall_layer(layers):
     return dest
 
 # si cambian esto, tienen que ejecutar este archivo para que arregle el atlas y la lista de coordenadas
-conf_walls =  {'newtiles/pared.png':'newtiles/pared.png',
+conf_walls =  {'newtiles/pared.png':'walls/pared_v.png',
 #                'tiles/ventana_rot.png':'tiles/ventana_v.png',
 #                'tiles/ventana.png':'tiles/ventana_v.png',
-#                'tiles/alambre.png':'tiles/alambre_v.png',
+                'newtiles/alambre.png':'walls/alambre_v.png',
 #                'tiles/alambre_v.png':'tiles/alambre_v.png',
             }
 if __name__ == "__main__":

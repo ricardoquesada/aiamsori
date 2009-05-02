@@ -1,6 +1,12 @@
 {
-    "newtiles/pared.png": [
+    "walls/alambre_v.png": [
         0, 
+        0, 
+        64, 
+        64
+    ], 
+    "walls/pared_v.png": [
+        69, 
         0, 
         64, 
         64

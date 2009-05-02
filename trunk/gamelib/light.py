@@ -23,7 +23,7 @@ class Light(BatchNode):
             sp.dy = 0
             sp.dt = random.random()*3.15
             self.add( sp )
-        self.schedule(self.update)
+#        self.schedule(self.update)
 
     def update(self, dt):
         for c in self.get_children():
