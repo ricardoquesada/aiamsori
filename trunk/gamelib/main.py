@@ -21,6 +21,8 @@ from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
 from cocos.sprite import NotifierSprite, Sprite
+from cocos.scenes.transitions import ShuffleTransition as TransitionScene
+from cocos.text import Label
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 from tiless_editor.layers.collision import CollisionLayer
@@ -83,11 +85,16 @@ def main():
     hud_layer = gamehud.HudLayer()
     game_layer = GameLayer(MAPFILE, hud_layer)
 #    game_layer.position = (400, 300)
-
+    x,y = director.get_window_size()
+    image_layer = ImageLayer(x,y)
+    
     director.set_3d_projection()
 #    director.set_2d_projection()
 
     main_scene = Scene()
+    first_scene = Scene()
+    first_scene.add(image_layer)
+    image_layer.next = (director, main_scene)   #ugly?
     main_scene.add(game_layer)
     main_scene.add(hud_layer, z = 1)
     if options.wpt_on:
@@ -97,7 +104,8 @@ def main():
     main_scene.add(KeyGameCtrl(game_layer))
     main_scene.add(MouseGameCtrl(game_layer))
 
-    director.run(main_scene)
+    #director.run(main_scene)
+    director.run(first_scene)
 
 class LightLayer(cocos.cocosnode.CocosNode):
     def __init__(self, main):
@@ -139,7 +147,28 @@ def make_sprites_layer(layer_data, atlas):
         layer.add(sprite)
     return layer
 
+class ImageLayer(Layer):
+    is_event_handler = True
 
+    def __init__(self, x, y):
+        super(ImageLayer, self).__init__()
+        self.w = x
+        self.h = y
+        bg = Sprite('data/img/ppl.jpg')
+        bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
+        self.add(bg)
+        
+        label = Label('Press any key to start!', font_name='Times New Roman', font_size=32)
+        label.position = 0,0
+        label.element.color = 0,0,0,255
+        self.add(label, z=1)
+        
+    def on_key_press(self, k, m):
+        print "aprento una tecla"
+        director, scene = self.next
+        ts = TransitionScene(scene, 2)
+        director.replace(ts)
+        
 class GameLayer(Layer):
     is_event_handler = True
 

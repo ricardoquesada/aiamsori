@@ -35,7 +35,6 @@ class Light(object):
         x, y = self.position
         self.shader.uset2F('light', float(x), float(y))
 
-
     def disbale(self):
         self.enabled = False
         self.shader.uninstall()
