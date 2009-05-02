@@ -15,6 +15,7 @@ import optparse
 import avbin
 
 from pyglet import gl
+from pyglet.window import key
 import cocos
 from cocos import euclid
 from cocos import framegrabber
@@ -60,6 +61,38 @@ UNKNOWN_ITEM_PROBABILTY = 0.1
 UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
+has_grabber = False
+
+def get_intro_scene():
+    x,y = director.get_window_size()
+    image_layer = ImageLayer(x,y)
+    scene = Scene()
+    scene.add(image_layer)
+
+    return scene
+
+def get_game_scene():
+    global has_grabber
+    # create game scene
+    hud_layer = gamehud.HudLayer()
+    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
+
+    scene = Scene()
+    scene.add(game_layer)
+    scene.add(hud_layer, z = 1)
+    if options.wpt_on:
+        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
+    else:
+        from gamectrl import MouseGameCtrl, KeyGameCtrl
+    scene.add(KeyGameCtrl(game_layer))
+    scene.add(MouseGameCtrl(game_layer))
+
+    return scene
+
+def get_end_scene():
+    scene = Scene()
+    scene.add(GameOverLayer())
+    return scene
 
 WAVE_DELAY = [5, 50, 47, 45, 44, 43, 32, 31, 30, 19, 18, 17, 16, 15, 10]
 WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
@@ -87,6 +120,7 @@ def main():
 
 #    avbin.init_avbin() #warn: if uncomented windows crash
 
+    global has_grabber
     try:
         import cocos.gl_framebuffer_object as FG
         FG.FramebufferObject().check_status()
@@ -102,31 +136,16 @@ def main():
     #director.init(fullscreen=True)
     director.init(options.width, options.height, resizable=True)
     sound.init()
-    # create game scene
-    hud_layer = gamehud.HudLayer()
-    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
-#    game_layer.position = (400, 300)
-    x,y = director.get_window_size()
-    image_layer = ImageLayer(x,y)
 
     director.set_3d_projection()
 #    director.set_2d_projection()
 
-    main_scene = Scene()
-    first_scene = Scene()
-    first_scene.add(image_layer)
-    image_layer.next = (director, main_scene)   #ugly?.. WHO CARES!
-    main_scene.add(game_layer)
-    main_scene.add(hud_layer, z = 1)
-    if options.wpt_on:
-        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
-    else:
-        from gamectrl import MouseGameCtrl, KeyGameCtrl
-    main_scene.add(KeyGameCtrl(game_layer))
-    main_scene.add(MouseGameCtrl(game_layer))
+    # FIXME: transition between scenes are not working
+    #scene = get_intro_scene()
+    scene = get_game_scene()
+    #scene = get_end_scene()
+    director.run(scene)
 
-    director.run(main_scene)
-    #director.run(first_scene)
 
 
 def make_sprites_layer(layer_data, atlas):
@@ -167,8 +186,42 @@ class ImageLayer(Layer):
 
     def on_key_press(self, k, m):
         print "aprento una tecla"
-        director, scene = self.next
-        director.replace(scene)
+        game_scene = get_game_scene()
+        director.replace(game_scene)
+
+
+class GameOverLayer(Layer):
+    is_event_handler = True
+
+    def __init__(self):
+	super(GameOverLayer, self).__init__()
+	w, h = director.get_window_size()
+	label = Label('Game Over, you sucker...', font_name='Times New Roman', font_size=52, bold=True)
+	label.position = w / 2 - 340 , h / 2 + 100
+	label.element.color = 40,179,75,180
+	label2 = Label('do you want to play again?', font_name='Times New Roman', font_size=52, bold=True)
+	label2.position = w / 2 - 420 , h / 2 
+	label2.element.color = 40,179,75,180
+	label3 = Label('(Y/N)', font_name='Times New Roman', font_size=52, bold=True)
+	label3.position = w / 2 - 40, h / 2 - 100
+	label3.element.color = 40,179,75,180
+	self.add(label, z=1)
+	#label.do(Hide() + Delay(10) + Show())
+	label2.do(Delay(10) + Show())
+	label3.do(Delay(10) + Show())
+	self.add(label)
+	self.add(label2)
+	self.add(label3)
+
+    def on_key_press(self, k, m):
+	if k == key.Y:
+	    game_scene = get_game_scene()
+	    director.replace(game_scene)
+	    return True
+	elif k == key.N:
+	    director.pop()
+	    return True
+
 
 class DeadStuffLayer(cocos.cocosnode.CocosNode):
     """Everything added to this node disappears a few seconds later"""
@@ -192,10 +245,11 @@ class GameLayer(Layer):
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
-            self.fire_lights = Layer()
 
-        self.grabber = framegrabber.TextureGrabber()
-        self.grabber.grab(self.texture)
+            self.grabber = framegrabber.TextureGrabber()
+            self.grabber.grab(self.texture)
+            print self.grabber
+
         self.map_node = LayersNode()
         self.projectiles = []
         self.dead_items = set()
@@ -218,6 +272,7 @@ class GameLayer(Layer):
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_T, pyglet.gl.GL_CLAMP_TO_EDGE )
 
         self.show_fire_frames = 0
+        self.fire_lights = Layer()
         self.fire_light = Sprite("data/newtiles/luz_escopeta.png")
         self.fire_light.scale = 1
         self.fire_lights.add(self.fire_light)
@@ -316,12 +371,9 @@ class GameLayer(Layer):
         if self.has_grabber:
             width, height = w, h
             print "RESETING TEXTURE", width, height
-
-
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
-
 
     def visit(self):
         if not self.has_grabber:
@@ -519,6 +571,10 @@ class GameLayer(Layer):
         #self.light.set_position(x/2, y/2)
         #self.light.enable()
 
+    def game_over(self):
+        end_scene = get_end_scene()
+        director.replace(end_scene)        
+
     def on_exit(self):
         super(GameLayer, self).on_exit()
         #self.light.disable()
@@ -606,7 +662,6 @@ class GameLayer(Layer):
     def is_empty(self,x,y):
         # note: ATM only walls, not muebles
         return self.wallmask.is_empty(x,y)
-
 
 
 
