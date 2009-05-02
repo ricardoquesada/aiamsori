@@ -3,38 +3,81 @@ import geom
 import random
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from pyglet.image import Animation, AnimationFrame, load
-from pymunk.vec2d import Vec2d
+#from pymunk.vec2d import Vec2d
 
-from cocos.sprite import NotifierSprite, Sprite
+RANDOM_DELTA = 70
 
-class NotifierSprite(Sprite):
-    def register(self, *args):
-        pass
+from cocos.sprite import Sprite
 
 from boids import merge, seek, cap, avoid_group
-from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
-from tiless_editor.layers.collision import Circle
+#from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
+#from tiless_editor.layers.collision import Circle
 import sound
 
 # NOTE: select wich class will be used as Zombie near EOF
 
 COLLISION_GROUP_FATHER = 1
 
+COLLISION_DISTANCE_SQUARED = 64**2
+
+TOP_SPEED = 230
+#TOP_SPEED = 330
+
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.2)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
 
 
-class Agent(NotifierSprite):
+class Agent(Sprite):
     def __init__(self, img, position=(0,0)):
         super(Agent, self).__init__(img, position)
         self.anims = {}
         self.current_anim = 'idle'
 
-        self.shape = AgentShape(self)
+        ###self.shape = AgentShape(self)
         self.just_born = True
 
     def update_position(self, position):
+        self.old_position = self.position
+        self.position = position
+
+        agents = self.parent.children
+        for z, agent in agents:
+            if agent is self: continue
+            distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
+            collision = distance <= COLLISION_DISTANCE_SQUARED
+            if collision:
+                #print self, 'COLLISION', agent
+                # objects collided
+                if self.just_born:
+                    self.x += random.choice([-1,1])*RANDOM_DELTA
+                    self.y += random.choice([-1,1])*RANDOM_DELTA
+                    self.target = self.position = (self.x, self.y)
+                    self.target = self.position
+                    return
+
+                #nx = self.old_position[0] + random.choice([-1,1])*RANDOM_DELTA
+                #ny = self.old_position[1] + random.choice([-1,1])*RANDOM_DELTA
+                #self.position = (nx, ny)
+                self.position = self.old_position
+                self.on_collision(agent)
+                #agent.on_collision(self)
+                #f = getattr(self.collision, "on_collision", None)
+                #if f is not None:
+                #    f(self)
+
+                #self.position = position[0], self.old_position[1]
+                #collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
+                #if collision:
+                #    self.position = self.old_position[0], position[1]
+                #    collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
+                #    if collision:
+                #        self.position = self.old_position
+            else:
+                if self.just_born:
+                    self.just_born = False
+
+        return
         # test for collisions
         self.old_position = self.position
         self.updating = True
@@ -46,8 +89,8 @@ class Agent(NotifierSprite):
         collision_layer.step()
         if self.collision:
             if self.just_born:
-                self.x += random.choice([-1,1])*70
-                self.y += random.choice([-1,1])*70
+                self.x += random.choice([-1,1])*RANDOM_DELTA
+                self.y += random.choice([-1,1])*RANDOM_DELTA
                 self.target = self.position = (self.x, self.y)
                 self.target = self.position
                 return
@@ -85,6 +128,7 @@ class Agent(NotifierSprite):
         self.current_anim = anim_name
 
     def on_collision(self, other):
+        #print 'self', self, 'other', other
         if isinstance(other, Bullet):
             self.die()
 
@@ -98,7 +142,7 @@ class Agent(NotifierSprite):
 class Father(Agent):
     def __init__(self, img, position, game_layer):
         super(Father, self).__init__(img, position)
-        self.shape.group = COLLISION_GROUP_FATHER
+        ###self.shape.group = COLLISION_GROUP_FATHER
 
         self._old_state = {'position': position}
         self.speed = 0
@@ -123,7 +167,7 @@ class Father(Agent):
 
     def update(self, dt):
         # update speed
-        if self.acceleration != 0 and abs(self.speed) < 130:
+        if self.acceleration != 0 and abs(self.speed) < TOP_SPEED:
             self.speed += self.acceleration*100*dt
 
         self.rotation += 110 * self.rotation_speed * dt
@@ -240,7 +284,7 @@ class ZombieBoid(Agent):
                       'walk': get_animation('zombie1_walk'),
                       }
         self.current_anim = 'idle'
-        self.shape = ZombieShape(self)
+        ###self.shape = ZombieShape(self)
 
     def update(self, dt):
         # save old position
@@ -299,7 +343,7 @@ class ZombieWpt(Agent):
                       'walk': get_animation('zombie1_walk'),
                       }
         self.current_anim = 'idle'
-        self.shape = ZombieShape(self)
+        ###self.shape = ZombieShape(self)
 
     def update(self, dt):
         # save old position
@@ -359,7 +403,7 @@ class ZombieWpt(Agent):
         game_layer.dead_items.add(self)
 
 
-class Bullet(NotifierSprite):
+class Bullet(Sprite):
     def __init__(self, img, agent):
         super(Bullet, self).__init__(img, agent.position, agent.rotation, agent.scale)
 
@@ -369,22 +413,26 @@ class Bullet(NotifierSprite):
         position = agent.position
         WEAPON_RANGE = 200
 
-        offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
-        target = offset+position
-        shape = BulletShape(self, position, target)
-        shape.group = agent.shape.group
-        self.shape = shape
+        #from pymunk.vec2d import Vec2d
+        #offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
+        #target = offset+position
+        nx = WEAPON_RANGE * cos( radians(-self.rotation) )
+        ny = WEAPON_RANGE * sin( radians(-self.rotation) )
+        target = (position[0] + nx, position[1] + ny)
+        ###shape = BulletShape(self, position, target)
+        ###shape.group = agent.shape.group
+        ###self.shape = shape
 
 
-class Ray(NotifierSprite):
+class Ray(Sprite):
     def __init__(self, agent, target):
         super(Ray, self).__init__('img/bullet.png', agent.position, agent.rotation, agent.scale)
-        shape = RayShape(self, agent.position, target)
-        shape.group = agent.shape.group
-        self.shape = shape
+        ###shape = RayShape(self, agent.position, target)
+        ###shape.group = agent.shape.group
+        ###self.shape = shape
 
 
-class Wall(NotifierSprite):
+class Wall(Sprite):
     def __init__(self, child):
         img = {'filename': child.path, 'position': child.position,
                'rotation': child.rotation, 'scale': child.scale,
@@ -395,7 +443,7 @@ class Wall(NotifierSprite):
         self.label = None
         self.path = img['filename']
         self.rect = img['rect']
-        self.shape = WallShape(self)
+        ###self.shape = WallShape(self)
 
 
 #select here wich Zombie class

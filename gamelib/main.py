@@ -22,11 +22,12 @@ from cocos.director import director
 from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
-from cocos.sprite import NotifierSprite, Sprite
+from cocos.sprite import Sprite
+from cocos.scenes.transitions import ShuffleTransition as TransitionScene
 from cocos.text import Label
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
-from tiless_editor.layers.collision import CollisionLayer
+#from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from tiless_editor.atlas import SavedAtlas
@@ -46,6 +47,8 @@ RETREAT_DELAY = 0.1
 
 ZOMBIE_WAVE_COUNT = 5
 ZOMBIE_WAVE_DURATION = 60
+
+RANDOM_DELTA = 70
 
 options = None
 
@@ -181,6 +184,7 @@ class GameLayer(Layer):
         self.bullets = []
         self.dead_items = set()
         self.wallmask = WallMask('newtiles/pared.png',64) # UPDATE!
+        self.agents_node = LayersNode()
 
         # get layers from map
         collision_layers = []
@@ -220,11 +224,13 @@ class GameLayer(Layer):
 
 
         # create collision shapes
-        collision_layer = self._create_collision_layer(collision_layers)
-        self.map_node.add_layer('collision', 1000, collision_layer)
+        ###collision_layer = self._create_collision_layer(for_collision_layers)
+        ###self.map_node.add_layer('collision', 1000, collision_layer)
         self.map_node.add(create_wall_layer(walls_layers), z=10)
         # add scene map node to the main layer
         self.add(self.map_node)
+
+        self.add(self.agents_node, z=1)
 
         # create agents (player and NPCs)
         self._create_agents()
@@ -347,12 +353,13 @@ class GameLayer(Layer):
             for i in range(ZOMBIE_WAVE_COUNT):
                 for c in self.zombie_spawn.get_children():
                     z = Zombie(get_animation('zombie1_idle'), self.player)
-                    z.x = c.x
-                    z.y = c.y
+                    z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
+                    z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
                     z.position = z.x, z.y
                     #self.map_node.add(z)
-                    self.add(z)
-                    collision_layer.add(z, static=z.shape.static, scale=.75)
+                    self.agents_node.add(z)
+                    ###collision_layer.add(z, static=z.shape.static, scale=.75)
+
             self.z_spawn_lifetime = 0
 
 
@@ -373,53 +380,53 @@ class GameLayer(Layer):
 
     def _create_agents(self):
         # get collision layer
-        collision_layer = self.map_node.get('collision')
+        ###collision_layer = self.map_node.get('collision')
 
         # create agent sprite
         father = Father(get_animation('father_idle'), (0,-800), self)
         self.player = father
-        self.add(father)
-        collision_layer.add(father, static=father.shape.static)
+        self.agents_node.add(father)
+        ###collision_layer.add(father, static=father.shape.static)
 
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
         if not options.wpt_on:
-            boy = Boy(get_animation('boy_idle'), (0,-800), self.player)
-            self.add(boy)
-            collision_layer.add(boy, static=boy.shape.static)
+            position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
+            boy = Boy(get_animation('boy_idle'), position, self.player)
+            self.agents_node.add(boy)
+            ###collision_layer.add(boy, static=boy.shape.static)
 
-            girl = Girl(get_animation('girl_idle'), (0,-800), self.player)
-            self.add(girl)
-            collision_layer.add(girl, static=girl.shape.static)
+            position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
+            girl = Girl(get_animation('girl_idle'), position, self.player)
+            self.agents_node.add(girl)
+            ###collision_layer.add(girl, static=girl.shape.static)
 
-            mother = Mother(get_animation('mother_idle'), (0,-800), self.player)
+            position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
+            mother = Mother(get_animation('mother_idle'), position, self.player)
 #            mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
-            self.add(mother)
-            collision_layer.add(mother, static=mother.shape.static)
+            self.agents_node.add(mother)
+            ###collision_layer.add(mother, static=mother.shape.static)
 
-            x, y = director.get_window_size()
-
-
-    def on_collision(self, shape_a, shape_b):
-        node = shape_a.sprite
-        other = shape_b.sprite
-        if isinstance(node, Agent):
-            node._on_collision(other)
-        if isinstance(other, Agent):
-            other._on_collision(node)
+    ###def on_collision(self, shape_a, shape_b):
+    ###    node = shape_a.sprite
+    ###    other = shape_b.sprite
+    ###    if isinstance(node, Agent):
+    ###        node._on_collision(other)
+    ###    if isinstance(other, Agent):
+    ###        other._on_collision(node)
 
 
-    def _create_collision_layer(self, layers):
-        collision_layer = CollisionLayer(self.on_collision)
-        # README: uncomment this to debug collision shapes
-        #collision_layer.show_shapes = False
+    ###def _create_collision_layer(self, layers):
+    ###    return
+    ###    collision_layer = CollisionLayer(self.on_collision)
+    ###    # README: uncomment this to debug collision shapes
+    ###    #collision_layer.show_shapes = False
 
-        for layer in layers:
-            for z, child in layer.children:
-                wall = Wall(child)
-                collision_layer.add(wall, static=wall.shape.static)
-                self.wallmask.add(child)
-        return collision_layer
+    ###    for layer in layers:
+    ###        for z, child in layer.children:
+    ###            wall = Wall(child)
+    ###            collision_layer.add(wall, static=wall.shape.static)
+    ###    return collision_layer
 
     def update(self, dt):
         x, y = director.get_window_size()
@@ -434,9 +441,9 @@ class GameLayer(Layer):
 
     def add_bullet(self, bullet):
         self.bullets.append(bullet)
-        self.add(bullet)
-        collision_layer = self.map_node.get('collision')
-        collision_layer.add(bullet, static=bullet.shape.static)
+        self.agents_node.add(bullet)
+        ###collision_layer = self.map_node.get('collision')
+        ###collision_layer.add(bullet, static=bullet.shape.static)
 
     def remove_bullet(self, bullet):
         self.bullets.remove(bullet)
@@ -449,18 +456,18 @@ class GameLayer(Layer):
         #print self.bullets
 
     def _remove_dead_items(self):
-        collision_layer = self.map_node.get('collision')
+        ###collision_layer = self.map_node.get('collision')
         for item in self.dead_items:
-            collision_layer.remove(item, static=item.shape.static)
-            self.remove(item)
+            ###collision_layer.remove(item, static=item.shape.static)
+            self.agents_node.remove(item)
         self.dead_items.clear()
 
     def is_clear_path(self, origin, target):
         ray = Ray(self.player, target)
-        collision_layer = self.map_node.get('collision')
-        collision_layer.add(ray, static=ray.shape.static)
-        collision_layer.step()
-        collision_layer.remove(ray)
+        ###collision_layer = self.map_node.get('collision')
+        ###collision_layer.add(ray, static=ray.shape.static)
+        ###collision_layer.step()
+        ###collision_layer.remove(ray)
         return not ray.shape.data['collided']
 
     def is_empty(self,x,y):

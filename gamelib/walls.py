@@ -11,10 +11,10 @@ import cocos
 from cocos.director import director
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
-from cocos.sprite import NotifierSprite, Sprite
+from cocos.sprite import Sprite
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
-from tiless_editor.layers.collision import CollisionLayer
+#from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.atlas import SavedAtlas
 

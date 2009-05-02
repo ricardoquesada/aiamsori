@@ -4,7 +4,7 @@ from cocos.director import director
 from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
-from cocos.sprite import NotifierSprite, Sprite
+from cocos.sprite import Sprite
 
 class HudLayer(cocos.layer.Layer):
     def __init__(self, life=100, bullets=100):
