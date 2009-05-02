@@ -37,6 +37,7 @@ import sound
 import light
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Bullet, Ray, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
+from wallmask import WallMask
 
 #WIDTH, HEIGHT = 1024, 768
 MAPFILE = 'data/map.json'
@@ -177,6 +178,7 @@ class GameLayer(Layer):
         self.map_node = LayersNode()
         self.bullets = []
         self.dead_items = set()
+        self.wallmask = WallMask('newtiles/pared.png',64) # UPDATE!
 
         # get layers from map
         collision_layers = []
@@ -227,11 +229,21 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         #self.light = light.Light(x/2, y/2)
 
+        # ends wallmask preparation, makes available service .is_empty(x,y)
+        self.wallmask.get_mask() #called for side effect _fill_gaps
+        # now is safe to call self.is_empty()
+
         # if waypoint editing mode, create waypoints
         if options.wpt_on:
             from wptlayer import WptLayer
             self.wptlayer = WptLayer(mapfile)
             self.map_node.add_layer('wptedit',1,self.wptlayer) # ?
+        else:
+            # LATER: 
+            # obtain wpts, instantiation need to wait until is safe to call
+            # ray functions..
+            wpts = [ (s.x,s.y) for s in waypoints] #Esta bien asi Lucio?
+            # a seguir
 
         # talk queue
         self.hud = hud
@@ -337,6 +349,7 @@ class GameLayer(Layer):
             for z, child in layer.children:
                 wall = Wall(child)
                 collision_layer.add(wall, static=wall.shape.static)
+                wallmask.add(child)
         return collision_layer
 
     def update(self, dt):
@@ -381,6 +394,9 @@ class GameLayer(Layer):
         collision_layer.remove(ray)
         return not ray.shape.data['collided']
 
+    def is_empty(self,x,y):
+        # note: ATM only walls, not muebles
+        return self.wallmask.is_empty(x,y)
 
 
 
