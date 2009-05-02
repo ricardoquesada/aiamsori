@@ -60,7 +60,7 @@ class EditMode(Mode, MouseEventHandler):
 
             return True
 
-            
+
     def on_mouse_motion(self, px, py, dx, dy):
         x, y = self.ed.layers.pointer_to_world(px, py)
         self.ed.mouse_position = (px, py)
@@ -109,6 +109,7 @@ class EditMode(Mode, MouseEventHandler):
             if self.ed.floating_sprite:
                 x, y = self.ed.layers.pointer_to_world(px, py)
                 nx, ny = self.ed.sprite_grid.snap_to_grid((x, y))
+                nx, ny = x, y
                 self.ed.move_floating(nx, ny)
                 return True
 

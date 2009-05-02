@@ -173,6 +173,10 @@ class GameLayer(Layer):
                     walls_layers.append(sprite_layer)
                 if layer_label in ['zombie_spawn']:
                     zombie_spawn = sprite_layer
+                if layer_label in ['item_spawn']:
+                    item_spawn = sprite_layer
+                if layer_label in ['waypoints']:
+                    waypoints = sprite_layer
 
         # create collision shapes
         collision_layer = self._create_collision_layer(for_collision_layers)
@@ -183,6 +187,9 @@ class GameLayer(Layer):
 
         # create agents (player and NPCs)
         self._create_agents(zombie_spawn)
+        self.setup_powerups(item_spawn)
+        self.setup_waypoints(waypoints)
+
         x, y = director.get_window_size()
         #self.light = light.Light(x/2, y/2)
 
@@ -199,6 +206,22 @@ class GameLayer(Layer):
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
+
+    def setup_waypoints(self, layer):
+        for c in layer.get_children():
+            print "waypoint", c.position
+            
+    def setup_powerups(self, layer):
+        self.powerup_interval = 10
+        self.item_spawn = []
+        for c in layer.get_children():
+            self.item_spawn.append( c.position )
+        self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
+
+    def spawn_powerup(self):
+        position = random.choice(self.item_spawn)
+        print "powerup position", position
+        self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
 
     def talk(self, who, what, duration=5, transient=False):
         self.talk_layer.talk(who, what, duration=duration, transient=transient)
