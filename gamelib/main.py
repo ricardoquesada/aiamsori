@@ -403,14 +403,14 @@ class GameLayer(Layer):
                     visible_map.add((a,b))
                 else:
                     not_visible_map.add((a,b))
-        def _visible(a, b):
+        def visible(a, b):
             if (a,b) in visible_map:
                 return True
             if (a,b) in not_visible_map:
                 return False
             return is_visible(a, b)
 
-        def visible(a, b):
+        def _visible(a, b):
             r = _visible(a, b)
             #print "visible", a, b, r
             return r
@@ -469,6 +469,12 @@ class GameLayer(Layer):
                 z = Zombie(self, get_animation('zombie1_idle'), self.player)
                 z.position = p.position
                 self.agents_node.add(z)
+                print "NEW ZOMBIE"
+                z = Zombie(self, get_animation('zombie1_idle'), self.player)
+                z.position = p.position
+                self.agents_node.add(z)
+
+
             self.z_spawn_lifetime += 1
         else:
             self.z_spawn_lifetime += dt
@@ -522,15 +528,15 @@ class GameLayer(Layer):
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
         if not options.wpt_on:
-            position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
+            position = -00, -900
             boy = Boy(self, get_animation('boy_idle'), position, self.player)
             self.agents_node.add(boy)
 
-            position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
+            position = -100, -850
             girl = Girl(self, get_animation('girl_idle'), position, self.player)
             self.agents_node.add(girl)
 
-            position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
+            position = 100, - 950
             mother = Mother(self, get_animation('mother_idle'), position, self.player)
             self.agents_node.add(mother)
 
@@ -545,8 +551,6 @@ class GameLayer(Layer):
 
         # clear out any dead items
         self._remove_dead_items()
-        if hasattr(self, "lights"):
-            self.lights.update(dt)
 
 
     def add_projectile(self, projectile):

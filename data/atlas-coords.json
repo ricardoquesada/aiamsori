@@ -1,7 +1,7 @@
 {
     "newtiles/pared2.png": [
-        1059, 
-        1162, 
+        913, 
+        645, 
         128, 
         128
     ], 
@@ -24,19 +24,19 @@
         119
     ], 
     "newtiles/piso_ceramico.png": [
-        926, 
-        1162, 
-        128, 
-        128
-    ], 
-    "newtiles/piso_camino.png": [
-        1312, 
+        780, 
         645, 
         128, 
         128
     ], 
+    "newtiles/piso_camino.png": [
+        660, 
+        1162, 
+        128, 
+        128
+    ], 
     "newtiles/sombra.png": [
-        527, 
+        926, 
         1162, 
         128, 
         128
@@ -54,7 +54,7 @@
         520
     ], 
     "newtiles/sofa.png": [
-        156, 
+        0, 
         1295, 
         383, 
         127
@@ -66,8 +66,8 @@
         302
     ], 
     "newtiles/puerta.png": [
-        133, 
-        1162, 
+        1312, 
+        645, 
         128, 
         128
     ], 
@@ -114,8 +114,8 @@
         128
     ], 
     "newtiles/columna.png": [
-        1046, 
-        645, 
+        793, 
+        1162, 
         128, 
         128
     ], 
@@ -126,7 +126,7 @@
         42
     ], 
     "newtiles/mesa.png": [
-        1192, 
+        266, 
         1162, 
         256, 
         128
@@ -144,19 +144,19 @@
         90
     ], 
     "newtiles/ventana.png": [
+        1320, 
+        1162, 
+        128, 
+        128
+    ], 
+    "newtiles/mesada-2.png": [
         1179, 
         645, 
         128, 
         128
     ], 
-    "newtiles/mesada-2.png": [
-        793, 
-        1162, 
-        128, 
-        128
-    ], 
     "newtiles/piso_madera.png": [
-        660, 
+        133, 
         1162, 
         128, 
         128
@@ -168,7 +168,7 @@
         114
     ], 
     "newtiles/mesada.png": [
-        266, 
+        1059, 
         1162, 
         256, 
         128
@@ -180,20 +180,20 @@
         126
     ], 
     "newtiles/sofa_chico.png": [
-        0, 
+        388, 
         1295, 
         151, 
         127
     ], 
     "newtiles/piso_pasto.png": [
-        913, 
+        1046, 
         645, 
         128, 
         128
     ], 
     "newtiles/piso_alfombra.png": [
-        780, 
-        645, 
+        527, 
+        1162, 
         128, 
         128
     ]

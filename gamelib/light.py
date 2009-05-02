@@ -25,7 +25,8 @@ class Light(BatchNode):
             self.add( sp )
 #        self.schedule(self.update)
 
-    def update(self, dt):
-        for c in self.get_children():
-            c.dt += dt
-            c.scale = c.source_scale + 0.05*sin(c.dt)
+#    def update(self, dt):
+#        return
+#        for c in self.get_children():
+#            c.dt += dt
+#            c.scale = c.source_scale + 0.05*sin(c.dt)

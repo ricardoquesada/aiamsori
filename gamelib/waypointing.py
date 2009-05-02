@@ -89,7 +89,6 @@ class WaypointNav:
         returns the next index in a minimal path from i to j , i if i==j
         """
         if i==j:
-            print "last node"
             return i
         dmin = self.min_dist[i,j]
         for k in self.adj[i]:
@@ -167,7 +166,6 @@ class WaypointNav:
         if not len(candidates_a):
             print '*** WARNING: no waypoint near SOURCE', a
             return b
-        print "first", candidates_a
         #get 3 ( if posible ) waypoints near b
         candidates_b = self.get_near_wps(b)
         if not len(candidates_b):
