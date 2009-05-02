@@ -5,7 +5,11 @@ from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from pyglet.image import Animation, AnimationFrame, load
 from pymunk.vec2d import Vec2d
 
-from cocos.sprite import NotifierSprite
+from cocos.sprite import NotifierSprite, Sprite
+
+class NotifierSprite(Sprite):
+    def register(self, *args):
+        pass
 
 from boids import merge, seek, cap, avoid_group
 from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
@@ -37,6 +41,7 @@ class Agent(NotifierSprite):
         collision_layer = self.parent
 
         self.position = position
+        return
         self.collision = None
         collision_layer.step()
         if self.collision:

@@ -126,7 +126,7 @@ def make_sprites_layer(layer_data, atlas):
     def build_sprite(img):
         rect = img['rect']
         region = saved_atlas[img['filename']]
-        s = NotifierSprite(region,
+        s = Sprite(region,
                    img['position'], img['rotation'], img['scale'], img['opacity'])
         s.label = img['label'] if "label" in img else None
         s.path = img['filename']
@@ -215,7 +215,7 @@ class GameLayer(Layer):
     def setup_waypoints(self, layer):
         for c in layer.get_children():
             print "waypoint", c.position
-            
+
     def setup_powerups(self, layer):
         self.powerup_interval = 10
         self.item_spawn = []
