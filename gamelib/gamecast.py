@@ -107,6 +107,7 @@ class Agent(Sprite):
         self.just_born = True
         self.life = PLAYER_MAX_LIFE
         self.collided_agent = None
+        self.zombie_crash = 0
 
     def update_position(self, position):
         self.collided_agent = None
@@ -131,6 +132,7 @@ class Agent(Sprite):
         if self.just_born:
             self.old_position = position
 
+        is_zombie = isinstance(self, Zombie)
         is_family = isinstance(self, Relative)
         # check collisions with dynamic objects
         agents = self.parent.children
@@ -140,6 +142,8 @@ class Agent(Sprite):
             distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
             collision = distance <= COLLISION_DISTANCE_SQUARED
 
+            if is_zombie and isinstance(agent, Zombie):
+                self.zombie_crash += 1
             if is_family:
                 if isinstance(agent, Father):
                     if distance > 1100**2:
@@ -150,6 +154,9 @@ class Agent(Sprite):
 
             if collision:
                 collided = True
+                if self.zombie_crash > 100000:
+                    self.just_born = True
+                    self.zombie_crash = 0
                 # objects collided
                 if self.just_born:
                     ###distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
