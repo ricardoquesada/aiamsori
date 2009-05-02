@@ -39,8 +39,8 @@ from walls import create_wall_layer
 import talk
 import gamehud
 import sound
-from light import Light
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
+import light
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, PowerUp, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
 
@@ -357,16 +357,22 @@ class GameLayer(Layer):
             print "waypoint", c.position
 
     def setup_powerups(self, layer):
-        self.powerup_interval = 10
         self.item_spawn = []
         for c in layer.get_children():
             self.item_spawn.append( c.position )
-        self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
+        self.spawn_powerup()
 
     def spawn_powerup(self):
+        delay = random.randrange(1, 30)
+        print 'DELAY', delay
+        self.do(Delay(delay))
         position = random.choice(self.item_spawn)
-        print "powerup position", position
-        self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
+        type = random.choice(['bullets', 'life'])
+        powerup = PowerUp(type, position, self)
+        self.agents_node.add(powerup)
+        print "powerup ", powerup, 'at', position
+        #print "powerup position", position
+        #self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
 
     def respawn_zombies(self, dt):
         self.z_spawn_lifetime += dt
