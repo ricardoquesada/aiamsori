@@ -199,7 +199,7 @@ class GameLayer(Layer):
 
         self.show_fire_frames = 0
         self.fire_light = Sprite("data/newtiles/luz_escopeta.png")
-        self.fire_light.scale = 3
+        self.fire_light.scale = 1
         self.fire_lights.add(self.fire_light)
 
         layers = simplejson.load(open(mapfile))['layers']
