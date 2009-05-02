@@ -61,7 +61,7 @@ UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
 
-WAVE_DELAY = [5, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
+WAVE_DELAY = [5, 50, 47, 45, 44, 43, 32, 31, 30, 19, 18, 17, 16, 15, 10]
 WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
 
 def main():

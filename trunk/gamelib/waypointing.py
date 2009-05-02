@@ -164,12 +164,12 @@ class WaypointNav:
         #get 3 ( if posible ) waypoints near a
         candidates_a = self.get_near_wps(a)
         if not len(candidates_a):
-            print '*** WARNING: no waypoint near SOURCE', a
+#            print '*** WARNING: no waypoint near SOURCE', a
             return b
         #get 3 ( if posible ) waypoints near b
         candidates_b = self.get_near_wps(b)
         if not len(candidates_b):
-            print '*** WARNING: no waypoint near GOAL', b
+#            print '*** WARNING: no waypoint near GOAL', b
             return b
 
         #choose the best combo
