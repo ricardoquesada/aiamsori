@@ -26,7 +26,7 @@ import simplejson
 from picker import PickerBatchNode
 import atlas
 from grid import SpriteGrid
-from layers.collision import CollisionLayer
+#from layers.collision import CollisionLayer
 
 from cocos.euclid import Point2
 
