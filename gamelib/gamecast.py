@@ -326,7 +326,7 @@ class Father(Family):
                 hud.set_bullets(weapon.ammo)
                 self.switch_weapon('shotgun')
                 sound.play('pickup_shotgun')
-            
+
 
     def update(self, dt):
         # update speed
@@ -658,12 +658,13 @@ class Zombie(Agent):
             d = (danger-50)/50
             chosen = merge([(goal, d), (escape, 1-d)])
 
-        delta = geom.angle_rotation(radians(b.rotation), radians(chosen))
-        delta = degrees(delta)
-        max_r = 270
-        delta = cap(delta, -max_r, max_r) * dt
-        b.rotation += delta
-
+        #delta = geom.angle_rotation(radians(b.rotation), radians(chosen))
+        #delta = degrees(delta)
+        #max_r = 270
+        #delta = cap(delta, -max_r, max_r) * dt
+        #b.rotation += delta
+        b.rotation = chosen
+        
         # FIXME: for some reason the x/y attributes don't update the position attribute correctly
         b.position = (b.x, b.y)
         b.rotation = b.rotation % 360
