@@ -41,6 +41,13 @@ class Agent(Sprite):
         self.old_position = self.position
         self.position = position
 
+        # check collisions with static objects
+        game_layer = self._get_game_layer()
+        if not game_layer.is_empty(*self.position):
+            self.position = self.old_position
+            return
+
+        # check collisions with dynamic objects
         agents = self.parent.children
         for z, agent in agents:
             if agent is self: continue
@@ -136,6 +143,9 @@ class Agent(Sprite):
         if isinstance(other, Bullet):
             self.die()
 
+    def _get_game_layer(self):
+        raise NotImplementedError
+
 
 class Father(Agent):
     def __init__(self, img, position, game_layer):
@@ -208,6 +218,9 @@ class Father(Agent):
         # as segfaults might occur
         game_layer = self.game_layer
         game_layer.dead_items.add(self)
+
+    def _get_game_layer(self):
+        return self.game_layer
             
 
 class Weapon(object):
@@ -284,6 +297,8 @@ class Relative(Agent):
         game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
+    def _get_game_layer(self):
+        return self.player.game_layer
 
 
 class Boy(Relative):
@@ -381,6 +396,8 @@ class ZombieBoid(Agent):
         game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
+    def _get_game_layer(self):
+        return self.player.game_layer
 
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
 class ZombieWpt(Agent):
@@ -455,6 +472,8 @@ class ZombieWpt(Agent):
         game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
+    def _get_game_layer(self):
+        return self.player.game_layer
 
 class Bullet(Sprite):
     def __init__(self, img, agent):        
