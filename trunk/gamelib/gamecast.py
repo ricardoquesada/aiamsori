@@ -172,8 +172,15 @@ class Agent(Sprite):
 
 class Family(Agent):
     def receive_damage(self, damage, other):
-        super(Family, self).receive_damage(damage, other)
+        self.life -= damage
         self.game_layer.hud.set_life(self.name, self.life)
+        ## return True if died
+        if self.life <= 0:
+            self.die()
+            self.add_gore(Blood, other, duration=5)
+            return True
+        self.add_gore(Blood, other, duration=.5)
+        return False
 
 class Father(Family):
     name = "Dad"
