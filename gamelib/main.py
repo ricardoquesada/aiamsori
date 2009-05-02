@@ -286,6 +286,7 @@ class GameOverLayer(Layer):
         self.add(label)
         self.add(label2)
         self.add(label3)
+        sound.play("MusicEnd")
 
     def on_key_press(self, k, m):
         if k == key.Y:

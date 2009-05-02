@@ -97,6 +97,7 @@ class BodyParts(Gore):
     images = globx("data/img/cacho[0-9]*.png") + BloodPool.images
 
 class Agent(Sprite):
+
     def __init__(self, game_layer, img, position=(0,0)):
         super(Agent, self).__init__(img, position)
         self.anims = {}
@@ -140,7 +141,30 @@ class Agent(Sprite):
         for z, agent in agents:
             if agent is self: continue
             distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
-            collision = distance <= COLLISION_DISTANCE_SQUARED
+            if isinstance(agent, Zombie):
+                if is_zombie:
+                    collision_distance = 32**2
+                elif is_family:
+                    collision_distance = 64**2
+                elif agent == self.game_layer.player:
+                    collision_distance = 64**2
+                else:
+                    collision_distance = 96**2
+            elif isinstance(agent, Family):
+                if is_zombie:
+                    collision_distance = 64**2
+                elif is_family:
+                    collision_distance = 64**2
+                elif agent == self.game_layer.player:
+                    collision_distance = 64**2
+                else:
+                    collision_distance = 96**2
+            elif isinstance(agent, Bullet):
+                    collision_distance = 64**2
+            else:
+                collision_distance = 96**2
+
+            collision = distance <= collision_distance
 
             if is_zombie and isinstance(agent, Zombie):
                 self.zombie_crash += 1
@@ -325,7 +349,7 @@ class Father(Family):
                 other.ammo = 0
                 hud.set_bullets(weapon.ammo)
                 self.switch_weapon('shotgun')
-                sound.play('pickup_shotgun')
+                #sound.play('pickup_shotgun')
 
 
     def update(self, dt):
@@ -664,7 +688,7 @@ class Zombie(Agent):
         #delta = cap(delta, -max_r, max_r) * dt
         #b.rotation += delta
         b.rotation = chosen
-        
+
         # FIXME: for some reason the x/y attributes don't update the position attribute correctly
         b.position = (b.x, b.y)
         b.rotation = b.rotation % 360
