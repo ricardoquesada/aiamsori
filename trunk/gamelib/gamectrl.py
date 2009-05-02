@@ -32,9 +32,11 @@ class KeyGameCtrl(Layer):
             x, y = self.game_layer.player.position
             origin = (x, y)
             target = self.game_layer.player.target
-            collided = self.game_layer.is_collide(origin, target)
-            if collided:
-                print 'PIZZA'
+            is_clear = self.game_layer.is_clear_path(origin, target)
+            if not is_clear:
+                print 'OBSTACLE'
+            else:
+                print 'FREE PATH'
 
         ## fire weapon
         if k == key.SPACE:

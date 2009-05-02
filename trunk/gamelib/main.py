@@ -33,7 +33,7 @@ import talk
 import gamehud
 import sound
 import light
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Bullet, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Bullet, Ray, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 
 #WIDTH, HEIGHT = 1024, 768
@@ -320,6 +320,7 @@ class GameLayer(Layer):
     def _remove_bullets(self):
         for bullet in self.bullets:
             self.remove_bullet(bullet)
+        #print self.bullets
 
     def _remove_dead_items(self):
         collision_layer = self.map_node.get('collision')
@@ -327,6 +328,16 @@ class GameLayer(Layer):
             collision_layer.remove(item, static=item.shape.static)
             self.remove(item)
         self.dead_items.clear()
+
+    def is_clear_path(self, origin, target):
+        ray = Ray(self.player, target)
+        collision_layer = self.map_node.get('collision')
+        collision_layer.add(ray, static=ray.shape.static)
+        collision_layer.step()
+        collision_layer.remove(ray)
+        return not ray.shape.data['collided']
+
+
 
 
 

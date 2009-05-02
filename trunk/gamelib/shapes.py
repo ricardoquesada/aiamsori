@@ -14,6 +14,8 @@ COLLISION_GROUP_ZOMBIE = 2
 BULLET_RADIUS = 30
 BULLET_DAMAGE_ENERGY = 10
 
+RAY_RADIUS = .75 * 64
+
 
 class AgentShape(Circle):
     def __init__(self, sprite):
@@ -38,16 +40,15 @@ class WallShape(Square):
         super(WallShape, self).__init__(sprite.width, sprite.height, position=sprite.position)
         self.sprite = sprite
         self.static = True
-        #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
-        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
+        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_RAY | COLLISION_LAYER_BULLET
 
 
 class RayShape(Segment):
-    def __init__(self, radius, origin, target):
-        super(Ray, self).__init__(radius, origin=origin, target=target)
+    def __init__(self, sprite, origin, target):
+        super(RayShape, self).__init__(RAY_RADIUS, origin=origin, target=target)
         self.sprite = sprite
         self.static = False
-        #self.layers = COLLISION_LAYER_WALL | COLLISION_LAYER_RAY
+        self.layers = COLLISION_LAYER_WALL
 
 
 class BulletShape(Segment):
@@ -55,8 +56,8 @@ class BulletShape(Segment):
         super(BulletShape, self).__init__(BULLET_RADIUS, origin=origin, target=target, scale=sprite.scale, rotation=sprite.rotation)
         self.sprite = sprite
         self.static = False
-        #self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
-        self.layers = COLLISION_LAYER_ZOMBIE
+        self.layers = COLLISION_LAYER_AGENT | COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
+        #self.layers = COLLISION_LAYER_ZOMBIE | COLLISION_LAYER_WALL | COLLISION_LAYER_BULLET
         self.damage_energy = BULLET_DAMAGE_ENERGY
 
     # README: uncomment this to debug collision shape
