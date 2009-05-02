@@ -151,8 +151,19 @@ class Father(Agent):
         self.rotation_speed = 0
         self.collision = False
         self.anims = {'idle': get_animation('father_idle'),
-                      'walk': get_animation('father_walk'),
+                      'walk': get_animation('father_walk'),                      
                       }
+        self.anim_sets = {'fist': {'idle': get_animation('father_idle'),
+                                   'walk': get_animation('father_walk'),                      
+                                   },
+                          'shotgun': {'idle': get_animation('father_shotgun_idle'),
+                                      'walk': get_animation('father_shotgun_walk'),                      
+                                      },
+                          }
+
+##         self.anims = {'idle': get_animation('father_idle'),
+##                       'walk': get_animation('father_walk'),
+##                       }
         self.current_anim = 'idle'
         self.family = {}
         self.selected_relative = None
@@ -217,6 +228,11 @@ class Father(Agent):
     def _get_game_layer(self):
         return self.game_layer
 
+    def switch_weapon(self, weapon_name):
+        self.weapon = self.weapons[weapon_name]
+        self.anims = self.anim_sets[weapon_name]
+        self.play_anim('idle')
+                
 
 class Weapon(object):
     def __init__(self, player, damage, atk_range, frequency, sound=None):

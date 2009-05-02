@@ -40,11 +40,13 @@ class KeyGameCtrl(Layer):
                 print 'FREE PATH'
 
         if k == key._1:
-            self.game_layer.player.weapon = self.game_layer.player.weapons['fist']
+            self.game_layer.player.switch_weapon('fist')
+#            self.game_layer.player.weapon = self.game_layer.player.weapons['fist']
 
 
         if k == key._2:
-            self.game_layer.player.weapon = self.game_layer.player.weapons['shotgun']
+            self.game_layer.player.switch_weapon('shotgun')
+#            self.game_layer.player.weapon = self.game_layer.player.weapons['shotgun']
 
 
         ## attack
@@ -57,12 +59,9 @@ class KeyGameCtrl(Layer):
             self.game_layer.player.acceleration = 0
             self.game_layer.player.speed = 0
             self.game_layer.player.play_anim('idle')
-
         if k in [key.LEFT, key.RIGHT, key.A, key.D]:
             self.game_layer.player.rotation_speed = 0
-
         
-
 
 class MouseGameCtrl(Layer):
     is_event_handler = True
