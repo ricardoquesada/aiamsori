@@ -192,18 +192,21 @@ class ImageLayer(Layer):
             s.do(Hide())
 
         # grossini abajo a la izquierda
-        grossini.position = self.w - grossini.image.width, grossini.image.height
+        grossini.position = self.w - grossini.image.width, grossini.image.height / 2
         texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']                
 
         labels = []
         for t in texts:
             l = Label(t, font_name='Times New Roman', font_size=52, bold=True)
-            l.position = self.w / 2 - 340 , self.h / 2
+            #l.position = self.w / 2 - 340 , self.h / 2
             l.element.color = 255,255,255,255
             labels.append(l)
             self.add(l, z=1)
             l.do(Hide())
 
+        # centrar texto
+        labels[0].position = self.w / 2 - 490 , self.h / 2
+        labels[5].position = self.w / 2 - 25 , self.h / 2
         delay = 1
         for l,s in zip(labels, sprites):
             l.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
