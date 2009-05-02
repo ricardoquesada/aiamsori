@@ -39,13 +39,24 @@ class TalkLayer(cocos.layer.Layer):
         who, text, duration = self.talking[0]
         x, y = director.get_window_size()
 
-        face = Sprite('faces/%s.png'%who)
+
         if who == "zombie":
             zombie_sound = random.choice([
                 "ZombieDie",
                 "ZombieGerman",
             ])
             sound.play(zombie_sound)
+            img = random.choice([
+                'faces/Punkie zombie.png',
+                'faces/Afro zombie.png',
+                'faces/Fat zombie byn.png',
+                'faces/Maicol zombie.png',
+                'faces/Bitch zombie.png',
+            ])
+            face = Sprite(img)
+        else:
+            face = Sprite('faces/%s.png'%who)
+
         self.add(face)
         face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
 

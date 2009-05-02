@@ -194,8 +194,7 @@ class ImageLayer(Layer):
 
         # grossini abajo a la izquierda
         grossini.position = self.w - grossini.image.width, grossini.image.height
-        texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']
-
+        texts = ['aiamsori productions presents...', '', '', '', '','and the neighbours','', 'in',]
         labels = []
         for t in texts:
             l = Label(t, font_name='Times New Roman', font_size=52, bold=True,
@@ -208,16 +207,39 @@ class ImageLayer(Layer):
 
         delay = 1
         ft = 1
-        for l,s in zip(labels, sprites):
+        for l in labels:
             l.do(Delay(delay) + Show() + FadeIn(ft) + Delay(1) + FadeOut(ft))
+            delay += 3
+
+        delay = 1
+        for s in sprites:
             s.do(Delay(delay) + Show() + FadeIn(ft) + Delay(1) + FadeOut(ft))
             delay += 3
 
-        labels[5].do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
         delay += 3
+        zombies = []
+        for zf in [
+                'img/Punkie zombie.png',
+                'img/Afro zombie.png',
+                'img/Fat zombie byn.png',
+                'img/Maicol zombie.png',
+                'img/Bitch zombie.png',
+                ]:
+            s = Sprite(zf)
+            self.add(s)
+            s.position = self.w / 2, self.h / 2
+            s.do(Hide())
+            zombies.append(s)
+
+        for s in zombies:
+            s.do(Delay(delay) + Show() + FadeIn(0.2) + Delay(0.3) + FadeOut(0.2))
+            delay += 0.7
+
+
+
 
         self.borrar = labels + sprites
-        self.do(Delay(delay) + CallFunc(lambda: self.on_key_press(0,0)))
+        self.do(Delay(delay+5.2) + CallFunc(lambda: self.on_key_press(0,0)))
         sound.play("intro_music")
 
     def on_key_press(self, k, m):
@@ -225,16 +247,16 @@ class ImageLayer(Layer):
         if self.state == 0:
             [self.remove(h) for h in self.borrar]
             x,y = self.w, self.h
-            labelkey = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
-            labelkey.position = self.w / 2 - 340 , 150
-            labelkey.element.color = 40,179,75,180
+            labelkey = Label('press any key to start', font_name='Times New Roman', font_size=28, bold=True, anchor_x='center')
+            labelkey.position = self.w / 2  , 150
+            labelkey.element.color = 0,0,0,180
             self.add(labelkey, z=1)
             labelkey.do(Hide())
 
             bg = Sprite('data/img/ppl.png')
             self.add(bg)
             bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
-            labelkey.do(Delay(10) + Show() + FadeIn(2))
+            labelkey.do(Delay(5) + Show() + FadeIn(2))
 
             self.state = 1
         elif self.state == 1:
@@ -647,7 +669,8 @@ class GameLayer(Layer):
         # get collision layer
 
         # create agent sprite
-        father = Father(self, get_animation('father_idle'), (0,-800))
+        father = Father(self, get_animation('father_idle'), (40,-700))
+        father.rotation = 90
         self.player = father
         self.hud.set_life("Dad", father.life)
         if hasattr(father.weapon, 'ammo'):
@@ -660,16 +683,18 @@ class GameLayer(Layer):
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
         if not options.wpt_on:
-            position = -00, -900
+            position = 40, -1000
             boy = Boy(self, get_animation('boy_idle'), position, self.player)
+            boy.rotation = -90
             self.agents_node.add(boy)
 
             position = -100, -850
             girl = Girl(self, get_animation('girl_idle'), position, self.player)
             self.agents_node.add(girl)
 
-            position = 100, - 950
+            position = 180, - 850
             mother = Mother(self, get_animation('mother_idle'), position, self.player)
+            mother.rotation = 180
             self.agents_node.add(mother)
 
     def update(self, dt):
