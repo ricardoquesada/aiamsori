@@ -245,6 +245,7 @@ class Father(Family):
                 if self.life > PLAYER_MAX_LIFE:
                     self.life = PLAYER_MAX_LIFE
                 print 'new life', self.life
+                sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
                 weapon = self.weapons[other.type]
@@ -252,6 +253,7 @@ class Father(Family):
                     weapon.ammo += FULL_LOAD_BULLETS
                     hud.set_bullets(weapon.ammo)
                 self.switch_weapon(other.type)
+                sound.play('pickup_shotgun')
 
     def update(self, dt):
         # update speed

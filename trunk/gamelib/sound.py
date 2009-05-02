@@ -10,6 +10,8 @@ sound_resources =  {
     'zombie_eat': 'sounds/ZombieEat.ogg',
     'fire_shotgun': 'sounds/Shoot01.ogg',
     'melee': 'sounds/player_punch.ogg',
+    'pickup_helth': 'sounds/pickup_health.wav',
+    'pickup_shotgun': 'sounds/pickup_shotgun.wav',
 ##    'game_music': 'sounds/player_die.mp3',
 ##    'intro_music': 'sounds/player_die.mp3',
 ##    'zombie_eat': 'sounds/player_die.mp3'
