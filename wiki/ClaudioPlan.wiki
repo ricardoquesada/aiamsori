@@ -1,0 +1,31 @@
+#summary One-sentence summary of this page.
+claudio .plan
+
+= Introduction =
+
+...
+*done*	create_ray_to_wall_collision(wallmask, tilesize)
+*done*	ray_to_wall_collision((x0,y0),(hx,hy)) ; first pair origin, second direction
+
+need:
+curr	build wallmask at loadmap
+curr	obtain tilesize at loadmap
+
+Later:
+	augment ray_to_wall_collision to 
+	fatray_to_wall_collision((x0,y0),(hx,hy),r) # r ray diameter
+
+	fn_visibles becomes trivial:
+	fn_visibles = fatray_to_wall_collision(a,b,a.radius)
+
+Later:
+	add wptnav member to GameLayer, will provide nav services
+	Zombie uses wptnav to move
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
