@@ -4,6 +4,7 @@ from cocos.layer import Layer
 from cocos.sprite import Sprite
 
 from pyglet.window import key
+import sound
 
 class KeyGameCtrl(Layer):
     is_event_handler = True
@@ -38,9 +39,17 @@ class KeyGameCtrl(Layer):
             else:
                 print 'FREE PATH'
 
-        ## fire weapon
+        if k == key._1:
+            self.game_layer.player.weapon = self.game_layer.player.weapons['fist']
+
+
+        if k == key._2:
+            self.game_layer.player.weapon = self.game_layer.player.weapons['shotgun']
+
+
+        ## attack
         if k == key.SPACE:
-            self.game_layer.player.fire()
+            self.game_layer.player.attack()
 
 
     def on_key_release(self, k, m):
@@ -52,6 +61,7 @@ class KeyGameCtrl(Layer):
         if k in [key.LEFT, key.RIGHT, key.A, key.D]:
             self.game_layer.player.rotation_speed = 0
 
+        
 
 
 class MouseGameCtrl(Layer):
