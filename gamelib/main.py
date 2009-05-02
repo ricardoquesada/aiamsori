@@ -349,7 +349,7 @@ class GameLayer(Layer):
             for z, child in layer.children:
                 wall = Wall(child)
                 collision_layer.add(wall, static=wall.shape.static)
-                wallmask.add(child)
+                self.wallmask.add(child)
         return collision_layer
 
     def update(self, dt):
