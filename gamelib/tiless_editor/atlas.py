@@ -31,7 +31,7 @@ import Image
 
 
 # How many pixels left as border
-PIXEL_BORDER = 1
+PIXEL_BORDER = 4
 
 class MyAllocator(Allocator):
 
