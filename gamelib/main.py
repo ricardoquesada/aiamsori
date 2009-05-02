@@ -40,6 +40,8 @@ from gamectrl import MouseGameCtrl, KeyGameCtrl
 MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
+ZOMBIE_WAVE_COUNT = 5
+
 options = None
 
 def main():
@@ -245,7 +247,7 @@ class GameLayer(Layer):
         collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        father = Father(get_animation('father_idle'), (-250,0), self)
+        father = Father(get_animation('father_idle'), (0,-800), self)
         self.player = father
         self.add(father)
         collision_layer.add(father, static=father.shape.static)
@@ -253,27 +255,29 @@ class GameLayer(Layer):
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
         if not options.wpt_on:
-            boy = Boy(get_animation('boy_idle'), (-150,100), self.player)
+            boy = Boy(get_animation('boy_idle'), (0,-800), self.player)
             self.add(boy)
             collision_layer.add(boy, static=boy.shape.static)
 
-            girl = Girl(get_animation('girl_idle'), (-250,120), self.player)
+            girl = Girl(get_animation('girl_idle'), (0,-800), self.player)
             self.add(girl)
             collision_layer.add(girl, static=girl.shape.static)
 
-            mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
+            mother = Mother(get_animation('mother_idle'), (0,-800), self.player)
+#            mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
             self.add(mother)
             collision_layer.add(mother, static=mother.shape.static)
 
             x, y = director.get_window_size()
-            for c in zombie_spawn.get_children():
-                z = Zombie(get_animation('zombie1_idle'), self.player)
-                z.x = c.x
-                z.y = c.y
-                z.position = z.x, z.y
-                #self.map_node.add(z)
-                self.add(z)
-                collision_layer.add(z, static=z.shape.static, scale=.75)
+            for i in range(ZOMBIE_WAVE_COUNT):
+                for c in zombie_spawn.get_children():
+                    z = Zombie(get_animation('zombie1_idle'), self.player)
+                    z.x = c.x
+                    z.y = c.y
+                    z.position = z.x, z.y
+                    #self.map_node.add(z)
+                    self.add(z)
+                    collision_layer.add(z, static=z.shape.static, scale=.75)
 
     def on_collision(self, shape_a, shape_b):
         node = shape_a.sprite
