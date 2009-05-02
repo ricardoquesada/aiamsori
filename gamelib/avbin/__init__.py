@@ -28,6 +28,7 @@ def init_avbin():
 
     elif s == 'Windows':
         libfn = "%s.dll" % libname
+        return
 
     elif s == 'Darwin':
         libfn = "lib%s.5.dylib" % libname

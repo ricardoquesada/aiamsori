@@ -125,8 +125,7 @@ def main():
     font.add_directory(fonts_path)
 
     #Load avbin
-
-#    avbin.init_avbin() #warn: if uncomented windows crash
+    avbin.init_avbin()
 
     try:
         import cocos.gl_framebuffer_object as FG

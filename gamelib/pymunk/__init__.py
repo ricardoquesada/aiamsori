@@ -37,10 +37,10 @@ class Space(object):
     """
     def __init__(self, iterations=10, elastic_iterations=10):
         """Create a new instace of the Space
-        
+
         If the objects in your Space does not have any elasticity set
         elastic_iterations to 0 to gain a little speedup.
-        
+
         :Parameters:
             iterations : int
                 Number of iterations to use in the impulse solver to solve 
@@ -98,7 +98,7 @@ class Space(object):
             else:
                 for oo in o:
                     self.add(oo)
-                    
+
     def add_static(self, *objs):
         """Add one or many static shapes to the space"""
         for o in objs:
@@ -107,7 +107,7 @@ class Space(object):
             else:
                 for oo in o:
                     self.add_static(oo)
-                    
+
     def remove(self, *objs):
         """Remove one or many shapes, bodies or joints from the space"""
         for o in objs:
@@ -120,7 +120,7 @@ class Space(object):
             else:
                 for oo in o:
                     self.remove(oo)
-                    
+
     def remove_static(self, *os):
         """Remove one or many static shapes from the space"""
         for o in os:
@@ -129,7 +129,7 @@ class Space(object):
             else:
                 for oo in o:
                     self.remove_static(oo)
-                    
+
     def _add_shape(self, shape):
         """Adds a shape to the space"""
         self._shapes[shape.id] = shape
@@ -198,13 +198,13 @@ class Space(object):
         contact persistence, requiring an order of magnitude fewer iterations
         to resolve the collisions in the usual case."""
         cp.cpSpaceStep(self._space, dt)
-   
+
     def _get_stamp(self):
         return self._space.contents.stamp
     stamp = property(_get_stamp, 
         doc="""Time stamp. Is incremented on every call to step()""")
-    
-    def _get_arbiters(self):        
+
+    def _get_arbiters(self):
         num = self._space.contents.arbiters.contents.num
         arr = self._space.contents.arbiters.contents.arr
         arbs = []
@@ -214,14 +214,14 @@ class Space(object):
         return arbs
     arbiters = property(_get_arbiters, 
         doc="""List of active arbiters for the impulse solver.""")
-        
+
     def add_collisionpair_func(self, a, b, func, data=None):
         """Register func to be called when a collision is found between 
         shapes with collision_type fields that match a and b. Pass None
         as func to reject any collision with the given collision type pair.
-        
+
             func(shapeA, shapeB, contacts, normal_coef, data) -> bool
-            
+
             Parameters
                 shapeA : `Shape`
                     The first shape
@@ -234,7 +234,7 @@ class Space(object):
                 data : any
                     The data argument sent to the add_collisionpair_func 
                     function
-        
+
         WARNING: It is not safe for collision pair functions to remove or
         free shapes or bodies from a space. Doing so will likely end in a 
         segfault as an earlier collision may already be referencing the shape
@@ -246,22 +246,22 @@ class Space(object):
             f = self._get_cf(func, data)
             self._callbacks[(a, b)] = f
             cp.cpSpaceAddCollisionPairFunc(self._space, a, b, f, None)
-            
+
     def remove_collisionpair_func(self, a, b):
         """Remove the collision pair function between shapes with 
         collision_type which match a and b.
-        
+
         :Parameters:
             a : int
                 The collision_type for the first shape
             b : int
                 The collision_type for the second shape
-            
+
         """
         if (a, b) in self._callbacks:
             del self._callbacks[(a, b)]
         cp.cpSpaceRemoveCollisionPairFunc(self._space, a, b)
-    
+
     def set_default_collisionpair_func(self, func, data=None):
         """Sets the default collsion pair function. Passing None as func will 
         reset it to default. See ``add_collisionpair_func`` for a details on func
@@ -273,7 +273,7 @@ class Space(object):
             f = self._get_cf(func, data)
             self._default_callback = f
             cp.cpSpaceSetDefaultCollisionPairFunc(self._space, f, None)
-    
+
     def _get_cf(self, func, data):
         def cf (cpShapeA, cpShapeB, cpContacts, numContacts, normal_coef, _data):
             ### Translate chipmunk shapes to Shapes.
@@ -286,10 +286,9 @@ class Space(object):
             else:
                 shapeB = self._static_shapes[cpShapeB.contents.id]
             return func(shapeA, shapeB, [Contact(cpContacts[i]) for i in xrange(numContacts)], normal_coef, data)
-        
+
         return cp.cpCollFunc(cf)
-    
-    
+
     def _get_query_cf(self, func, data):
         def cf (cpShape, _data):
             ### Translate chipmunk shapes to Shapes.
@@ -299,12 +298,12 @@ class Space(object):
                 shape = self._static_shapes[cpShape.contents.id]
             return func(shape, data)
         return cp.cpSpacePointQueryFunc(cf)
-    
+
     def point_query(self, point, func, data=None):
         """Query the space for collisions between a point and its shapes 
         (both static and nonstatic shapes)
-        
-        :Parameters:    
+
+        :Parameters:
             point : (x,y) or `Vec2d`
                 Define where to check for collision in the space.
             func : ``func(shape, data)``
@@ -313,16 +312,16 @@ class Space(object):
                 The colliding shape
             data : any
                 Data argument sent to the point_query function
-        """       
+        """
         f = self._get_query_cf(func, data)
         cp.cpSpaceShapePointQuery(self._space, point, f, None)
         cp.cpSpaceStaticShapePointQuery(self._space, point, f, None)
-        
+
     def static_point_query(self, point, func, data=None):
         """Query the space for collisions between a point and the static 
         shapes in the space. Call the callback function when a colliosion is 
         found.
-        
+
         :Parameters:
             point : (x,y) or `Vec2d`
                 Define where to check for collision in the space.
@@ -332,14 +331,14 @@ class Space(object):
                 The colliding shape
             data : any
                 Data argument sent to the point_query function
-        """       
+        """
         f = self._get_query_cf(func, data)
         cp.cpSpaceStaticShapePointQuery(self._space, point, f, None)
-        
+
     def nonstatic_point_query(self, point, func, data=None):
         """Query the space for collisions between a point and the non static 
         shapes in the space
-        
+
         :Parameters:
             point : (x,y) or `Vec2d`
                 Define where to check for collision in the space.
@@ -352,12 +351,12 @@ class Space(object):
         """       
         f = self._get_query_cf(func, data)
         cp.cpSpaceShapePointQuery(self._space, point, f, None)    
-    
+
 class Body(object):
     def __init__(self, mass, inertia):
         self._body = cp.cpBodyNew(mass, inertia)
         self._bodycontents =  self._body.contents 
-        
+
     def __del__(self):
         cp.cpBodyFree(self._body)
 
@@ -379,7 +378,7 @@ class Body(object):
         #return self._bodycontents.a
         return self._bodycontents.a
     angle = property(_get_angle, _set_angle)
-    
+
     def _get_rotation_vector(self):
         return self._bodycontents.rot
     rotation_vector = property(_get_rotation_vector)
@@ -411,7 +410,7 @@ class Body(object):
 
     def apply_impulse(self, j, r=(0,0)):
         """Apply the impulse j to body with offset r.
-        
+
         :Parameters:
             j : (x,y) or `Vec2d`
                 Impulse to be applied
@@ -422,7 +421,7 @@ class Body(object):
         #TODO: Test me and figure out if r is in local or world coords.
         self.velocity = self.velocity + j * self._bodycontents.m_inv
         self._bodycontents.w += self._bodycontents.i_inv* r.cross(j)
-    
+
     def reset_forces(self):
         """Reset the forces on the body"""
         cp.cpBodyResetForces(self._body)
@@ -430,7 +429,7 @@ class Body(object):
     def apply_force(self, f, r=(0,0)):
         """Apply (accumulate) the force f on body with offset r. Both f and r 
         should be in world coordinates.
-        
+
             f : (x,y) or `Vec2d`
                 Force in world coordinates
             r : (x,y) or `Vec2d`
@@ -456,7 +455,7 @@ class Body(object):
         #TODO: Test me
         v = Vec2d(v)
         return self.position + v.cpvrotate(self.rotation_vector)
-        
+
     def world_to_local(self, v):
         """Convert world to body local coordinates"""
         #TODO: Test me
@@ -467,7 +466,7 @@ class Body(object):
     def damped_spring(self, b, anchor1, anchor2, rlen, k, dmp, dt):
         """Apply a spring force between this and body b at anchors anchr1 and 
         anchr2 respectively. 
-        
+
         :Parameters:
             b : `Body`
                 The other body
@@ -556,10 +555,10 @@ class Shape(object):
 
     def cache_bb(self):
         """This method is used internally by chipmunk.
-        
+
         If you really need it please add it as feature request on the pymunk 
         issue tracker.
-        
+
         :deprecated: Scheduled for deletion in pymunk 0.8.5+
         """
         return BB(cp.cpShapeCacheBB(self._shape))
