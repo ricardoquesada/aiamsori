@@ -17,7 +17,7 @@ import avbin
 from pyglet import gl
 import cocos
 from cocos import framegrabber
-from cocos.actions import Delay, CallFunc
+from cocos.actions import Delay, CallFunc, FadeTo
 from cocos.director import director
 from cocos.batch import BatchNode
 from cocos.scene import Scene
@@ -275,14 +275,12 @@ class GameLayer(Layer):
         action = Delay(delay)
         light = random.choice(self.lights.get_children())
 
-        turn_on = CallFunc(lambda: setattr(light, "opacity", 255))
-        turn_off = CallFunc(lambda: setattr(light, "opacity", 50))
         for i in range(random.randint(5, 10)):
             micro_delay = random.random()*0.10
             micro_delay2 = random.random()*0.10
-            action = action + Delay(micro_delay) + turn_off + Delay(micro_delay2) + turn_on
+            action = action + FadeTo(50, micro_delay) + FadeTo(255, micro_delay2)
         action = action + CallFunc(self.flicker)
-        self.do(action)
+        light.do(action)
 
 
     def on_resize(self, w, h):
@@ -398,7 +396,7 @@ class GameLayer(Layer):
     def on_enter(self):
         super(GameLayer, self).on_enter()
         x, y = director.get_window_size()
-
+        self.lights.on_enter()
         sound.play('zombie_eat')
 
         self.do( Delay(3) + CallFunc(lambda: sound.play_music('game_music')) )
@@ -410,6 +408,7 @@ class GameLayer(Layer):
     def on_exit(self):
         super(GameLayer, self).on_exit()
         #self.light.disable()
+        self.lights.on_exit()
 
 
 
