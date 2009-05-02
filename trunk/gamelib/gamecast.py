@@ -395,7 +395,6 @@ class ZombieBoid(Agent):
                       'walk': get_animation('zombie1_walk'),
                       }
         self.current_anim = 'idle'
-        self.gore = ['cacho1.png', 'cacho2.png', 'cacho4.png']
         ###self.shape = ZombieShape(self)
         self.last_goal = random.random()*0.3
         self.goal = self.position
@@ -470,12 +469,6 @@ class ZombieBoid(Agent):
         return self.player.game_layer
 
 
-    def receive_damage(self, damage):
-        gore_piece = Sprite(load('data/img/'+random.choice(self.gore)),
-                                     (self.player.position))
-        self.add(gore_piece)
-        print gore_piece
-        return super(Zombie, self).receive_damage(damage)
 
 
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
