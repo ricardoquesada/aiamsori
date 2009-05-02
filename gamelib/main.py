@@ -41,6 +41,7 @@ MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
 ZOMBIE_WAVE_COUNT = 5
+ZOMBIE_WAVE_DURATION = 60
 
 options = None
 
@@ -149,9 +150,11 @@ class GameLayer(Layer):
         self.dead_items = set()
 
         # get layers from map
-        for_collision_layers = []
+        collision_layers = []
         walls_layers = []
-        zombie_spawn = None
+        self.zombie_spawn = None
+        self.z_spawn_lifetime = 0
+        self.schedule(self.respawn_zombies)
 
         img = pyglet.image.load(  'data/atlas-fixed.png' )
         self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
@@ -170,25 +173,25 @@ class GameLayer(Layer):
                     self.map_node.add_layer(layer_data['label'], layer_data['z'],
                                        sprite_layer)
                 if layer_label in ['walls', 'furninture']:
-                    for_collision_layers.append(sprite_layer)
+                    collision_layers.append(sprite_layer)
                 if layer_label in ['walls', 'gates']:
                     walls_layers.append(sprite_layer)
                 if layer_label in ['zombie_spawn']:
-                    zombie_spawn = sprite_layer
+                    self.zombie_spawn = sprite_layer
                 if layer_label in ['item_spawn']:
                     item_spawn = sprite_layer
                 if layer_label in ['waypoints']:
                     waypoints = sprite_layer
 
         # create collision shapes
-        collision_layer = self._create_collision_layer(for_collision_layers)
+        collision_layer = self._create_collision_layer(collision_layers)
         self.map_node.add_layer('collision', 1000, collision_layer)
         self.map_node.add(create_wall_layer(walls_layers), z=10)
         # add scene map node to the main layer
         self.add(self.map_node)
 
         # create agents (player and NPCs)
-        self._create_agents(zombie_spawn)
+        self._create_agents()
         self.setup_powerups(item_spawn)
         self.setup_waypoints(waypoints)
 
@@ -225,6 +228,22 @@ class GameLayer(Layer):
         print "powerup position", position
         self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
 
+    def respawn_zombies(self, dt):
+        self.z_spawn_lifetime += dt
+        if self.z_spawn_lifetime == 0 or self.z_spawn_lifetime >= ZOMBIE_WAVE_DURATION:
+            collision_layer = self.map_node.get('collision')
+            for i in range(ZOMBIE_WAVE_COUNT):
+                for c in self.zombie_spawn.get_children():
+                    z = Zombie(get_animation('zombie1_idle'), self.player)
+                    z.x = c.x
+                    z.y = c.y
+                    z.position = z.x, z.y
+                    #self.map_node.add(z)
+                    self.add(z)
+                    collision_layer.add(z, static=z.shape.static, scale=.75)
+            self.z_spawn_lifetime = 0
+                
+
     def talk(self, who, what, duration=5, transient=False):
         self.talk_layer.talk(who, what, duration=duration, transient=transient)
 
@@ -242,7 +261,7 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         #self.light.set_position(w/2, h/2)
 
-    def _create_agents(self, zombie_spawn):
+    def _create_agents(self):
         # get collision layer
         collision_layer = self.map_node.get('collision')
 
@@ -269,15 +288,7 @@ class GameLayer(Layer):
             collision_layer.add(mother, static=mother.shape.static)
 
             x, y = director.get_window_size()
-            for i in range(ZOMBIE_WAVE_COUNT):
-                for c in zombie_spawn.get_children():
-                    z = Zombie(get_animation('zombie1_idle'), self.player)
-                    z.x = c.x
-                    z.y = c.y
-                    z.position = z.x, z.y
-                    #self.map_node.add(z)
-                    self.add(z)
-                    collision_layer.add(z, static=z.shape.static, scale=.75)
+            
 
     def on_collision(self, shape_a, shape_b):
         node = shape_a.sprite
