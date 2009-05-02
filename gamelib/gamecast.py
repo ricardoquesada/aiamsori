@@ -28,6 +28,8 @@ POWERUP_TYPE_LIFE = 'life'
 POWERUP_BULLETS = 5
 POWERUP_LIFE = 20
 
+PLAYER_MAX_LIFE = 100
+
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.15)
                       for img_file in  glob('data/img/%s*.png' % anim_name)])
@@ -42,7 +44,7 @@ class Agent(Sprite):
 
         ###self.shape = AgentShape(self)
         self.just_born = True
-        self.life = 100
+        self.life = PLAYER_MAX_LIFE
         self.collided_agent = None
 
     def update_position(self, position):
@@ -170,7 +172,7 @@ class Father(Agent):
         self.just_born = False
         self.weapons = {'shotgun': RangedWeapon(self),
                         'fist': MeleeWeapon(self)}
-        self.weapon = self.weapons['shotgun']
+        self.weapon = self.weapons['fist']
         self.time_since_attack = 0
 
     def on_collision(self, other):
@@ -183,6 +185,8 @@ class Father(Agent):
                 hud.set_bullets(weapon.ammo)
             elif other.type == POWERUP_TYPE_LIFE:
                 self.life += POWERUP_LIFE
+                if self.life > PLAYER_MAX_LIFE:
+                    self.life = PLAYER_MAX_LIFE
                 print 'new life', self.life
                 hud.set_life(self.life)
 
@@ -229,7 +233,10 @@ class Father(Agent):
         return self.game_layer
 
     def switch_weapon(self, weapon_name):
-        self.weapon = self.weapons[weapon_name]
+        weapon = self.weapons[weapon_name]
+        if hasattr(weapon, 'ammo') and weapon.ammo < 1:
+            return
+        self.weapon = weapon
         self.anims = self.anim_sets[weapon_name]
         self.play_anim('idle')
                 
@@ -250,14 +257,18 @@ class Weapon(object):
 class RangedWeapon(Weapon):
     def __init__(self, player, damage=50, atk_range=1000, frequency=1.2, sound='fire_shotgun'):
         super(RangedWeapon, self).__init__(player, damage, atk_range, frequency, sound)
-        self.ammo = 10
-
+        self.ammo = 0
 
     def attack(self):
         projectile = Bullet(get_animation('bullet'), self.player)
         self.player.game_layer.add_projectile(projectile)
         self._play_sound()
-
+        self.ammo -= 1
+        if self.ammo < 1:
+            # defensive progamming
+            self.ammo = 0
+            self.player.switch_weapon('fist')
+        self.player.game_layer.hud.set_bullets(self.ammo)
 
 
 class MeleeWeapon(Weapon):
