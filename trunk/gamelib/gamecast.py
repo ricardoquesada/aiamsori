@@ -413,8 +413,10 @@ class Relative(Family):
         self.current_anim = 'idle'
         #self.target = self.position
         self.target = self.position
+        self.goal = self.position
         self.updatecounter = 200
         self.mm = 0
+        self.last_goal = 0
 
     def update(self, dt):
         # move to designated target or stay and fight
@@ -426,8 +428,13 @@ class Relative(Family):
         if self.target and abs(Point2(*self.position) - Point2(*self.target) ) < 100:
             self.target = None
 
+        self.last_goal += dt
         if self.target:
-            goal = seek(self.x, self.y, self.target[0], self.target[1])
+
+            if self.last_goal > 0.3:
+                self.last_goal = 0
+                self.goal = self.game_layer.ways.get_dest(self.position, self.target)
+            goal = seek(self.x, self.y, self.goal[0], self.goal[1])
 
             delta = geom.angle_rotation(radians(self.rotation), radians(goal))
             delta = degrees(delta)
