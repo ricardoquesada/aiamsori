@@ -52,7 +52,7 @@ MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
 ZOMBIE_WAVE_COUNT = 4
-ZOMBIE_DEBUG = 0
+ZOMBIE_DEBUG = 0        
 ZOMBIE_WAVE_DURATION = 60
 
 RANDOM_DELTA = 128
@@ -151,9 +151,6 @@ def main():
     #scene = get_game_scene()
     #scene = get_end_scene()
     director.run(scene)
-
-    director.run(main_scene)
-    #director.run(first_scene)
 
 def make_sprites_layer(layer_data, atlas):
     saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
@@ -543,7 +540,7 @@ class GameLayer(Layer):
         self.do(Delay(5) + CallFunc(lambda: self.talk('Mom', "Protect your family!", duration=2, transient=False)))
         self.do(Delay(7) + CallFunc(lambda: self.talk('Zack', "Click on us to move us", duration=2, transient=False)))
         self.do(Delay(9) + CallFunc(lambda: self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")))
-        self.spawn_powerup('shotgun')
+        self.spawn_powerup()
 
     def spawn_powerup(self, type=''):
         delay = random.randrange(PWUP_MIN_TIME, PWUP_MAX_TIME)
@@ -552,15 +549,15 @@ class GameLayer(Layer):
     def add_powerup(self, type='', msg=''):
         position = random.choice(self.item_spawn)
         if not type:
-            type = random.choice(['bullets', 'life'])
+            # make ammo and life categories equally probable
+            type = random.choice(POWERUP_TYPE_AMMO_LIST*3 + POWERUP_TYPE_LIFE_LIST)
         powerup = PowerUp(type, position, self)
         self.agents_node.add(powerup)
-        if type == 'life':
-            item = 'food'
-        elif type == 'bullets':
-            item = 'ammo'
-        else:
-            item = ''
+        item = type
+        if item == 'burger':
+            item = 'a burger'
+        elif item == 'medicine':
+            item = 'some medicine'
         if random.random() < UNKNOWN_ITEM_PROBABILTY:
             item = ''
         place = powerup.label if hasattr(powerup, 'label') else ''
