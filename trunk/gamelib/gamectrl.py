@@ -59,9 +59,13 @@ class KeyGameCtrl(Layer):
             self.game_layer.player.acceleration = 0
             self.game_layer.player.speed = 0
             self.game_layer.player.play_anim('idle')
-        if k in [key.LEFT, key.RIGHT, key.A, key.D]:
-            self.game_layer.player.rotation_speed = 0
-        
+        if k in [key.LEFT, key.A]:
+            if self.game_layer.player.rotation_speed == -1:
+                self.game_layer.player.rotation_speed = 0
+        if k in [key.RIGHT, key.A, key.D]:
+            if self.game_layer.player.rotation_speed == 1:
+                self.game_layer.player.rotation_speed = 0
+
 
 class MouseGameCtrl(Layer):
     is_event_handler = True

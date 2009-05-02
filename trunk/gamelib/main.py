@@ -51,7 +51,8 @@ from wallmask import WallMask
 MAPFILE = 'data/map.json'
 RETREAT_DELAY = 0.1
 
-ZOMBIE_WAVE_COUNT = 5
+ZOMBIE_WAVE_COUNT = 4
+ZOMBIE_DEBUG = 0
 ZOMBIE_WAVE_DURATION = 60
 
 RANDOM_DELTA = 128
@@ -264,7 +265,7 @@ class GameLayer(Layer):
 
         # create agents (player and NPCs)
         self._create_agents()
-        self.setup_waypoints(waypoints)
+
 
         x, y = director.get_window_size()
         #self.light = light.Light(x/2, y/2)
@@ -275,7 +276,7 @@ class GameLayer(Layer):
             for child in layer.get_children():
                 self.wallmask.add(child)
         # now is safe to call self.is_empty()
-
+        self.setup_waypoints(waypoints)
         # if waypoint editing mode, create waypoints
         if options.wpt_on:
             from wptlayer import WptLayer
@@ -385,7 +386,7 @@ class GameLayer(Layer):
             q = euclid.Vector2(*q)
             d = p-q
 
-            steps = d.magnitude()/15
+            steps = d.magnitude() / 10
             for i in range(int(steps+1)):
                 c = q+d*(i/float(steps))
                 if not self.is_empty(*c):
@@ -400,13 +401,17 @@ class GameLayer(Layer):
                     visible_map.add((a,b))
                 else:
                     not_visible_map.add((a,b))
-        def visible(a, b):
+        def _visible(a, b):
             if (a,b) in visible_map:
                 return True
             if (a,b) in not_visible_map:
                 return False
             return is_visible(a, b)
 
+        def visible(a, b):
+            r = _visible(a, b)
+            print "visible", a, b, r
+            return r
         print "Found", len(visible_map), "connections"
         self.ways = waypointing.WaypointNav(points, visible)
         print "Navigation setup done."
@@ -453,16 +458,26 @@ class GameLayer(Layer):
         #print "powerup ", powerup, 'at', place, position
 
     def respawn_zombies(self, dt):
-        self.z_spawn_lifetime += dt
-        if self.z_spawn_lifetime == 0 or self.z_spawn_lifetime >= ZOMBIE_WAVE_DURATION:
-            for i in range(ZOMBIE_WAVE_COUNT):
-                for c in self.zombie_spawn.get_children():
-                    z = Zombie(self, get_animation('zombie1_idle'), self.player)
-                    z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
-                    z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
-                    z.position = z.x, z.y
-                    self.agents_node.add(z)
-            self.z_spawn_lifetime = 0
+
+        if ZOMBIE_DEBUG:
+            if self.z_spawn_lifetime == 0:
+                print "NEW ZOMBIE"
+                p = self.zombie_spawn.get_children()[0]
+                z = Zombie(self, get_animation('zombie1_idle'), self.player)
+                z.position = p.position
+                self.agents_node.add(z)
+            self.z_spawn_lifetime += 1
+        else:
+            self.z_spawn_lifetime += dt
+            if self.z_spawn_lifetime == 0 or self.z_spawn_lifetime >= ZOMBIE_WAVE_DURATION:
+                for i in range(ZOMBIE_WAVE_COUNT):
+                    for c in self.zombie_spawn.get_children():
+                        z = Zombie(self, get_animation('zombie1_idle'), self.player)
+                        z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
+                        z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
+                        z.position = z.x, z.y
+                        self.agents_node.add(z)
+                self.z_spawn_lifetime = 0
 
 
     def talk(self, who, what, duration=5, transient=False):

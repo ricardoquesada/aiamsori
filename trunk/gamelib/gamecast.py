@@ -66,6 +66,7 @@ class Agent(Sprite):
         self.collided_agent = None
 
     def update_position(self, position):
+        self.collided_agent = None
         self.old_position = self.position
         self.position = position
 
@@ -438,7 +439,7 @@ class ZombieBoid(Agent):
         ###self.shape = ZombieShape(self)
         self.last_goal = random.random()*0.3
         self.goal = self.position
-        self.target = None
+        self.target = self.player
 
 
     def on_enter(self):
@@ -446,6 +447,7 @@ class ZombieBoid(Agent):
         self.target = random.choice(
             [ p for p in self.parent.get_children() if isinstance(p, Family) ]
         )
+        self.target = self.player
 
     def update(self, dt):
         # save old position
@@ -460,7 +462,7 @@ class ZombieBoid(Agent):
                 target = self
             else:
                 target = self.target
-            self.goal = self.game_layer.ways.get_dest(self.position, target.position)
+        self.goal = self.game_layer.ways.get_dest(self.position, self.target.position)
         gx, gy = self.goal
         goal = seek(b.x, b.y, gx, gy)
         #print "GOAL", goal
