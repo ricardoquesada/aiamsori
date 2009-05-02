@@ -230,7 +230,7 @@ class GameLayer(Layer):
         #self.light = light.Light(x/2, y/2)
 
         # ends wallmask preparation, makes available service .is_empty(x,y)
-        self.wallmask.get_mask() #called for side effect _fill_gaps
+        #self.wallmask.get_mask() #called for side effect _fill_gaps
         # now is safe to call self.is_empty()
 
         # if waypoint editing mode, create waypoints
