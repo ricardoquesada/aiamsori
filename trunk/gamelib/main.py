@@ -21,7 +21,6 @@ from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
 from cocos.sprite import NotifierSprite, Sprite
-from cocos.scenes.transitions import ShuffleTransition as TransitionScene
 from cocos.text import Label
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
@@ -167,8 +166,7 @@ class ImageLayer(Layer):
     def on_key_press(self, k, m):
         print "aprento una tecla"
         director, scene = self.next
-        ts = TransitionScene(scene, 2)
-        director.replace(ts)
+        director.replace(scene)
         
 class GameLayer(Layer):
     is_event_handler = True
