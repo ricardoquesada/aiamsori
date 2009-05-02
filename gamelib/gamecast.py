@@ -21,7 +21,7 @@ COLLISION_GROUP_FATHER = 1
 COLLISION_DISTANCE_SQUARED = 64**2
 
 TOP_SPEED = 230
-#TOP_SPEED = 330
+ACCEL_FACTOR = 200
 
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.2)
@@ -50,10 +50,14 @@ class Agent(Sprite):
                 #print self, 'COLLISION', agent
                 # objects collided
                 if self.just_born:
+                    ###distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
+                    ###collision = distance <= COLLISION_DISTANCE_SQUARED
+                    ###while collision:
                     self.x += random.choice([-1,1])*RANDOM_DELTA
                     self.y += random.choice([-1,1])*RANDOM_DELTA
                     self.target = self.position = (self.x, self.y)
                     self.target = self.position
+                    ###self.just_born = False
                     return
 
                 #nx = self.old_position[0] + random.choice([-1,1])*RANDOM_DELTA
@@ -61,7 +65,7 @@ class Agent(Sprite):
                 #self.position = (nx, ny)
                 self.position = self.old_position
                 self.on_collision(agent)
-                #agent.on_collision(self)
+                agent.on_collision(self)
                 #f = getattr(self.collision, "on_collision", None)
                 #if f is not None:
                 #    f(self)
@@ -132,12 +136,6 @@ class Agent(Sprite):
         if isinstance(other, Bullet):
             self.die()
 
-    def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
-        game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
-
 
 class Father(Agent):
     def __init__(self, img, position, game_layer):
@@ -168,7 +166,7 @@ class Father(Agent):
     def update(self, dt):
         # update speed
         if self.acceleration != 0 and abs(self.speed) < TOP_SPEED:
-            self.speed += self.acceleration*100*dt
+            self.speed += self.acceleration*ACCEL_FACTOR*dt
 
         self.rotation += 110 * self.rotation_speed * dt
         # update the position, based on the speed
@@ -192,7 +190,14 @@ class Father(Agent):
 
     def fire(self):
         bullet = Bullet(get_animation('bullet'), self)
+        #print 'bullet:', bullet.position
         self.game_layer.add_bullet(bullet)
+
+    def die(self):
+        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
+        # as segfaults might occur
+        game_layer = self.game_layer
+        game_layer.dead_items.add(self)
 
 
 class Relative(Agent):
@@ -238,6 +243,13 @@ class Relative(Agent):
         else:
             if self.current_anim != 'idle':
                 self.play_anim('idle')
+
+    def die(self):
+        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
+        # as segfaults might occur
+        game_layer = self.player.game_layer
+        game_layer.dead_items.add(self)
+
 
 
 class Boy(Relative):
@@ -329,6 +341,13 @@ class ZombieBoid(Agent):
             if self.current_anim != 'idle':
                 self.play_anim('idle')
 
+    def die(self):
+        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
+        # as segfaults might occur
+        game_layer = self.player.game_layer
+        game_layer.dead_items.add(self)
+
+
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
 class ZombieWpt(Agent):
     def __init__(self, img, player):
@@ -393,7 +412,7 @@ class ZombieWpt(Agent):
         #    import pdb; pdb.set_trace()
         #elif isinstance(other.shape, Bullet):
         if isinstance(other, Bullet):
-            print 'Zombie hit at position', self.position
+            #print 'Zombie hit at position', self.position
             self.die(other)
 
     def die(self, bullet):
@@ -409,19 +428,56 @@ class Bullet(Sprite):
 
         self.anims = {}
         self.agent = agent
+        self.speed = 400
+        self.schedule(self.update)
 
-        position = agent.position
+
+        # get target
         WEAPON_RANGE = 200
 
         #from pymunk.vec2d import Vec2d
         #offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
         #target = offset+position
+        position = agent.position
         nx = WEAPON_RANGE * cos( radians(-self.rotation) )
         ny = WEAPON_RANGE * sin( radians(-self.rotation) )
         target = (position[0] + nx, position[1] + ny)
+        #print 'target ', target
+        self.target = target
+        #print 'BULLET CREATED'
+
         ###shape = BulletShape(self, position, target)
         ###shape.group = agent.shape.group
         ###self.shape = shape
+
+    def update(self, dt):
+        goal = seek(self.x, self.y, self.target[0], self.target[1])
+
+        self.position = (self.x, self.y)
+        # update position
+        a = -self.rotation
+        nx = (self.x + cos( radians(a) ) * self.speed * dt)
+        ny = (self.y + sin( radians(a) ) * self.speed * dt)
+
+        #print 'updating bullet position', self.position, (nx,ny)
+        self.update_position((nx, ny))
+        if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
+            self.die()
+
+    def update_position(self, position):
+        self.position = position
+
+    def on_collision(self, other):
+        #print 'BULLET DIED'
+        #print self, self.position, other, other.position
+        if self.agent != other:
+            self.die()
+
+    def die(self):
+        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
+        # as segfaults might occur
+        game_layer = self.agent.game_layer
+        game_layer.dead_items.add(self)
 
 
 class Ray(Sprite):

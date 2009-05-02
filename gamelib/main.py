@@ -25,6 +25,7 @@ from cocos.layer.base_layers import Layer
 from cocos.sprite import Sprite
 from cocos.scenes.transitions import ShuffleTransition as TransitionScene
 from cocos.text import Label
+from cocos.sprite import Sprite
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 #from tiless_editor.layers.collision import CollisionLayer
@@ -112,8 +113,8 @@ def main():
     main_scene.add(KeyGameCtrl(game_layer))
     main_scene.add(MouseGameCtrl(game_layer))
 
-    #director.run(main_scene)
-    director.run(first_scene)
+    director.run(main_scene)
+    #director.run(first_scene)
 
 class LightLayer(cocos.batch.BatchNode):
     def __init__(self):
@@ -241,7 +242,7 @@ class GameLayer(Layer):
         #self.light = light.Light(x/2, y/2)
 
         # ends wallmask preparation, makes available service .is_empty(x,y)
-        self.wallmask.get_mask() #called for side effect _fill_gaps
+        #self.wallmask.get_mask() #called for side effect _fill_gaps
         # now is safe to call self.is_empty()
 
         # if waypoint editing mode, create waypoints
@@ -349,7 +350,7 @@ class GameLayer(Layer):
     def respawn_zombies(self, dt):
         self.z_spawn_lifetime += dt
         if self.z_spawn_lifetime == 0 or self.z_spawn_lifetime >= ZOMBIE_WAVE_DURATION:
-            collision_layer = self.map_node.get('collision')
+            ###collision_layer = self.map_node.get('collision')
             for i in range(ZOMBIE_WAVE_COUNT):
                 for c in self.zombie_spawn.get_children():
                     z = Zombie(get_animation('zombie1_idle'), self.player)
@@ -359,7 +360,6 @@ class GameLayer(Layer):
                     #self.map_node.add(z)
                     self.agents_node.add(z)
                     ###collision_layer.add(z, static=z.shape.static, scale=.75)
-
             self.z_spawn_lifetime = 0
 
 
@@ -434,14 +434,18 @@ class GameLayer(Layer):
         self.y = -self.player.y + y/2
         #self.lights.sprite.position = self.player.position
         # clear out any non-collisioned bullets
-        self._remove_bullets()
+        #self._remove_bullets()
 
         # clear out any dead items
         self._remove_dead_items()
 
     def add_bullet(self, bullet):
+        #print 'adding bullet'
         self.bullets.append(bullet)
         self.agents_node.add(bullet)
+        #print '---  '
+        #print self.agents_node.children
+
         ###collision_layer = self.map_node.get('collision')
         ###collision_layer.add(bullet, static=bullet.shape.static)
 
