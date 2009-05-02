@@ -325,7 +325,7 @@ class RangedWeapon(Weapon):
 
 
 class MeleeWeapon(Weapon):
-    def __init__(self, player, damage=35, atk_range=0, frequency=0.2, sound='melee'):
+    def __init__(self, player, damage=10, atk_range=0, frequency=0.2, sound='melee'):
         super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
 
     def attack(self):
@@ -339,6 +339,10 @@ class MeleeWeapon(Weapon):
             if died:
                 self.player.collided_agent = None
             self._play_sound()
+
+class ZombieMeleeWeapon(MeleeWeapon):
+    def __init__(self, player, damage=20, atk_range=0, frequency=2, sound='melee'):
+        super(ZombieMeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
 
 
 class Relative(Family):
@@ -442,6 +446,10 @@ class ZombieBoid(Agent):
                       'walk': get_animation('zombie1_walk'),
                       }
         self.current_anim = 'idle'
+
+        self.weapon = ZombieMeleeWeapon(self)
+        self.time_since_attack = 0
+
         ###self.shape = ZombieShape(self)
         self.last_goal = random.random()*0.3
         self.goal = self.position
@@ -500,12 +508,24 @@ class ZombieBoid(Agent):
 
         self.update_position((nx, ny))
 
+        self.game_layer.update(dt)
+        self.time_since_attack += dt
+
         if self.position != self.old_position:
             self.play_anim('walk')
 
         else:
             if self.current_anim != 'idle':
                 self.play_anim('idle')
+
+    def attack(self):
+        if self.time_since_attack > self.weapon.frequency:
+            self.weapon.attack()
+            self.time_since_attack = 0
+
+    def on_collision(self, other):
+        super(ZombieBoid, self).on_collision(other)
+        self.attack()
 
     def die(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
