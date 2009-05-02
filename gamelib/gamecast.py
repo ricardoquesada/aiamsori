@@ -146,7 +146,7 @@ class Agent(Sprite):
                     collision_distance = 32**2
                 elif is_family:
                     collision_distance = 64**2
-                elif agent == self.game_layer.player:
+                elif self == self.game_layer.player:
                     collision_distance = 64**2
                 else:
                     collision_distance = 96**2
@@ -155,7 +155,7 @@ class Agent(Sprite):
                     collision_distance = 64**2
                 elif is_family:
                     collision_distance = 64**2
-                elif agent == self.game_layer.player:
+                elif self == self.game_layer.player:
                     collision_distance = 64**2
                 else:
                     collision_distance = 96**2
