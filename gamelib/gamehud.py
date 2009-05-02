@@ -29,6 +29,7 @@ class HudLayer(cocos.layer.Layer):
         self.add(self.bullets_label)
 
         self.faces = {}
+        self.deads = []
         space = 0
         self.face_scale = scale = 0.7
         for who in ["Dad", "Mom", "Zack", "Bee"]:
@@ -44,6 +45,8 @@ class HudLayer(cocos.layer.Layer):
             self.add(sprite)
 
     def set_life(self, who, life):
+        if life <= 0:
+            self.deads.append(who)
         pic = self.faces[who]
         pic.opacity = max(20, life/100.0 * 255)
         pic.stop()
