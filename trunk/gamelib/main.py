@@ -157,8 +157,8 @@ class ImageLayer(Layer):
         bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
         self.add(bg)
 
-        label = Label('Press any key to start!', font_name='Times New Roman', font_size=52)
-        label.position = self.w / 2 ,10
+        label = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
+        label.position = self.w / 2 - 50 , self.h / 2
         label.element.color = 0,0,0,180
         self.add(label, z=1)
         label.do(Hide() + Delay(10) + Show())
