@@ -112,11 +112,12 @@ def main():
     (options, args) = parser.parse_args()
 
     # fix pyglet resource path
-    pyglet.resource.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
+    basepath = os.path.join(os.path.abspath(os.path.dirname(__file__)), '..')
+    pyglet.resource.path.append(basepath)
     pyglet.resource.reindex()
 
     #Fonts stuff
-    fonts_path = os.path.abspath('data/fonts')
+    fonts_path = os.path.join(basepath, 'data/fonts')
     print fonts_path
     font.add_directory(fonts_path)
 
