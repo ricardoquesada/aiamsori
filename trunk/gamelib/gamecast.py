@@ -544,6 +544,10 @@ class Relative(Family):
         game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
+        # mark relative as dead in the HUD
+        game_layer.hud.faces[self.name].color = (172, 0, 0)
+        game_layer.hud.faces[self.name].opacity = 200
+
         # check if whole family is dead
         if not self.player.family:
             game_layer.game_over()
