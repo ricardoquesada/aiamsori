@@ -32,7 +32,7 @@ from tiless_editor.atlas import SavedAtlas
 #from shapes import COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
 import talk
-import hud
+import gamehud
 import sound
 import light
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Bullet, get_animation
@@ -79,7 +79,7 @@ def main():
     director.init(options.width, options.height, resizable=True)
     sound.init()
     # create game scene
-    hud_layer = hud.HudLayer()
+    hud_layer = gamehud.HudLayer()
     game_layer = GameLayer(MAPFILE, hud_layer)
 #    game_layer.position = (400, 300)
 

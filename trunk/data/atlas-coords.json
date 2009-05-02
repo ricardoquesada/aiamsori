@@ -5,6 +5,12 @@
         128, 
         128
     ], 
+    "newtiles/pared.png": [
+        1186, 
+        652, 
+        64, 
+        64
+    ], 
     "newtiles/piso_ceramico.png": [
         1046, 
         0, 
@@ -16,12 +22,6 @@
         652, 
         128, 
         128
-    ], 
-    "newtiles/zombie-spawm.png": [
-        1176, 
-        0, 
-        64, 
-        64
     ], 
     "newtiles/luz_ventana.png": [
         0, 
@@ -53,11 +53,17 @@
         258, 
         302
     ], 
-    "newtiles/pared.png": [
+    "newtiles/zombie-spawm.png": [
         1168, 
         522, 
         64, 
         64
+    ], 
+    "newtiles/item-spawn.png": [
+        1176, 
+        0, 
+        100, 
+        100
     ], 
     "newtiles/cama2.png": [
         522, 
