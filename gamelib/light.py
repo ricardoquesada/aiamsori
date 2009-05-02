@@ -28,5 +28,4 @@ class Light(BatchNode):
     def update(self, dt):
         for c in self.get_children():
             c.dt += dt
-            c.scale = c.source_scale + 0.1*sin(c.dt)
-        print c.position, c.dx, c.dy
+            c.scale = c.source_scale + 0.05*sin(c.dt)
