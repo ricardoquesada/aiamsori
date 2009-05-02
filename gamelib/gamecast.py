@@ -46,12 +46,16 @@ class Gore(Sprite):
     def __init__(self, *a, **kw):
         img = random.choice(self.images)
         super(Gore, self).__init__(img, *a, **kw)
+        self.scale = 1.5
 
 class Blood(Gore):
     images = glob("data/img/sangre[0-9]*.png")
 
+class BloodPool(Gore):
+    images = glob("data/img/sangre_mancha[0-9]*.png")
+
 class BodyParts(Gore):
-    images = glob("data/img/cacho[0-9]*.png")
+    images = glob("data/img/cacho[0-9]*.png") + BloodPool.images
 
 class Agent(Sprite):
     def __init__(self, game_layer, img, position=(0,0)):
@@ -177,7 +181,7 @@ class Family(Agent):
         ## return True if died
         if self.life <= 0:
             self.die()
-            self.add_gore(Blood, other, duration=5)
+            self.add_gore(BloodPool, other, duration=5)
             return True
         self.add_gore(Blood, other, duration=.5)
         return False
