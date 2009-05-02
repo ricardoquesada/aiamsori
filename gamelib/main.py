@@ -61,6 +61,9 @@ UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
 
+WAVE_DELAY = [5, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
+WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
+
 def main():
     # make available options
     parser = optparse.OptionParser()
@@ -205,6 +208,7 @@ class GameLayer(Layer):
         walls_layers = []
         self.zombie_spawn = None
         self.z_spawn_lifetime = 0
+        self.zombie_wave_number = 0
         self.schedule(self.respawn_zombies)
 
         img = pyglet.image.load(  'data/atlas-fixed.png' )
@@ -478,8 +482,10 @@ class GameLayer(Layer):
             self.z_spawn_lifetime += 1
         else:
             self.z_spawn_lifetime += dt
-            if self.z_spawn_lifetime == 0 or self.z_spawn_lifetime >= ZOMBIE_WAVE_DURATION:
-                for i in range(ZOMBIE_WAVE_COUNT):
+            waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
+            delay = WAVE_DELAY[ waveno ]
+            if self.z_spawn_lifetime >= delay:
+                for i in range(WAVE_NUM[ waveno ]):
                     for c in self.zombie_spawn.get_children():
                         z = Zombie(self, get_animation('zombie1_idle'), self.player)
                         z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
@@ -487,6 +493,7 @@ class GameLayer(Layer):
                         z.position = z.x, z.y
                         self.agents_node.add(z)
                 self.z_spawn_lifetime = 0
+                self.zombie_wave_number += 1
 
 
     def talk(self, who, what, duration=5, transient=False):
