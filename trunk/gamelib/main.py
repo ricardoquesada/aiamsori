@@ -116,7 +116,7 @@ def main():
     main_scene.add(MouseGameCtrl(game_layer))
 
     director.run(main_scene)
-#    director.run(first_scene)
+    #director.run(first_scene)
 
 class LightLayer(cocos.batch.BatchNode):
     def __init__(self):
@@ -158,8 +158,8 @@ class ImageLayer(Layer):
         self.add(bg)
 
         label = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
-        label.position = self.w / 2 - 50 , self.h / 2
-        label.element.color = 0,0,0,180
+        label.position = self.w / 2 - 340 , self.h / 2
+        label.element.color = 40,179,75,180
         self.add(label, z=1)
         label.do(Hide() + Delay(10) + Show())
 
