@@ -410,8 +410,10 @@ class Relative(Family):
         self.updating = False
         self.collision = False
         self.current_anim = 'idle'
-        self.target = self.position
-
+        #self.target = self.position
+        self.target = player
+        self.updatecounter = 200
+        self.mm = 0
     def update(self, dt):
         # move to designated target or stay and fight
 
@@ -419,7 +421,13 @@ class Relative(Family):
         self._old_state = {'position': self.position, 'rotation': self.rotation}
 
         locals = []
-        goal = seek(self.x, self.y, self.target[0], self.target[1])
+        if self.updatecounter > 50:
+            self.mm = random.choice([50, 100, 150, 200, 250]) * random.choice([1, -1])
+            self.updatecounter = 0
+        else:
+            self.updatecounter += 1
+        print self.updatecounter
+        goal = seek(self.x, self.y, self.target.position[0]  * self.mm, self.target.position[1] - self.mm)
 
         delta = geom.angle_rotation(radians(self.rotation), radians(goal))
         delta = degrees(delta)
