@@ -8,6 +8,7 @@ from pyglet.image import Animation, AnimationFrame, load
 RANDOM_DELTA = 128
 
 from cocos.sprite import Sprite
+from cocos.actions.interval_actions import MoveBy
 
 from boids import merge, seek, cap, avoid_group
 #from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
@@ -31,6 +32,11 @@ POWERUP_LIFE = 20
 FULL_LOAD_BULLETS = 50
 
 PLAYER_MAX_LIFE = 100
+
+BLOOD_SPLATTER_RANGE = 50, 200
+BLOOD_SPLATTER_SECONDS = .7
+
+BLOODY_HANDS_EASTEREGG = False
 
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.15)
@@ -154,6 +160,9 @@ class Agent(Sprite):
 
     def add_gore(self, gore_class, other, duration=5):
         gore = gore_class((self.x, self.y), other.rotation)
+        dist = random.randrange(*BLOOD_SPLATTER_RANGE)
+        alpha = radians(-other.rotation)
+        gore.do(MoveBy( (cos(alpha)*dist, sin(alpha)*dist), BLOOD_SPLATTER_SECONDS))
         self.player.game_layer.deadstuff_layer.add(gore, duration)
 
 
@@ -310,6 +319,9 @@ class MeleeWeapon(Weapon):
 
     def attack(self):
         print "ATTACK"
+        if BLOODY_HANDS_EASTEREGG:
+            self.player.add_gore(Blood, self.player, duration=.5)
+
         if self.player.collided_agent != None:
             print 'morite!!', self.player.collided_agent
             died = self.player.collided_agent.receive_damage(self.damage, self.player)
