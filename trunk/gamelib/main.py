@@ -234,7 +234,7 @@ class GameLayer(Layer):
         # add scene map node to the main layer
         self.add(self.map_node)
 
-        self.add(self.agents_node, z=1)
+        self.add(self.agents_node, z=1000)
 
         # talk queue
         self.hud = hud
