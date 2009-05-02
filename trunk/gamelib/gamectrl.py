@@ -121,14 +121,16 @@ class MouseGameCtrl(Layer):
             mouse_over = (px-x)**2+(py-y)**2 < 100**2
             if mouse_over:
                 #self.game_layer.player.selected_relative = relative
+                print "MOUSE OVER", relative
                 return relative
 
             # test for mouse over on the faces
             face = hud.faces[relative.name]
             x, y = face.position
-            print x, y, px, py
-            mouse_over = (px-x)**2+(py-y)**2 < 100**2
+            npx = px + self.game_layer.x
+            npy = py + self.game_layer.y
+            print "CHECK PSRITE", relative, x, y, npx, npy
+            mouse_over = (npx-x)**2+(npy-y)**2 < 100**2
             if mouse_over:
+                print "MOUSE OVER2", relative
                 return relative
-            
-
