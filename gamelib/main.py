@@ -194,33 +194,33 @@ class GameOverLayer(Layer):
     is_event_handler = True
 
     def __init__(self):
-	super(GameOverLayer, self).__init__()
-	w, h = director.get_window_size()
-	label = Label('Game Over, you sucker...', font_name='Times New Roman', font_size=52, bold=True)
-	label.position = w / 2 - 340 , h / 2 + 100
-	label.element.color = 40,179,75,180
-	label2 = Label('do you want to play again?', font_name='Times New Roman', font_size=52, bold=True)
-	label2.position = w / 2 - 420 , h / 2 
-	label2.element.color = 40,179,75,180
-	label3 = Label('(Y/N)', font_name='Times New Roman', font_size=52, bold=True)
-	label3.position = w / 2 - 40, h / 2 - 100
-	label3.element.color = 40,179,75,180
-	self.add(label, z=1)
-	#label.do(Hide() + Delay(10) + Show())
-	label2.do(Delay(10) + Show())
-	label3.do(Delay(10) + Show())
-	self.add(label)
-	self.add(label2)
-	self.add(label3)
+        super(GameOverLayer, self).__init__()
+        w, h = director.get_window_size()
+        label = Label('Game Over, you sucker...', font_name='Times New Roman', font_size=52, bold=True)
+        label.position = w / 2 - 340 , h / 2 + 100
+        label.element.color = 40,179,75,180
+        label2 = Label('do you want to play again?', font_name='Times New Roman', font_size=52, bold=True)
+        label2.position = w / 2 - 420 , h / 2 
+        label2.element.color = 40,179,75,180
+        label3 = Label('(Y/N)', font_name='Times New Roman', font_size=52, bold=True)
+        label3.position = w / 2 - 40, h / 2 - 100
+        label3.element.color = 40,179,75,180
+        self.add(label, z=1)
+        #label.do(Hide() + Delay(10) + Show())
+        label2.do(Delay(10) + Show())
+        label3.do(Delay(10) + Show())
+        self.add(label)
+        self.add(label2)
+        self.add(label3)
 
     def on_key_press(self, k, m):
-	if k == key.Y:
-	    game_scene = get_game_scene()
-	    director.replace(game_scene)
-	    return True
-	elif k == key.N:
-	    director.pop()
-	    return True
+        if k == key.Y:
+            game_scene = get_game_scene()
+            director.replace(game_scene)
+            return True
+        elif k == key.N:
+            director.pop()
+            return True
 
 
 class DeadStuffLayer(cocos.cocosnode.CocosNode):
@@ -573,7 +573,7 @@ class GameLayer(Layer):
 
     def game_over(self):
         end_scene = get_end_scene()
-        director.replace(end_scene)        
+        director.replace(end_scene)
 
     def on_exit(self):
         super(GameLayer, self).on_exit()
