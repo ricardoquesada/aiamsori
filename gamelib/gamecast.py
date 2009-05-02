@@ -445,12 +445,12 @@ class Relative(Family):
                 self.goal = self.game_layer.ways.get_dest(self.position, self.target)
             goal = seek(self.x, self.y, self.goal[0], self.goal[1])
 
-            delta = geom.angle_rotation(radians(self.rotation), radians(goal))
-            delta = degrees(delta)
-            max_r = 270
-            delta = cap(delta, -max_r, max_r) * dt
-            self.rotation += delta
-
+            #delta = geom.angle_rotation(radians(self.rotation), radians(goal))
+            #delta = degrees(delta)
+            #max_r = 5*270
+            #delta = cap(delta, -max_r, max_r) * dt
+            #self.rotation += delta
+            self.rotation = goal
             # FIXME: for some reason the x/y attributes don't update the position attribute correctly
             self.position = (self.x, self.y)
             self.rotation = self.rotation % 360
@@ -560,7 +560,7 @@ class Zombie(Agent):
         self.collision = False
 
         n_zombie = random.choice([1,2,3])
-        
+
         self.anims = {'idle': get_animation('zombie%d_idle'%n_zombie),
                       'walk': get_animation('zombie%d_walk'%n_zombie),
                       }

@@ -1,3 +1,5 @@
+import random
+
 import cocos
 from cocos.actions import Delay, CallFunc
 from cocos.director import director
@@ -5,6 +7,8 @@ from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
 from cocos.sprite import Sprite
+
+import sound
 
 class TalkLayer(cocos.layer.Layer):
     def __init__(self):
@@ -36,6 +40,12 @@ class TalkLayer(cocos.layer.Layer):
         x, y = director.get_window_size()
 
         face = Sprite('faces/%s.png'%who)
+        if who == "zombie":
+            zombie_sound = random.choice([
+                "ZombieDie",
+                "ZombieGerman",
+            ])
+            sound.play(zombie_sound)
         self.add(face)
         face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
 
