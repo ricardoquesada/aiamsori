@@ -140,7 +140,10 @@ class Agent(Sprite):
             return True
         return False
 
-class Father(Agent):
+class Family(Agent):
+    pass
+
+class Father(Family):
     def __init__(self, game_layer, img, position):
         super(Father, self).__init__(game_layer, img, position)
         ###self.shape.group = COLLISION_GROUP_FATHER
@@ -155,13 +158,13 @@ class Father(Agent):
         self.rotation_speed = 0
         self.collision = False
         self.anims = {'idle': get_animation('father_idle'),
-                      'walk': get_animation('father_walk'),                      
+                      'walk': get_animation('father_walk'),
                       }
         self.anim_sets = {'fist': {'idle': get_animation('father_idle'),
-                                   'walk': get_animation('father_walk'),                      
+                                   'walk': get_animation('father_walk'),
                                    },
                           'shotgun': {'idle': get_animation('father_shotgun_idle'),
-                                      'walk': get_animation('father_shotgun_walk'),                      
+                                      'walk': get_animation('father_shotgun_walk'),
                                       },
                           }
 
@@ -248,7 +251,6 @@ class Father(Agent):
         self.weapon = weapon
         self.anims = self.anim_sets[weapon_name]
         self.play_anim('idle')
-                
 
 
 class Weapon(object):
@@ -295,7 +297,7 @@ class MeleeWeapon(Weapon):
             self._play_sound()
 
 
-class Relative(Agent):
+class Relative(Family):
     def __init__(self, game_layer, img, position, player):
         super(Relative, self).__init__(game_layer, img, position)
         self._old_state = {}
@@ -395,6 +397,16 @@ class ZombieBoid(Agent):
         self.current_anim = 'idle'
         self.gore = ['cacho1.png', 'cacho2.png', 'cacho4.png']
         ###self.shape = ZombieShape(self)
+        self.last_goal = random.random()*0.3
+        self.goal = self.position
+        self.target = None
+
+
+    def on_enter(self):
+        super(ZombieBoid, self).on_enter()
+        self.target = random.choice(
+            [ p for p in self.parent.get_children() if isinstance(p, Family) ]
+        )
 
     def update(self, dt):
         # save old position
@@ -402,7 +414,16 @@ class ZombieBoid(Agent):
 
         locals = []
         b = self
-        goal = seek(b.x, b.y, self.player.x, self.player.y)
+        self.last_goal += dt
+        if self.last_goal > 0.3:
+            self.last_goal = 0
+            if self.target is None:
+                target = self
+            else:
+                target = self.target
+            self.goal = self.game_layer.ways.get_dest(self.position, target.position)
+        gx, gy = self.goal
+        goal = seek(b.x, b.y, gx, gy)
         #print "GOAL", goal
         escape, danger = avoid_group(b.x, b.y, locals)
         #print "danger", danger, escape
@@ -449,7 +470,7 @@ class ZombieBoid(Agent):
         return self.player.game_layer
 
 
-    def receive_damage(self, damage):        
+    def receive_damage(self, damage):
         gore_piece = Sprite(load('data/img/'+random.choice(self.gore)),
                                      (self.player.position))
         self.add(gore_piece)
