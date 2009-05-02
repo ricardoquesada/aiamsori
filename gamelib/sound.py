@@ -8,6 +8,9 @@ sound_resources =  {
     'game_music': 'sounds/Music01.ogg',
     'intro_music': 'sounds/Musictitle.ogg',
     'zombie_eat': 'sounds/ZombieEat.ogg'
+##    'game_music': 'sounds/player_die.mp3',
+##    'intro_music': 'sounds/player_die.mp3',
+##    'zombie_eat': 'sounds/player_die.mp3'
 }
 
 music_player =  pyglet.media.Player()
