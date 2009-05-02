@@ -233,16 +233,6 @@ class Family(Agent):
         self.add_gore(Blood, other, duration=.5)
         return False
 
-    def on_collision(self, other):
-        super(Family, self).on_collision(other)
-        if isinstance(other, PowerUp):
-            hud = self.game_layer.hud
-            if other.type in POWERUP_TYPE_LIFE_LIST:
-                self.life += POWERUP_LIFE[other.type]
-                if self.life > PLAYER_MAX_LIFE:
-                    self.life = PLAYER_MAX_LIFE
-                hud.set_life(self.name, self.life)
-
 class Father(Family):
     name = "Dad"
     def __init__(self, game_layer, img, position):
@@ -276,20 +266,25 @@ class Father(Family):
         self.family = {}
         self.selected_relative = None
         self.just_born = False
-        self.weapons = {'shotgun': RangedWeapon(self),
-                        'fist': MeleeWeapon(self)}
+        #self.weapons = {'shotgun': RangedWeapon(self),
+        #                'fist': MeleeWeapon(self)}
+        self.weapons = {'fist': MeleeWeapon(self)}
         self.weapon = self.weapons['fist']
         self.time_since_attack = 0
         self.player = self #shortcut
 
     def on_collision(self, other):
-        super(Father, self).on_collision(other)
+        hud = self.game_layer.hud
         if isinstance(other, PowerUp):
-            hud = self.game_layer.hud
             if other.type in POWERUP_TYPE_AMMO_LIST:
-                weapon = self.weapons['shotgun']
-                weapon.ammo += POWERUP_AMMO
-                hud.set_bullets(weapon.ammo)
+                if self.weapons.has_key('shotgun'):
+                    weapon = self.weapons['shotgun']
+                    weapon.ammo += POWERUP_AMMO
+                    hud.set_bullets(weapon.ammo)
+                    self.switch_weapon('shotgun')
+                    sound.play('pickup_shotgun')
+                else:
+                    return
             elif other.type in POWERUP_TYPE_LIFE_LIST:
                 self.life += POWERUP_LIFE[other.type]
                 if self.life > PLAYER_MAX_LIFE:
@@ -297,12 +292,27 @@ class Father(Family):
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
-                weapon = self.weapons[other.type]
-                if hasattr(weapon, 'ammo'):
-                    weapon.ammo += WEAPON_FULL_AMMO
-                    hud.set_bullets(weapon.ammo)
+                if self.weapons.has_key(other.type):
+                    weapon = self.weapons[other.type]
+                    if hasattr(weapon, 'ammo'):
+                        weapon.ammo += WEAPON_FULL_AMMO
+                        hud.set_bullets(weapon.ammo)
+                    else:
+                        return
+                elif other.type == 'shotgun':
+                    self.weapons['shotgun'] = RangedWeapon(self)
                 self.switch_weapon(other.type)
                 sound.play('pickup_shotgun')
+        elif isinstance(other, Relative):
+            if self.weapons.has_key('shotgun'):
+                weapon = self.weapons['shotgun']
+                weapon.ammo += other.ammo
+                other.ammo = 0
+                hud.set_bullets(weapon.ammo)
+                self.switch_weapon('shotgun')
+                sound.play('pickup_shotgun')
+        super(Father, self).on_collision(other)
+            
 
     def update(self, dt):
         # update speed
@@ -426,6 +436,7 @@ class Relative(Family):
         self.last_goal = 0
         self.alone = False
         self.last_alone = False
+        self.ammo = 0
 
     def update(self, dt):
         # move to designated target or stay and fight
@@ -503,6 +514,19 @@ class Relative(Family):
     def _get_game_layer(self):
         return self.player.game_layer
 
+    def on_collision(self, other):
+        super(Relative, self).on_collision(other)
+        if isinstance(other, PowerUp):
+            hud = self.game_layer.hud
+            if other.type in POWERUP_TYPE_AMMO_LIST:
+                # family just collects ammo for later use
+                self.ammo += POWERUP_AMMO
+            elif other.type in POWERUP_TYPE_LIFE_LIST:
+                self.life += POWERUP_LIFE[other.type]
+                if self.life > PLAYER_MAX_LIFE:
+                    self.life = PLAYER_MAX_LIFE
+                sound.play('pickup_helth')
+                hud.set_life(self.name, self.life)
 
 class Boy(Relative):
     name = "Zack"
