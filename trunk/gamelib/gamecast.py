@@ -24,13 +24,14 @@ COLLISION_DISTANCE_SQUARED = 64**2
 TOP_SPEED = 430
 ACCEL_FACTOR = 300
 
+POWERUP_TYPE_AMMO_LIST = ['bullets']
 POWERUP_TYPE_WEAPON_LIST = ['shotgun']
-POWERUP_TYPE_BULLETS = 'bullets'
-POWERUP_TYPE_LIFE = 'life'
-POWERUP_BULLETS = 15
-POWERUP_LIFE = 20
-FULL_LOAD_BULLETS = 25
-
+POWERUP_TYPE_FOOD_LIST = ['chicken', 'burger']
+POWERUP_TYPE_HEALTH_LIST = ['medicine']
+POWERUP_TYPE_LIFE_LIST = POWERUP_TYPE_FOOD_LIST + POWERUP_TYPE_HEALTH_LIST
+POWERUP_AMMO = 15
+POWERUP_LIFE = {'chicken': 20, 'burger': 20, 'medicine': 50}
+WEAPON_FULL_AMMO = 25
 PLAYER_MAX_LIFE = 100
 
 BLOOD_SPLATTER_RANGE = 50, 200
@@ -236,8 +237,8 @@ class Family(Agent):
         super(Family, self).on_collision(other)
         if isinstance(other, PowerUp):
             hud = self.game_layer.hud
-            if other.type == POWERUP_TYPE_LIFE:
-                self.life += POWERUP_LIFE
+            if other.type in POWERUP_TYPE_LIFE_LIST:
+                self.life += POWERUP_LIFE[other.type]
                 if self.life > PLAYER_MAX_LIFE:
                     self.life = PLAYER_MAX_LIFE
                 hud.set_life(self.name, self.life)
@@ -285,22 +286,20 @@ class Father(Family):
         super(Father, self).on_collision(other)
         if isinstance(other, PowerUp):
             hud = self.game_layer.hud
-            if other.type == POWERUP_TYPE_BULLETS:
+            if other.type in POWERUP_TYPE_AMMO_LIST:
                 weapon = self.weapons['shotgun']
-                weapon.ammo += POWERUP_BULLETS
-#                print 'new ammo', weapon.ammo
+                weapon.ammo += POWERUP_AMMO
                 hud.set_bullets(weapon.ammo)
-            elif other.type == POWERUP_TYPE_LIFE:
-                self.life += POWERUP_LIFE
+            elif other.type in POWERUP_TYPE_LIFE_LIST:
+                self.life += POWERUP_LIFE[other.type]
                 if self.life > PLAYER_MAX_LIFE:
                     self.life = PLAYER_MAX_LIFE
-#                print 'new life', self.life
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
                 weapon = self.weapons[other.type]
                 if hasattr(weapon, 'ammo'):
-                    weapon.ammo += FULL_LOAD_BULLETS
+                    weapon.ammo += WEAPON_FULL_AMMO
                     hud.set_bullets(weapon.ammo)
                 self.switch_weapon(other.type)
                 sound.play('pickup_shotgun')
@@ -377,7 +376,7 @@ class RangedWeapon(Weapon):
         self.ammo = 0
 
     def attack(self):
-        projectile = Bullet(get_animation('bullet'), self.player)
+        projectile = Bullet('img/bullet.png', self.player)
         self.player.game_layer.add_projectile(projectile)
         self._play_sound()
         self.ammo -= 1
@@ -720,7 +719,6 @@ class Bullet(Sprite):
             self.hit()
 
 
-#    def die(self):
     def hit(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
         # as segfaults might occur

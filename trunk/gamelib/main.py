@@ -43,7 +43,8 @@ import sound
 from light import Light
 import waypointing
 
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, PowerUp, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
+from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
 
@@ -549,15 +550,10 @@ class GameLayer(Layer):
     def add_powerup(self, type='', msg=''):
         position = random.choice(self.item_spawn)
         if not type:
-            type = random.choice(['bullets', 'life'])
+            type = random.choice(POWERUP_TYPE_AMMO_LIST + POWERUP_TYPE_LIFE_LIST)
         powerup = PowerUp(type, position, self)
         self.agents_node.add(powerup)
-        if type == 'life':
-            item = 'food'
-        elif type == 'bullets':
-            item = 'ammo'
-        else:
-            item = ''
+        item = type
         if random.random() < UNKNOWN_ITEM_PROBABILTY:
             item = ''
         place = powerup.label if hasattr(powerup, 'label') else ''
@@ -702,20 +698,10 @@ class GameLayer(Layer):
         #print self.projectiles
 
     def _remove_dead_items(self):
-        ###collision_layer = self.map_node.get('collision')
         for item in self.dead_items:
-            ###collision_layer.remove(item, static=item.shape.static)
             if item in self.agents_node:
                 self.agents_node.remove(item)
         self.dead_items.clear()
-
-    def is_clear_path(self, origin, target):
-        ray = Ray(self.player, target)
-        ###collision_layer = self.map_node.get('collision')
-        ###collision_layer.add(ray, static=ray.shape.static)
-        ###collision_layer.step()
-        ###collision_layer.remove(ray)
-        return not ray.shape.data['collided']
 
     def is_empty(self,x,y):
         # note: ATM only walls, not muebles
