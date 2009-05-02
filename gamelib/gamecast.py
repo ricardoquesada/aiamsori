@@ -29,9 +29,10 @@ def get_animation(anim_name):
 
 
 class Agent(Sprite):
-    def __init__(self, img, position=(0,0)):
+    def __init__(self, game_layer, img, position=(0,0)):
         super(Agent, self).__init__(img, position)
         self.anims = {}
+        self.game_layer = game_layer
         self.current_anim = 'idle'
 
         ###self.shape = AgentShape(self)
@@ -42,10 +43,15 @@ class Agent(Sprite):
         self.position = position
 
         # check collisions with static objects
-        game_layer = self._get_game_layer()
-        if not game_layer.is_empty(*self.position):
-            self.position = self.old_position
-            return
+
+        if not self.game_layer.is_empty(*self.position):
+            self.x = self.old_position[0]
+            if not self.game_layer.is_empty(*self.position):
+                self.y = self.old_position[1]
+                self.x = position[0]
+                if not self.game_layer.is_empty(*self.position):
+                    self.position = self.old_position
+                    return
 
         # check collisions with dynamic objects
         agents = self.parent.children
@@ -105,7 +111,7 @@ class Agent(Sprite):
                 self.target = self.position = (self.x, self.y)
                 self.target = self.position
                 return
-            
+
             self.on_collision(self.collision)
             f = getattr(self.collision, "on_collision", None)
             if f is not None:
@@ -148,8 +154,8 @@ class Agent(Sprite):
 
 
 class Father(Agent):
-    def __init__(self, img, position, game_layer):
-        super(Father, self).__init__(img, position)
+    def __init__(self, game_layer, img, position):
+        super(Father, self).__init__(game_layer, img, position)
         ###self.shape.group = COLLISION_GROUP_FATHER
 
         self._old_state = {'position': position}
@@ -195,6 +201,8 @@ class Father(Agent):
         self.game_layer.update(dt)
         self.time_since_attack += dt
 
+
+
     def look_at(self, px, py):
         # translate mouse position to world
         px = px - self.game_layer.x
@@ -221,7 +229,7 @@ class Father(Agent):
 
     def _get_game_layer(self):
         return self.game_layer
-            
+
 
 class Weapon(object):
     def __init__(self, player, damage, atk_range, frequency, sound=None):
@@ -240,16 +248,16 @@ class RangedWeapon(Weapon):
 
     def get_projectile(self):
         return Bullet(get_animation('bullet'), self.player)
-        
+
 
 class MeleeWeapon(Weapon):
     def __init__(self, player, damage=30, atk_range=0, frequency=0.5):
         super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency)
-        
-    
+
+
 class Relative(Agent):
-    def __init__(self, img, position, player):
-        super(Relative, self).__init__(img, position)
+    def __init__(self, game_layer, img, position, player):
+        super(Relative, self).__init__(game_layer, img, position)
         self._old_state = {}
         self.speed = 100
         self.schedule(self.update)
@@ -302,8 +310,8 @@ class Relative(Agent):
 
 
 class Boy(Relative):
-    def __init__(self, img, position, player):
-        super(Boy, self).__init__(img, position, player)
+    def __init__(self, game_layer, img, position, player):
+        super(Boy, self).__init__(game_layer, img, position, player)
         self.anims = {'idle': get_animation('boy_idle'),
                       'walk': get_animation('boy_walk'),
                       }
@@ -312,8 +320,8 @@ class Boy(Relative):
 
 
 class Girl(Relative):
-    def __init__(self, img, position, player):
-        super(Girl, self).__init__(img, position, player)
+    def __init__(self, game_layer, img, position, player):
+        super(Girl, self).__init__(game_layer, img, position, player)
         self.anims = {'idle': get_animation('girl_idle'),
                       'walk': get_animation('girl_walk'),
                       }
@@ -322,8 +330,8 @@ class Girl(Relative):
 
 
 class Mother(Relative):
-    def __init__(self, img, position, player):
-        super(Mother, self).__init__(img, position, player)
+    def __init__(self, game_layer, img, position, player):
+        super(Mother, self).__init__(game_layer, img, position, player)
         self.anims = {'idle': get_animation('mother_idle'),
                       'walk': get_animation('mother_walk'),
                       }
@@ -333,8 +341,8 @@ class Mother(Relative):
 
 # ZombieBoid , the old zombie class
 class ZombieBoid(Agent):
-    def __init__(self, img, player):
-        super(Zombie, self).__init__(img)
+    def __init__(self, game_layer, img, player):
+        super(Zombie, self).__init__(game_layer, img)
         self._old_state = {}
         self.speed = 100
         self.schedule(self.update)
@@ -401,8 +409,8 @@ class ZombieBoid(Agent):
 
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
 class ZombieWpt(Agent):
-    def __init__(self, img, player):
-        super(Zombie, self).__init__(img)
+    def __init__(self, game_layer, img, player):
+        super(Zombie, self).__init__(game_layer, img)
         self._old_state = {}
         self.speed = 100
         self.schedule(self.update)
@@ -476,7 +484,7 @@ class ZombieWpt(Agent):
         return self.player.game_layer
 
 class Bullet(Sprite):
-    def __init__(self, img, agent):        
+    def __init__(self, img, agent):
         super(Bullet, self).__init__(img, agent.position, agent.rotation, agent.scale)
 
         self.anims = {}

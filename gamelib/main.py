@@ -118,14 +118,6 @@ def main():
     director.run(main_scene)
     #director.run(first_scene)
 
-class LightLayer(cocos.batch.BatchNode):
-    def __init__(self):
-        super(LightLayer, self).__init__()
-        #self.sprite = Sprite('light.png')
-        #self.sprite.position = -0,-800
-        #self.sprite.scale = 1.5
-        #self.add(self.sprite)
-
 
 def make_sprites_layer(layer_data, atlas):
     saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
@@ -180,7 +172,6 @@ class GameLayer(Layer):
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
-            self.lights = LightLayer()
 
         self.grabber = framegrabber.TextureGrabber()
         self.grabber.grab(self.texture)
@@ -246,6 +237,9 @@ class GameLayer(Layer):
 
         # ends wallmask preparation, makes available service .is_empty(x,y)
         #self.wallmask.get_mask() #called for side effect _fill_gaps
+        for layer in collision_layers:
+            for child in layer.get_children():
+                self.wallmask.add(child)
         # now is safe to call self.is_empty()
 
         # if waypoint editing mode, create waypoints
@@ -267,6 +261,21 @@ class GameLayer(Layer):
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Dad", "hello hello hello"*5)
         self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
+        self.flicker()
+
+    def flicker(self):
+        delay = random.random()*5+2
+        action = Delay(delay)
+        light = random.choice(self.lights.get_children())
+
+        turn_on = CallFunc(lambda: setattr(light, "opacity", 255))
+        turn_off = CallFunc(lambda: setattr(light, "opacity", 0))
+        for i in range(random.randint(5, 10)):
+            micro_delay = random.random()*0.10
+            micro_delay2 = random.random()*0.10
+            action = action + Delay(micro_delay) + turn_off + Delay(micro_delay2) + turn_on
+        action = action + CallFunc(self.flicker)
+        self.do(action)
 
 
     def on_resize(self, w, h):
@@ -357,7 +366,7 @@ class GameLayer(Layer):
             ###collision_layer = self.map_node.get('collision')
             for i in range(ZOMBIE_WAVE_COUNT):
                 for c in self.zombie_spawn.get_children():
-                    z = Zombie(get_animation('zombie1_idle'), self.player)
+                    z = Zombie(self, get_animation('zombie1_idle'), self.player)
                     z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
                     z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
                     z.position = z.x, z.y
@@ -377,8 +386,8 @@ class GameLayer(Layer):
         sound.play('zombie_eat')
 
         self.do( Delay(3) + CallFunc(lambda: sound.play_music('game_music')) )
-        
-        
+
+
         #self.light.set_position(x/2, y/2)
         #self.light.enable()
 
@@ -393,7 +402,7 @@ class GameLayer(Layer):
         ###collision_layer = self.map_node.get('collision')
 
         # create agent sprite
-        father = Father(get_animation('father_idle'), (0,-800), self)
+        father = Father(self, get_animation('father_idle'), (0,-800))
         self.player = father
         self.agents_node.add(father)
         ###collision_layer.add(father, static=father.shape.static)
@@ -402,17 +411,17 @@ class GameLayer(Layer):
         # pester you when editing waypoints
         if not options.wpt_on:
             position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
-            boy = Boy(get_animation('boy_idle'), position, self.player)
+            boy = Boy(self, get_animation('boy_idle'), position, self.player)
             self.agents_node.add(boy)
             ###collision_layer.add(boy, static=boy.shape.static)
 
             position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
-            girl = Girl(get_animation('girl_idle'), position, self.player)
+            girl = Girl(self, get_animation('girl_idle'), position, self.player)
             self.agents_node.add(girl)
             ###collision_layer.add(girl, static=girl.shape.static)
 
             position = 0 + random.choice([-1,1])*RANDOM_DELTA, -800 + random.choice([-1,1])*RANDOM_DELTA
-            mother = Mother(get_animation('mother_idle'), position, self.player)
+            mother = Mother(self, get_animation('mother_idle'), position, self.player)
 #            mother = Mother(get_animation('mother_idle'), (-350,-100), self.player)
             self.agents_node.add(mother)
             ###collision_layer.add(mother, static=mother.shape.static)
