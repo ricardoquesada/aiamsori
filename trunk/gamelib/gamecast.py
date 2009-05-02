@@ -176,7 +176,7 @@ class Father(Agent):
         self.just_born = False
         self.weapons = {'shotgun': RangedWeapon(self),
                         'fist': MeleeWeapon(self)}
-        self.weapon = self.weapons['fist']
+        self.weapon = self.weapons['shotgun']
         self.time_since_attack = 0
 
     def on_collision(self, other):
