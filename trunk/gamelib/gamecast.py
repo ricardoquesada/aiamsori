@@ -27,9 +27,9 @@ ACCEL_FACTOR = 300
 POWERUP_TYPE_WEAPON_LIST = ['shotgun']
 POWERUP_TYPE_BULLETS = 'bullets'
 POWERUP_TYPE_LIFE = 'life'
-POWERUP_BULLETS = 5
+POWERUP_BULLETS = 15
 POWERUP_LIFE = 20
-FULL_LOAD_BULLETS = 50
+FULL_LOAD_BULLETS = 25
 
 PLAYER_MAX_LIFE = 100
 
@@ -364,7 +364,7 @@ class Weapon(object):
 
 
 class RangedWeapon(Weapon):
-    def __init__(self, player, damage=100, atk_range=1000, frequency=1, sound='fire_shotgun'):
+    def __init__(self, player, damage=100, atk_range=1000, frequency=0.6, sound='fire_shotgun'):
         super(RangedWeapon, self).__init__(player, damage, atk_range, frequency, sound)
         self.ammo = 0
 
@@ -470,6 +470,7 @@ class Relative(Family):
         # check if whole family is dead
         if not self.player.family:
             game_layer.game_over()
+        sound.play("player_die")
 
     def _get_game_layer(self):
         return self.player.game_layer
