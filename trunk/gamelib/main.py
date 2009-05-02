@@ -545,7 +545,8 @@ class GameLayer(Layer):
 
 
     def talk(self, who, what, duration=5, transient=False):
-        self.talk_layer.talk(who, what, duration=duration, transient=transient)
+        if who not in self.hud.deads:
+            self.talk_layer.talk(who, what, duration=duration, transient=transient)
 
     def on_enter(self):
         super(GameLayer, self).on_enter()
