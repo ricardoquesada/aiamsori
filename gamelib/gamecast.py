@@ -558,8 +558,11 @@ class Zombie(Agent):
         self.player = player
         self.updating = False
         self.collision = False
-        self.anims = {'idle': get_animation('zombie1_idle'),
-                      'walk': get_animation('zombie1_walk'),
+
+        n_zombie = random.choice([1,2,3])
+        
+        self.anims = {'idle': get_animation('zombie%d_idle'%n_zombie),
+                      'walk': get_animation('zombie%d_walk'%n_zombie),
                       }
         self.current_anim = 'idle'
 
