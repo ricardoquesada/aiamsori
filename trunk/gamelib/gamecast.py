@@ -38,9 +38,47 @@ BLOOD_SPLATTER_SECONDS = .7
 
 BLOODY_HANDS_EASTEREGG = False
 
+####Pruebas hechas en win:
+####No conversion , glob encuentra nombres, pero los entrga con barras mezcladas,
+####cuelga el app no encontrando file (ej: "data/img\sangre1.png" not found )
+####Convertir a win antes de glob, salen barras parejas tipo windows, igual
+#### el app saca "data\img\sangre2.png" not found ( la intercepcion de glob
+#### mostraba que habia encontrado  'data\\img\\sangre2.png' )
+####Convertir antes a win y despues del glob a unix: BINGO!!!. take that, sucker!!!
+##def globx(s):
+##    import os
+##    print '*** globx'
+##    print 's:',s
+##    if os.sep == '\\':
+##        z = s.replace('/',os.sep)
+##        s = z
+##        print 'z:',z
+##    li = glob(s)
+##    print 'glob results unconverted:'
+##    print li
+##    if os.sep == '\\':
+##        li2 = [ s.replace('\\','/') for s in li ]
+##        li = li2
+##        print 'glob result converted back to unix:'
+##        li
+##    return li
+
+def globx(s):
+    import os
+    if os.sep == '\\':
+        z = s.replace('/',os.sep)
+        s = z
+    li = glob(s)
+    if os.sep == '\\':
+        li2 = [ s.replace('\\','/') for s in li ]
+        li = li2
+        # 'glob result converted back to unix:'
+    return li
+
+
 def get_animation(anim_name):
     return Animation([AnimationFrame(load(img_file), 0.15)
-                      for img_file in  glob('data/img/%s*.png' % anim_name)])
+                      for img_file in  globx('data/img/%s*.png' % anim_name)])
 
 class Gore(Sprite):
     def __init__(self, *a, **kw):
@@ -49,13 +87,13 @@ class Gore(Sprite):
         self.scale = 1.5
 
 class Blood(Gore):
-    images = glob("data/img/sangre[0-9]*.png")
+    images = globx("data/img/sangre[0-9]*.png")
 
 class BloodPool(Gore):
-    images = glob("data/img/sangre_mancha[0-9]*.png")
+    images = globx("data/img/sangre_mancha[0-9]*.png")
 
 class BodyParts(Gore):
-    images = glob("data/img/cacho[0-9]*.png") + BloodPool.images
+    images = globx("data/img/cacho[0-9]*.png") + BloodPool.images
 
 class Agent(Sprite):
     def __init__(self, game_layer, img, position=(0,0)):
