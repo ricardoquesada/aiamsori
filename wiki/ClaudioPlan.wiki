@@ -3,9 +3,9 @@ claudio .plan
 
 = Introduction =
 
-...
-*done*	create_ray_to_wall_collision(wallmask, tilesize)
-*done*	ray_to_wall_collision((x0,y0),(hx,hy)) ; first pair origin, second direction
+...<br>
+*done*	create_ray_to_wall_collision(wallmask, tilesize)<br>
+*done*	ray_to_wall_collision((x0,y0),(hx,hy)) ; first pair origin, second direction<br>
 
 need:
 curr	build wallmask at loadmap
