@@ -43,7 +43,8 @@ import sound
 from light import Light
 import waypointing
 
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, PowerUp, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
+from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
 
