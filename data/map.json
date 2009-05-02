@@ -11,26 +11,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            1972.0, 
-                            -742.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1972.0, 
-                            -1126.0000000000002
+                            2100.0, 
+                            -1638.0
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -48,7 +30,7 @@
                         "label": null, 
                         "position": [
                             2100.0, 
-                            -2150.0
+                            -1766.0
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -65,8 +47,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            1716.0, 
-                            -2278.0
+                            2100.0, 
+                            -870.00000000000023
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -83,854 +65,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            -1228.0000000000002, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1484.0000000000002, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1844.0, 
-                            153.99999999999977
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -332.00000000000023, 
-                            -2406.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            692.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1844.0, 
-                            281.99999999999977
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1204.0, 
-                            409.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1460.0, 
-                            409.99999999999977
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            564.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -460.0, 
-                            281.99999999999994
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            179.99999999999989, 
-                            -870.0
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/piso_ceramico.png", 
-                        "rect": [
-                            926, 
-                            1162, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1204.0, 
-                            -870.0
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/piso_ceramico.png", 
-                        "rect": [
-                            926, 
-                            1162, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1100.0, 
-                            281.99999999999994
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -844.00000000000011, 
-                            -1638.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -972.00000000000011, 
-                            -1638.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1076.0, 
-                            -230.00000000000011
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1204.0, 
-                            -358.00000000000011
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            948.0, 
-                            -358.00000000000011
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1204.0, 
-                            -230.00000000000011
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1588.0, 
-                            -358.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -844.0, 
-                            26.000000000000028
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1588.0, 
-                            153.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1588.0, 
-                            281.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1588.0, 
-                            -102.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1204.0, 
-                            281.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1588.0, 
-                            409.99999999999977
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1972.0, 
-                            665.99999999999977
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            180.0, 
-                            281.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            948.0, 
-                            281.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1076.0, 
-                            281.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1460.0, 
-                            281.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1076.0, 
-                            -742.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1076.0, 
-                            -614.00000000000011
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1228.0, 
-                            -101.99999999999994
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_alfombra.png", 
-                        "rect": [
-                            524, 
-                            0, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            820.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            52.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            308.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -332.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -460.0, 
-                            409.99999999999994
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1228.0, 
-                            282.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -76.0, 
-                            409.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            948.0, 
-                            409.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            52.0, 
-                            281.99999999999989
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1076.0, 
-                            409.99999999999983
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1484.0, 
-                            -1254.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1844.0, 
-                            25.999999999999773
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1612.0, 
-                            -102.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1612.0, 
-                            26.0
+                            2100.0, 
+                            -1510.0
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -2317,6 +1453,24 @@
                         "position": [
                             948.0, 
                             -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -1126.0000000000002
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -4531,6 +3685,1248 @@
                         "position": [
                             -332.0, 
                             281.99999999999994
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -1254.0000000000002
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1740.0, 
+                            -1126.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1612.0000000000002, 
+                            -2406.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1484.0000000000002, 
+                            -2406.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1740.0000000000002, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1228.0000000000002, 
+                            -2406.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -716.00000000000023, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -588.00000000000023, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            179.99999999999977, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            51.999999999999773, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1972.0, 
+                            -2022.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -1382.0000000000002
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -742.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -998.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -614.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -358.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -230.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1972.0, 
+                            -742.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1972.0, 
+                            -1126.0000000000002
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            2100.0, 
+                            -2150.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1716.0, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1228.0000000000002, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1484.0000000000002, 
+                            -2278.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1844.0, 
+                            153.99999999999977
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -332.00000000000023, 
+                            -2406.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            692.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1844.0, 
+                            281.99999999999977
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1204.0, 
+                            409.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1460.0, 
+                            409.99999999999977
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            564.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -460.0, 
+                            281.99999999999994
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            179.99999999999989, 
+                            -870.0
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/piso_ceramico.png", 
+                        "rect": [
+                            926, 
+                            1162, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1204.0, 
+                            -870.0
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/piso_ceramico.png", 
+                        "rect": [
+                            926, 
+                            1162, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1100.0, 
+                            281.99999999999994
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -844.00000000000011, 
+                            -1638.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -972.00000000000011, 
+                            -1638.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1076.0, 
+                            -230.00000000000011
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1204.0, 
+                            -358.00000000000011
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            948.0, 
+                            -358.00000000000011
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1204.0, 
+                            -230.00000000000011
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1588.0, 
+                            -358.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -844.0, 
+                            26.000000000000028
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1588.0, 
+                            153.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1588.0, 
+                            281.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1588.0, 
+                            -102.00000000000023
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1204.0, 
+                            281.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1588.0, 
+                            409.99999999999977
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1972.0, 
+                            665.99999999999977
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            180.0, 
+                            281.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            948.0, 
+                            281.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1076.0, 
+                            281.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1460.0, 
+                            281.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1076.0, 
+                            -742.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1076.0, 
+                            -614.00000000000011
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1228.0, 
+                            -101.99999999999994
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_alfombra.png", 
+                        "rect": [
+                            524, 
+                            0, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            820.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            52.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            308.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -332.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -460.0, 
+                            409.99999999999994
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1228.0, 
+                            282.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -76.0, 
+                            409.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            948.0, 
+                            409.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            52.0, 
+                            281.99999999999989
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1076.0, 
+                            409.99999999999983
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1484.0, 
+                            -1254.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1844.0, 
+                            25.999999999999773
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1612.0, 
+                            -102.0
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/piso_pasto.png", 
+                        "rect": [
+                            0, 
+                            522, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -1612.0, 
+                            26.0
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -13476,222 +13872,6 @@
                         "label": null, 
                         "position": [
                             2100.0, 
-                            -230.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -358.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -614.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -998.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -742.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -1382.0000000000002
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -1254.0000000000002
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -1510.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -870.00000000000023
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -1638.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -1766.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
-                            -1126.0000000000002
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            2100.0, 
                             -1894.0
                         ], 
                         "rotation": -90, 
@@ -13837,186 +14017,6 @@
                         "position": [
                             2100.0, 
                             -2406.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            1972.0, 
-                            -2022.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            51.999999999999773, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            179.99999999999977, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -588.00000000000023, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -716.00000000000023, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1228.0000000000002, 
-                            -2406.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1740.0000000000002, 
-                            -2278.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1484.0000000000002, 
-                            -2406.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1612.0000000000002, 
-                            -2406.0
-                        ], 
-                        "rotation": -90, 
-                        "filename": "newtiles/piso_pasto.png", 
-                        "rect": [
-                            0, 
-                            522, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -1740.0, 
-                            -1126.0
                         ], 
                         "rotation": -90, 
                         "filename": "newtiles/piso_pasto.png", 
@@ -14956,6 +14956,24 @@
                 "sprites": [
                     {
                         "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -377.0, 
+                            -1066.0
+                        ], 
+                        "rotation": 150, 
+                        "filename": "newtiles/planta_interior.png", 
+                        "rect": [
+                            516, 
+                            791, 
+                            123, 
+                            106
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
                         "scale": 1.9099376297100015, 
                         "z": 0, 
                         "label": null, 
@@ -15172,24 +15190,6 @@
                     }, 
                     {
                         "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -377.0, 
-                            -1066.0
-                        ], 
-                        "rotation": 150, 
-                        "filename": "newtiles/planta_interior.png", 
-                        "rect": [
-                            516, 
-                            791, 
-                            123, 
-                            106
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
                         "scale": 1.6105100000000008, 
                         "z": 0, 
                         "label": null, 
@@ -15275,6 +15275,24 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
+                            851.64729499344185, 
+                            -773.19683917014299
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/pared.png", 
+                        "rect": [
+                            914, 
+                            0, 
+                            64, 
+                            64
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
                             1844.0, 
                             793.99999999999977
                         ], 
@@ -15293,24 +15311,6 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            723.64729499344185, 
-                            -389.19683917014305
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/pared.png", 
-                        "rect": [
-                            914, 
-                            0, 
-                            64, 
-                            64
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
                             -1868.0, 
                             538.0
                         ], 
@@ -15321,6 +15321,24 @@
                             0, 
                             4, 
                             128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            723.64729499344185, 
+                            -389.19683917014305
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/pared.png", 
+                        "rect": [
+                            914, 
+                            0, 
+                            64, 
+                            64
                         ]
                     }, 
                     {
@@ -15349,6 +15367,24 @@
                         "position": [
                             1555.6472949934418, 
                             -1157.196839170143
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/pared.png", 
+                        "rect": [
+                            914, 
+                            0, 
+                            64, 
+                            64
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            723.64729499344185, 
+                            -1285.196839170143
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/pared.png", 
@@ -15403,24 +15439,6 @@
                         "position": [
                             -556.35270500655815, 
                             186.80316082985701
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/pared.png", 
-                        "rect": [
-                            914, 
-                            0, 
-                            64, 
-                            64
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            851.64729499344185, 
-                            -773.19683917014299
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/pared.png", 
@@ -17581,24 +17599,6 @@
                         "position": [
                             1555.6472949934418, 
                             -901.19683917014299
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/pared.png", 
-                        "rect": [
-                            914, 
-                            0, 
-                            64, 
-                            64
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            723.64729499344185, 
-                            -1285.196839170143
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/pared.png", 
@@ -20396,8 +20396,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            1506.6887000000004, 
-                            -2179.3033000000005
+                            -1099.1730000000002, 
+                            -1441.3310000000001
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/zombie-spawm.png", 
@@ -20414,8 +20414,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            110.05579999999991, 
-                            468.3014000000004
+                            117.96500000000015, 
+                            439.30100000000027
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/zombie-spawm.png", 
@@ -20432,8 +20432,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            -1100.9306000000006, 
-                            -1450.9978000000003
+                            1455.9380000000006, 
+                            -2085.0520000000001
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/zombie-spawm.png", 
@@ -20450,8 +20450,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            1963.6647000000005, 
-                            -842.64850000000001
+                            1811.8520000000005, 
+                            -859.12599999999998
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/zombie-spawm.png", 
@@ -20468,8 +20468,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            -1632.1652000000006, 
-                            -51.508799999999781
+                            -1481.4510000000002, 
+                            -402.14999999999992
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/zombie-spawm.png", 
@@ -20495,8 +20495,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            988.49301500000047, 
-                            60.011405000000039
+                            992.37100000000032, 
+                            -17.674999999999812
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/item-spawn.png", 
@@ -20513,8 +20513,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            -1119.7372000000005, 
-                            25.595400000000101
+                            572.74400000000026, 
+                            -15.477999999999813
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/item-spawn.png", 
@@ -20531,8 +20531,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            602.49110000000007, 
-                            25.595400000000101
+                            579.33500000000026, 
+                            -1441.3310000000001
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/item-spawn.png", 
@@ -20549,8 +20549,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            616.82872200000031, 
-                            -1503.8747110000008
+                            1418.5890000000004, 
+                            -1588.5300000000002
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/item-spawn.png", 
@@ -20567,8 +20567,8 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            1456.6934880000008, 
-                            -1634.198554000001
+                            -1105.7640000000001, 
+                            -39.644999999999818
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/item-spawn.png", 
@@ -20588,6 +20588,42 @@
             "z": 5, 
             "data": {
                 "sprites": [
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            951.6700000000003, 
+                            -1952.2800000000004
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/waypoint.png", 
+                        "rect": [
+                            1204, 
+                            658, 
+                            40, 
+                            40
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            -59.737270000000336, 
+                            -1585.4842300000005
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/waypoint.png", 
+                        "rect": [
+                            1476, 
+                            1162, 
+                            40, 
+                            40
+                        ]
+                    }, 
                     {
                         "opacity": 255, 
                         "scale": 1, 
@@ -20620,42 +20656,6 @@
                         "rect": [
                             1476, 
                             1162, 
-                            40, 
-                            40
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            -59.737270000000336, 
-                            -1585.4842300000005
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/waypoint.png", 
-                        "rect": [
-                            1476, 
-                            1162, 
-                            40, 
-                            40
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            951.6700000000003, 
-                            -1952.2800000000004
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/waypoint.png", 
-                        "rect": [
-                            1204, 
-                            658, 
                             40, 
                             40
                         ]
@@ -21215,24 +21215,6 @@
                         "z": 0, 
                         "label": null, 
                         "position": [
-                            1287.9800000000002, 
-                            -1771.4500000000005
-                        ], 
-                        "rotation": 0, 
-                        "filename": "newtiles/piso_camino.png", 
-                        "rect": [
-                            399, 
-                            525, 
-                            128, 
-                            128
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
                             1031.9800000000002, 
                             -2155.4500000000007
                         ], 
@@ -21253,6 +21235,24 @@
                         "position": [
                             1031.9800000000002, 
                             -2027.4500000000005
+                        ], 
+                        "rotation": 0, 
+                        "filename": "newtiles/piso_camino.png", 
+                        "rect": [
+                            399, 
+                            525, 
+                            128, 
+                            128
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            1287.9800000000002, 
+                            -1771.4500000000005
                         ], 
                         "rotation": 0, 
                         "filename": "newtiles/piso_camino.png", 
@@ -21382,6 +21382,24 @@
                 "sprites": [
                     {
                         "opacity": 255, 
+                        "scale": 1, 
+                        "z": 0, 
+                        "label": null, 
+                        "position": [
+                            438.06269999999995, 
+                            191.78949999999963
+                        ], 
+                        "rotation": -90, 
+                        "filename": "newtiles/luz_ventana.png", 
+                        "rect": [
+                            936, 
+                            0, 
+                            520, 
+                            520
+                        ]
+                    }, 
+                    {
+                        "opacity": 255, 
                         "scale": 1.3923445320585912, 
                         "z": 0, 
                         "label": null, 
@@ -21498,24 +21516,6 @@
                             -482.21050000000037
                         ], 
                         "rotation": -180, 
-                        "filename": "newtiles/luz_ventana.png", 
-                        "rect": [
-                            936, 
-                            0, 
-                            520, 
-                            520
-                        ]
-                    }, 
-                    {
-                        "opacity": 255, 
-                        "scale": 1, 
-                        "z": 0, 
-                        "label": null, 
-                        "position": [
-                            438.06269999999995, 
-                            191.78949999999963
-                        ], 
-                        "rotation": -90, 
                         "filename": "newtiles/luz_ventana.png", 
                         "rect": [
                             936, 

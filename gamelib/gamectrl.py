@@ -23,11 +23,11 @@ class KeyGameCtrl(Layer):
             self.game_layer.player.acceleration= -1
             self.game_layer.player.play_anim('walk')
 
-##         if k in [key.RIGHT, key.D]:
-##             self.game_layer.player.strafe_speed = 1
+        if k in [key.RIGHT, key.D]:
+            self.game_layer.player.strafe_speed = 1
 
-##         if k in [key.LEFT, key.A]:
-##             self.game_layer.player.strafe_speed = -1
+        if k in [key.LEFT, key.A]:
+            self.game_layer.player.strafe_speed = -1
 
         if k == key.R:
             x, y = self.game_layer.player.position
