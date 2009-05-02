@@ -1,8 +1,10 @@
 #summary claudio .plan and status
 
-status: jodido, trunk esta roto para mi. me desconectaron wallmask.<br>
-<br>
-buscando la rev donde se rompio<br> 
+status: 
+solucionado win crash<br>
+viendo como quedo wallmask para seguir con waypointing<br>
+
+ 
 
 = Introduction =
 
