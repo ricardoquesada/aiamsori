@@ -14375,14 +14375,6 @@
         }, 
         {
             "layer_type": "sprite", 
-            "z": 3, 
-            "data": {
-                "sprites": []
-            }, 
-            "label": "lights"
-        }, 
-        {
-            "layer_type": "sprite", 
             "z": 4, 
             "data": {
                 "sprites": [

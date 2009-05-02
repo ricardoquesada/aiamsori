@@ -45,7 +45,6 @@ class Agent(Sprite):
         self.position = position
 
         # check collisions with static objects
-
         if not self.game_layer.is_empty(*self.position):
             self.x = self.old_position[0]
             if not self.game_layer.is_empty(*self.position):

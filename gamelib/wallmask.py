@@ -1,43 +1,21 @@
 
 
 class WallMask(object):
-    def __init__(self,fname,tilesize):
-        self.fname = fname
-        self.tilesize = float(tilesize) # square
-        self.wallmask = {}
+    def __init__(self):
+        self.tilesize = 20
+        self.wallmask = set()
 
     def add(self,sprite): #only if apropiate
-        if sprite.path!=self.fname: #TODO: verify adjust OS compatibility
-            return
-        if ((sprite.width!=self.tilesize) or
-            (sprite.height!=self.tilesize)):
-            print '*** Unexpected : wall tile is not square!!!'
-        key = int(sprite.x/self.tilesize),int(sprite.y/self.tilesize)
-        print "added", key
-        self.wallmask[key]=1
+        padding = 2
+        sx = (sprite.x - sprite.width/2)/self.tilesize - padding
+        sy = (sprite.y - sprite.height/2)/self.tilesize - padding
+        for x in range(sprite.width/self.tilesize+1 + padding*2):
+            for y in range(sprite.height/self.tilesize+1 + padding*2):
+                key = int(sx+x),int(sy+y)
+                self.wallmask.add(key)
 
-    def _fill_gaps(self): # asumes no holes
-        #calc bounds
-        xs = [ x for x,y in self.wallmask]
-        ys = [ y for x,y in self.wallmask]
-        min_x = min(xs)
-        max_x = max(xs)
-        min_y = min(ys)
-        max_y = max(ys)
-
-        for x in xrange(min_x,max_x):
-            for y in xrange(min_y,max_y):
-                if (x,y) in self.wallmask:
-                    pass
-                else:
-                    self.wallmask[x,y]=0
-
-    def get_mask(self):
-        self._fill_gaps()
-        return self.wallmask
 
     def is_empty(self,x,y):
         key = (int(x/self.tilesize),int(y/self.tilesize))
-        result = not ((key in self.wallmask) and self.wallmask[key])
-        print "result wallmask", result, key
+        result = not key in self.wallmask
         return result

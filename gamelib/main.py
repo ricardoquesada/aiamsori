@@ -39,7 +39,7 @@ from walls import create_wall_layer
 import talk
 import gamehud
 import sound
-import light
+from light import Light
 from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
 from gamectrl import MouseGameCtrl, KeyGameCtrl
 from wallmask import WallMask
@@ -75,6 +75,7 @@ def main():
     pyglet.resource.reindex()
 
     #Load avbin
+
 #    avbin.init_avbin() #warn: if uncomented windows crash
 
     try:
@@ -179,7 +180,7 @@ class GameLayer(Layer):
         self.map_node = LayersNode()
         self.projectiles = []
         self.dead_items = set()
-        self.wallmask = WallMask('newtiles/pared.png',64) # UPDATE!
+        self.wallmask = WallMask()
         self.agents_node = LayersNode()
 
         # get layers from map
@@ -219,7 +220,7 @@ class GameLayer(Layer):
                 if layer_label in ['waypoints']:
                     waypoints = sprite_layer
                 if layer_label in ['lights']:
-                    self.lights = sprite_layer
+                    self.lights = Light(sprite_layer)
 
 
         # create collision shapes
@@ -465,6 +466,8 @@ class GameLayer(Layer):
 
         # clear out any dead items
         self._remove_dead_items()
+        if hasattr(self, "lights"):
+            self.lights.update(dt)
 
 
     def add_projectile(self, projectile):
