@@ -112,13 +112,13 @@ def main():
     #director.run(main_scene)
     director.run(first_scene)
 
-class LightLayer(cocos.cocosnode.CocosNode):
+class LightLayer(cocos.batch.BatchNode):
     def __init__(self):
         super(LightLayer, self).__init__()
-        self.sprite = Sprite('light.png')
-        self.sprite.position = -0,-800
-        self.sprite.scale = 1.5
-        self.add(self.sprite)
+        #self.sprite = Sprite('light.png')
+        #self.sprite.position = -0,-800
+        #self.sprite.scale = 1.5
+        #self.add(self.sprite)
 
 
 def make_sprites_layer(layer_data, atlas):
@@ -215,6 +215,9 @@ class GameLayer(Layer):
                     item_spawn = sprite_layer
                 if layer_label in ['waypoints']:
                     waypoints = sprite_layer
+                if layer_label in ['lights']:
+                    self.lights = sprite_layer
+
 
         # create collision shapes
         collision_layer = self._create_collision_layer(collision_layers)
@@ -419,7 +422,7 @@ class GameLayer(Layer):
         x, y = director.get_window_size()
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
-        self.lights.sprite.position = self.player.position
+        #self.lights.sprite.position = self.player.position
         # clear out any non-collisioned bullets
         self._remove_bullets()
 

@@ -71,6 +71,8 @@ class BatchNode( cocosnode.CocosNode ):
 
     def visit(self):
         """ All children are placed in to self.batch, so nothing to visit """
+        if not self.visible:
+            return
         glPushMatrix()
         self.transform()
         self.batch.draw()
@@ -121,4 +123,3 @@ class BatchableNode( cocosnode.CocosNode ):
             self.group = group
         for childZ, child in self.children:
             child.set_batch(self.batch, groups, z + childZ)
-
