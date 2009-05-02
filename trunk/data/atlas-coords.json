@@ -53,6 +53,12 @@
         258, 
         302
     ], 
+    "newtiles/waypoint.png": [
+        1204, 
+        658, 
+        40, 
+        40
+    ], 
     "newtiles/zombie-spawm.png": [
         1191, 
         0, 
