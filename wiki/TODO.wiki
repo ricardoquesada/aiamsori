@@ -22,8 +22,8 @@ AI:
   * que los zombies vayan a lugares que hacen sentido -> claudio, leer mas abajo
 
 COLLISION:
-  * correcta colisiones entre distintos shapes (ricardo)
-  * colisión de rayos para line-of-sight (ricardo)
+  ~~* correcta colisiones entre distintos shapes (ricardo)~~
+  ~~* colisión de rayos para line-of-sight (ricardo)~~
   * colisión de balas para disparar (ricardo)
 
 GAMEPLAY:
