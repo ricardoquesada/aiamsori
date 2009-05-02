@@ -53,6 +53,8 @@ ZOMBIE_WAVE_COUNT = 5
 ZOMBIE_WAVE_DURATION = 60
 
 RANDOM_DELTA = 70
+UNKNOWN_ITEM_PROBABILTY = 0.1
+UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
 
@@ -234,9 +236,16 @@ class GameLayer(Layer):
 
         self.add(self.agents_node, z=1)
 
+        # talk queue
+        self.hud = hud
+        self.talk_layer = talk.TalkLayer()
+        self.hud.add(self.talk_layer, z=10)
+        self.talk("Dad", "DAMN ZOMBIES!!!! Where's my shotgun!!!")
+        #self.talk("Dad", "hello hello hello"*5)
+        #self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
+
         # create agents (player and NPCs)
         self._create_agents()
-        self.setup_powerups(item_spawn)
         self.setup_waypoints(waypoints)
 
         x, y = director.get_window_size()
@@ -261,13 +270,8 @@ class GameLayer(Layer):
             wpts = [ (s.x,s.y) for s in waypoints.get_children()] #Esta bien asi Lucio?
             # a seguir
 
-        # talk queue
-        self.hud = hud
-        self.talk_layer = talk.TalkLayer()
-        self.hud.add(self.talk_layer, z=10)
-        self.talk("Dad", "hello hello hello"*5)
-        self.talk("Dad", "hello hello hello"*5)
-        self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
+        self.setup_powerups(item_spawn)
+
         self.flicker()
 
     def flicker(self):
@@ -363,16 +367,34 @@ class GameLayer(Layer):
         self.spawn_powerup()
 
     def spawn_powerup(self):
-        delay = random.randrange(1, 30)
-        print 'DELAY', delay
-        self.do(Delay(delay))
-        position = random.choice(self.item_spawn)
-        type = random.choice(['bullets', 'life'])
-        powerup = PowerUp(type, position, self)
-        self.agents_node.add(powerup)
-        print "powerup ", powerup, 'at', position
-        #print "powerup position", position
-        #self.do( Delay(self.powerup_interval)+CallFunc(self.spawn_powerup))
+        def _spawn_powerup():
+            position = random.choice(self.item_spawn)
+            type = random.choice(['bullets', 'life'])
+            powerup = PowerUp(type, position, self)
+            self.agents_node.add(powerup)
+            if type == 'life':
+                item = 'food'
+            elif type == 'bullets':
+                item = 'ammo'
+            if random.random() < UNKNOWN_ITEM_PROBABILTY:
+                item = ''
+            place = powerup.label if hasattr(powerup, 'label') else ''
+            if random.random() < UNKNOWN_PLACE_PROBABILTY:
+                place = ''
+            msg = "I think I remember seeing "
+            if item:
+                msg += item 
+            else:
+                msg += 'something'
+            if place:
+                msg += " in the %s." % place
+            else:
+                msg += ' somewhere.'
+            self.talk("Dad", msg, transient=False)
+            #print "powerup ", powerup, 'at', place, position
+
+        delay = random.randrange(10, 30)
+        self.do(Delay(delay) + CallFunc(_spawn_powerup))
 
     def respawn_zombies(self, dt):
         self.z_spawn_lifetime += dt
@@ -419,6 +441,12 @@ class GameLayer(Layer):
         # create agent sprite
         father = Father(self, get_animation('father_idle'), (0,-800))
         self.player = father
+        self.hud.set_life(father.life)
+        if hasattr(father.weapon, 'ammo'):
+            self.hud.set_bullets(father.weapon.ammo)
+        else:
+            # fist weapon has no bullets
+            self.hud.set_bullets(0)
         self.agents_node.add(father)
         ###collision_layer.add(father, static=father.shape.static)
 
