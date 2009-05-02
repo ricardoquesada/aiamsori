@@ -489,7 +489,8 @@ class GameLayer(Layer):
         ###collision_layer = self.map_node.get('collision')
         for item in self.dead_items:
             ###collision_layer.remove(item, static=item.shape.static)
-            self.agents_node.remove(item)
+            if item in self.agents_node:
+                self.agents_node.remove(item)
         self.dead_items.clear()
 
     def is_clear_path(self, origin, target):
