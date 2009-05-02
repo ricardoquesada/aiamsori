@@ -711,6 +711,8 @@ class Bullet(Sprite):
         # FIXME: this goes away as soon as bullets collide agains walls
 ##         if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
 ##             self.hit()
+        if not self.player.game_layer.is_empty(*self.position):
+            self.hit()
 
     def update_position(self, position):
         self.position = position
