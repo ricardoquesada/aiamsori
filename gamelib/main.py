@@ -276,7 +276,7 @@ class GameLayer(Layer):
         light = random.choice(self.lights.get_children())
 
         turn_on = CallFunc(lambda: setattr(light, "opacity", 255))
-        turn_off = CallFunc(lambda: setattr(light, "opacity", 0))
+        turn_off = CallFunc(lambda: setattr(light, "opacity", 50))
         for i in range(random.randint(5, 10)):
             micro_delay = random.random()*0.10
             micro_delay2 = random.random()*0.10
