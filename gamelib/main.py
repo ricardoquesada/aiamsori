@@ -485,6 +485,14 @@ class GameLayer(Layer):
             waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
             delay = WAVE_DELAY[ waveno ]
             if self.z_spawn_lifetime >= delay:
+                # we have a zombie wave
+                msg = random.choice([
+                    "cerebroooo.....",
+                    "brraaaaaiins....",
+                    "arrghhhhh....",
+                    "me hungry!"
+                ])
+                self.talk("zombie", msg)
                 for i in range(WAVE_NUM[ waveno ]):
                     for c in self.zombie_spawn.get_children():
                         z = Zombie(self, get_animation('zombie1_idle'), self.player)

@@ -458,10 +458,14 @@ class ZombieBoid(Agent):
 
     def on_enter(self):
         super(ZombieBoid, self).on_enter()
-        self.target = random.choice(
-            [ p for p in self.parent.get_children() if isinstance(p, Family) ]
-        )
-        #self.target = self.player
+        family = [ p for p in self.parent.get_children() if isinstance(p, Family) ]
+        if family:
+            self.target = random.choice(
+                family
+            )
+        else:
+            self.target = self
+        self.target = self.player
 
     def update(self, dt):
         # save old position
