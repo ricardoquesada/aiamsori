@@ -39,9 +39,9 @@ class TalkLayer(cocos.layer.Layer):
         self.add(face)
         face.position = face.image.width*face.scale/2, y - face.image.height * face.scale/2
 
-        balloon_l = Sprite('faces/balloon-left.png')
-        balloon_r = Sprite('faces/balloon-right.png')
-        balloon_c = Sprite('faces/balloon-center.png')
+        balloon_l = Sprite('faces/balloon-left.png', opacity=127)
+        balloon_r = Sprite('faces/balloon-right.png', opacity=127)
+        balloon_c = Sprite('faces/balloon-center.png', opacity=127)
 
         self.add(balloon_l)
         self.add(balloon_c)
