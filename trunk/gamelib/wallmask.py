@@ -2,7 +2,7 @@
 from math import floor
 
 
-class MaskWall(object):
+class WallMask(object):
     def __init__(self,fname,tilesize):
         self.fname = fname
         self.tilesize = float(tilesize) # square
