@@ -1,6 +1,6 @@
 #summary claudio .plan and status
 
-status: 
+status: durmiendo<br> 
 solucionado win crash<br>
 viendo como quedo wallmask para seguir con waypointing<br>
 
