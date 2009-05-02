@@ -191,7 +191,9 @@ class ImageLayer(Layer):
             s.position = self.w / 2, self.h / 2
             s.do(Hide())
         
-        texts = ['aiamsori productions presents...', 'Mom...', 'Bee...', 'Zack...', 'and Dad!', 'in', 'Zombies Galore']                
+        # grossini abajo a la izquierda
+        grossini.position = self.w - grossini.image.width, grossini.image.height
+        texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']                
         labels = []
         for t in texts:
             l = Label(t, font_name='Times New Roman', font_size=52, bold=True)
