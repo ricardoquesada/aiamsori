@@ -1,5 +1,8 @@
-#summary One-sentence summary of this page.
-claudio .plan
+#summary claudio .plan and status
+
+status: jodido, trunk esta roto para mi. me desconectaron wallmask.<br>
+<br>
+buscando la rev donde se rompio<br> 
 
 = Introduction =
 
