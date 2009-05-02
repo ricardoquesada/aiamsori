@@ -130,6 +130,7 @@ class Agent(Sprite):
         if self.just_born:
             self.old_position = position
 
+        is_family = isinstance(self, Relative)
         # check collisions with dynamic objects
         agents = self.parent.children
         collided = False
@@ -137,6 +138,13 @@ class Agent(Sprite):
             if agent is self: continue
             distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
             collision = distance <= COLLISION_DISTANCE_SQUARED
+
+            if is_family:
+                if isinstance(agent, Father):
+                    if distance > 1100**2:
+                        self.alone = True
+                    else:
+                        self.alone = False
 
 
             if collision:
@@ -417,6 +425,8 @@ class Relative(Family):
         self.updatecounter = 200
         self.mm = 0
         self.last_goal = 0
+        self.alone = False
+        self.last_alone = False
 
     def update(self, dt):
         # move to designated target or stay and fight
@@ -454,12 +464,31 @@ class Relative(Family):
         else:
             self.update_position(self.position)
 
+        if not self.last_alone and self.alone:
+            if random.random() < 0.10:
+                self.panic()
+        if not self.alone and self.last_alone:
+            print "NOT ALONE", self
+        self.last_alone = self.alone
+
         if self.position != self.old_position:
             self.play_anim('walk')
 
         else:
             if self.current_anim != 'idle':
                 self.play_anim('idle')
+
+    def panic(self):
+        self.target = random.choice(self.game_layer.waypoints_list)
+        message = random.choice([
+            "I'm scared!",
+            "Zombies are everywhere! HELP!",
+            "I need to run away!",
+            "No one is here to protect me!"
+
+        ])
+        self.game_layer.talk(self.name, message, transient=False, duration=2)
+
 
     def die(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase

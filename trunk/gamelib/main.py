@@ -60,7 +60,7 @@ UNKNOWN_ITEM_PROBABILTY = 0.1
 UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
-has_grabber = False
+has_grabber = True
 
 WAVE_DELAY = [20, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
 WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
@@ -179,7 +179,7 @@ class ImageLayer(Layer):
         self.w = x
         self.h = y
         self.state = 0
-        
+
         grossini = Sprite('data/img/grossini.png')
         mom = Sprite('data/img/Mom.png')
         bee = Sprite('data/img/Bee.png')
@@ -190,10 +190,11 @@ class ImageLayer(Layer):
             self.add(s)
             s.position = self.w / 2, self.h / 2
             s.do(Hide())
-        
+
         # grossini abajo a la izquierda
         grossini.position = self.w - grossini.image.width, grossini.image.height
         texts = ['aiamsori productions presents...', '', '', '', '', 'in', 'Zombies Galore']                
+
         labels = []
         for t in texts:
             l = Label(t, font_name='Times New Roman', font_size=52, bold=True)
@@ -202,19 +203,19 @@ class ImageLayer(Layer):
             labels.append(l)
             self.add(l, z=1)
             l.do(Hide())
-        
+
         delay = 1
         for l,s in zip(labels, sprites):
             l.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
             s.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
             delay += 5
-        
+
         labels[5].do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
         delay += 5
 
         self.borrar = labels + sprites
         self.do(Delay(delay), CallFunc(self.on_key_press, [self, 0,0], {}))
-        
+
     def on_key_press(self, k, m):
         print "aprento una tecla"
         if self.state == 0:
@@ -225,14 +226,14 @@ class ImageLayer(Layer):
             labelkey.element.color = 40,179,75,180
             self.add(labelkey, z=1)
             labelkey.do(Hide())
-                
+
             bg = Sprite('data/img/ppl.png')
             self.add(bg)
             bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
             labelkey.do(Delay(10) + Show() + FadeIn(2))
-        
+
             self.state = 1
-        else:        
+        else:
             director.replace(get_game_scene())
 
 class GameOverLayer(Layer):
@@ -476,7 +477,8 @@ class GameLayer(Layer):
 
             gl.glPopAttrib()
             gl.glDisable(self.texture.target)
-	except pyglet.gl.GLException:
+        except pyglet.gl.GLException:
+            print "***"*1000, "nograbber"
             self.has_grabber = False
 
 
@@ -486,7 +488,7 @@ class GameLayer(Layer):
 
     def setup_waypoints(self, layer):
         print "Setting up navigation..."
-        points = [ c.position for c in layer.get_children() ]
+        self.waypoints_list = points = [ c.position for c in layer.get_children() ]
         def is_visible(p, q):
             if p == q:
                 return True
