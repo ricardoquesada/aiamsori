@@ -194,13 +194,12 @@ class ImageLayer(Layer):
 
         # grossini abajo a la izquierda
         grossini.position = self.w - grossini.image.width, grossini.image.height
-        texts = ['aiamsori productions presents...', '', '', '', '','and the neighbours','', 'in',]
+        #texts = ['aiamsori productions presents...', '', '', '', '','and the neighbours','', 'in',]
+        texts = ['productions.png'] + ['none.png'] * 4 + ['neigs.png', 'none.png', 'in.png']
         labels = []
         for t in texts:
-            l = Label(t, font_name='Times New Roman', font_size=52, bold=True,
-                      anchor_x='center', anchor_y='center')
+            l = Sprite(os.path.join('data', 'img', t))
             l.position = self.w / 2, self.h / 2
-            l.element.color = 255,255,255,255
             labels.append(l)
             self.add(l, z=1)
             l.do(Hide())
@@ -234,11 +233,8 @@ class ImageLayer(Layer):
             s.do(Delay(delay) + Show() + FadeIn(0.3) + Delay(0.3) + FadeOut(0.3))
             delay += 0.7
 
-
-
-
         self.borrar = labels + sprites
-        self.do(Delay(delay+5.2) + CallFunc(lambda: self.goto_title()))
+        self.do(Delay(delay+3) + CallFunc(lambda: self.on_key_press(0,0)))
         sound.play_music("intro_music")
 
 #    def on_key_press(self, k, m):
