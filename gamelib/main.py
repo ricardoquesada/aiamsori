@@ -197,7 +197,8 @@ class GameLayer(Layer):
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_T, pyglet.gl.GL_CLAMP_TO_EDGE )
 
         self.show_fire_frames = 0
-        self.fire_light = Sprite("data/newtiles/light.png")
+        self.fire_light = Sprite("data/newtiles/luz_escopeta.png")
+        self.fire_light.scale = 3
         self.fire_lights.add(self.fire_light)
 
         layers = simplejson.load(open(mapfile))['layers']
@@ -482,6 +483,7 @@ class GameLayer(Layer):
 
         self.fire_light.x = self.player.x
         self.fire_light.y = self.player.y
+        self.fire_light.rotation = self.player.rotation
         self.show_fire_frames = 3
 
     def remove_projectile(self, projectile):
