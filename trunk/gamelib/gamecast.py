@@ -85,27 +85,28 @@ class Agent(Sprite):
                 self.y += random.random() * 40 - 20
                 return
 
+        if self.just_born:
+            self.old_position = position
 
         # check collisions with dynamic objects
         agents = self.parent.children
+        collided = False
         for z, agent in agents:
             if agent is self: continue
             distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
             collision = distance <= COLLISION_DISTANCE_SQUARED
+
+
             if collision:
-                if not isinstance(self, ZombieBoid):
-                    print "Colisione", self.__class__
-                #print self, 'COLLISION', agent
+                collided = True
                 # objects collided
                 if self.just_born:
-                    print 'newborn collision', self.position
                     ###distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
                     ###collision = distance <= COLLISION_DISTANCE_SQUARED
                     ###while collision:
                     self.x += random.choice([-1,1])*RANDOM_DELTA
                     self.y += random.choice([-1,1])*RANDOM_DELTA
                     self.position = (self.x, self.y)
-                    self.target = self.position
                     ###self.just_born = False
                     return
 
@@ -126,10 +127,10 @@ class Agent(Sprite):
                 #    collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
                 #    if collision:
                 #        self.position = self.old_position
-            else:
-                if self.just_born:
-                    print "just_born to False"
-                    self.just_born = False
+
+        if not collided:
+            if self.just_born:
+                self.just_born = False
 
 
 
@@ -452,7 +453,7 @@ class ZombieBoid(Agent):
         self.target = random.choice(
             [ p for p in self.parent.get_children() if isinstance(p, Family) ]
         )
-        self.target = self.player
+        #self.target = self.player
 
     def update(self, dt):
         # save old position
