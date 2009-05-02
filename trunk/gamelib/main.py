@@ -15,6 +15,7 @@ import optparse
 import avbin
 
 from pyglet import gl, font
+from pyglet.window import key
 
 import cocos
 from cocos import euclid
@@ -61,9 +62,41 @@ UNKNOWN_ITEM_PROBABILTY = 0.1
 UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
+has_grabber = False
 
 WAVE_DELAY = [20, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
 WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
+
+def get_intro_scene():
+    x,y = director.get_window_size()
+    image_layer = ImageLayer(x,y)
+    scene = Scene()
+    scene.add(image_layer)
+    return scene
+
+def get_game_scene():
+    global has_grabber
+    # create game scene
+    hud_layer = gamehud.HudLayer()
+    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
+
+    scene = Scene()
+    scene.add(game_layer)
+    scene.add(hud_layer, z = 1)
+    if options.wpt_on:
+        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
+    else:
+        from gamectrl import MouseGameCtrl, KeyGameCtrl
+    scene.add(KeyGameCtrl(game_layer))
+    scene.add(MouseGameCtrl(game_layer))
+
+    return scene
+
+def get_end_scene():
+    scene = Scene()
+    scene.add(GameOverLayer())
+    return scene
+
 
 def main():
     # make available options
@@ -108,31 +141,15 @@ def main():
     #director.init(fullscreen=True)
     director.init(options.width, options.height, resizable=True)
     sound.init()
-    # create game scene
-    hud_layer = gamehud.HudLayer()
-    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
-#    game_layer.position = (400, 300)
-    x,y = director.get_window_size()
-    image_layer = ImageLayer(x,y)
 
     director.set_3d_projection()
 #    director.set_2d_projection()
 
-    main_scene = Scene()
-    first_scene = Scene()
-    first_scene.add(image_layer)
-    image_layer.next = (director, main_scene)   #ugly?.. WHO CARES!
-    main_scene.add(game_layer)
-    main_scene.add(hud_layer, z = 1)
-    if options.wpt_on:
-        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
-    else:
-        from gamectrl import MouseGameCtrl, KeyGameCtrl
-    main_scene.add(KeyGameCtrl(game_layer))
-    main_scene.add(MouseGameCtrl(game_layer))
-
-    director.run(main_scene)
-    #director.run(first_scene)
+    # FIXME: transition between scenes are not working
+    scene = get_intro_scene()
+    #scene = get_game_scene()
+    #scene = get_end_scene()
+    director.run(scene)
 
 
 def make_sprites_layer(layer_data, atlas):
@@ -231,10 +248,10 @@ class GameLayer(Layer):
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
-            self.fire_lights = Layer()
 
             self.grabber = framegrabber.TextureGrabber()
             self.grabber.grab(self.texture)
+
         self.map_node = LayersNode()
         self.projectiles = []
         self.dead_items = set()
@@ -257,6 +274,7 @@ class GameLayer(Layer):
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_T, pyglet.gl.GL_CLAMP_TO_EDGE )
 
         self.show_fire_frames = 0
+        self.fire_lights = Layer()
         self.fire_light = Sprite("data/newtiles/luz_escopeta.png")
         self.fire_light.scale = 1
         self.fire_lights.add(self.fire_light)
@@ -369,51 +387,54 @@ class GameLayer(Layer):
         #do lights
 
         # before render
+        try:
 
-        # capture before drawing
-        self.grabber.before_render(self.texture)
+            # capture before drawing
+            self.grabber.before_render(self.texture)
 
-        # render scene
-        super(GameLayer, self).visit()
+            # render scene
+            super(GameLayer, self).visit()
 
-        # psot render
-        # capture after drawing
-        self.grabber.after_render(self.texture)
+            # psot render
+            # capture after drawing
+            self.grabber.after_render(self.texture)
 
-        ambient = 0.1
-        gl.glClearColor(ambient,ambient,ambient,ambient)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-        # after render
-        # blit lights
-        pyglet.gl.glPushMatrix()
-        self.transform()
-        #pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
-        #gl.glBlendFunc( gl.GL_ONE, gl.GL_ONE );
-        #gl.glBlendEquation(gl.GL_MAX);
+            ambient = 0.1
+            gl.glClearColor(ambient,ambient,ambient,ambient)
+            gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+            # after render
+            # blit lights
+            pyglet.gl.glPushMatrix()
+            self.transform()
+            #pyglet.gl.glEnable(pyglet.gl.GL_BLEND)
+            #gl.glBlendFunc( gl.GL_ONE, gl.GL_ONE );
+            #gl.glBlendEquation(gl.GL_MAX);
 
-        self.lights.visit()
-        if self.show_fire_frames > 0:
-            self.fire_lights.visit()
-            self.show_fire_frames -= 1
+            self.lights.visit()
+            if self.show_fire_frames > 0:
+                self.fire_lights.visit()
+                self.show_fire_frames -= 1
 
-        gl.glPopMatrix()
+            gl.glPopMatrix()
 
-        gl.glBlendFunc( gl.GL_DST_COLOR, gl.GL_ONE_MINUS_SRC_ALPHA );
-        gl.glBlendEquation(gl.GL_FUNC_ADD);
+            gl.glBlendFunc( gl.GL_DST_COLOR, gl.GL_ONE_MINUS_SRC_ALPHA );
+            gl.glBlendEquation(gl.GL_FUNC_ADD);
 
-        #gl.glBlendFunc( gl.GL_DST_COLOR, gl.GL_ONE_MINUS_SRC_ALPHA );
-        #gl.glBlendEquation(gl.GL_FUNC_ADD);
+            #gl.glBlendFunc( gl.GL_DST_COLOR, gl.GL_ONE_MINUS_SRC_ALPHA );
+            #gl.glBlendEquation(gl.GL_FUNC_ADD);
 
-        # blit
-        gl.glEnable(self.texture.target)
-        gl.glBindTexture(self.texture.target, self.texture.id)
+            # blit
+            gl.glEnable(self.texture.target)
+            gl.glBindTexture(self.texture.target, self.texture.id)
 
-        gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
+            gl.glPushAttrib(gl.GL_COLOR_BUFFER_BIT)
 
-        self.texture.blit(0,0)
+            self.texture.blit(0,0)
 
-        gl.glPopAttrib()
-        gl.glDisable(self.texture.target)
+            gl.glPopAttrib()
+            gl.glDisable(self.texture.target)
+	except pyglet.gl.GLException:
+            self.has_grabber = False
 
 
     def on_key_press( self, symbol, modifiers ):
@@ -650,6 +671,9 @@ class GameLayer(Layer):
     def is_empty(self,x,y):
         # note: ATM only walls, not muebles
         return self.wallmask.is_empty(x,y)
+
+    def game_over(self):
+        director.replace(get_end_scene())
 
 
 
