@@ -182,6 +182,16 @@ class Family(Agent):
         self.add_gore(Blood, other, duration=.5)
         return False
 
+    def on_collision(self, other):
+        super(Family, self).on_collision(other)
+        if isinstance(other, PowerUp):
+            hud = self.game_layer.hud
+            if other.type == POWERUP_TYPE_LIFE:
+                self.life += POWERUP_LIFE
+                if self.life > PLAYER_MAX_LIFE:
+                    self.life = PLAYER_MAX_LIFE
+                hud.set_life(self.name, self.life)
+
 class Father(Family):
     name = "Dad"
     def __init__(self, game_layer, img, position):
