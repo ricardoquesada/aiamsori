@@ -176,9 +176,7 @@ class WaypointNav:
 
         #choose the best combo
         d, i, j = self.best_pair( a, candidates_a, b, candidates_b)
-        print "dij", d, i, j
         #advance in the waypoint route to b while waypoint is visible
-        print "PATH", self.get_path_indexed(i, j)
         while 1:
             last_visible = i
             i = self._next_waypoint(i,j)
