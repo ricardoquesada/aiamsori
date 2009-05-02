@@ -80,3 +80,7 @@ class MouseGameCtrl(Layer):
                     mouse_over = (px-x)**2+(py-y)**2 < 100**2
                     if mouse_over:
                         self.game_layer.player.selected_relative = relative
+
+        ## test for is empty, cambien el button cuando quieran(pero avisen)
+        if button ==1:
+            print '** is_empty:',self.game_layer.is_empty(px,py)
