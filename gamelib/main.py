@@ -222,7 +222,6 @@ class ImageLayer(Layer):
                 'img/Punkie zombie.png',
                 'img/Afro zombie.png',
                 'img/Fat zombie byn.png',
-                'img/Maicol zombie.png',
                 'img/Bitch zombie.png',
                 ]:
             s = Sprite(zf)
@@ -232,7 +231,7 @@ class ImageLayer(Layer):
             zombies.append(s)
 
         for s in zombies:
-            s.do(Delay(delay) + Show() + FadeIn(0.2) + Delay(0.3) + FadeOut(0.2))
+            s.do(Delay(delay) + Show() + FadeIn(0.3) + Delay(0.3) + FadeOut(0.3))
             delay += 0.7
 
 
@@ -291,6 +290,7 @@ class GameOverLayer(Layer):
         sound.play("MusicEnd")
 
     def on_key_press(self, k, m):
+        sound.stop_music()
         if k == key.Y:
             game_scene = get_game_scene()
             director.replace(game_scene)
@@ -658,7 +658,7 @@ class GameLayer(Layer):
         sound.play('zombie_eat')
 
         self.do( Delay(3) + CallFunc(lambda: sound.stop_music()) +
-                CallFunc(lambda: sound.play_music('game_music')) )
+                CallFunc(lambda: sound.play_music('game_music', 0.25)) )
 
         #self.light.set_position(x/2, y/2)
         #self.light.enable()
@@ -668,6 +668,7 @@ class GameLayer(Layer):
         super(GameLayer, self).on_exit()
         #self.light.disable()
         self.lights.on_exit()
+        sound.stop_music()
 
 
 
@@ -675,7 +676,7 @@ class GameLayer(Layer):
         # get collision layer
 
         # create agent sprite
-        father = Father(self, get_animation('father_idle'), (40,-700))
+        father = Father(self, get_animation('father_idle'), (40,-900))
         father.rotation = 90
         self.player = father
         self.hud.set_life("Dad", father.life)
@@ -689,16 +690,16 @@ class GameLayer(Layer):
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
         if not options.wpt_on:
-            position = 40, -1000
+            position = 40, -1200
             boy = Boy(self, get_animation('boy_idle'), position, self.player)
             boy.rotation = -90
             self.agents_node.add(boy)
 
-            position = -100, -850
+            position = -100, -1050
             girl = Girl(self, get_animation('girl_idle'), position, self.player)
             self.agents_node.add(girl)
 
-            position = 180, - 850
+            position = 180, - 1050
             mother = Mother(self, get_animation('mother_idle'), position, self.player)
             mother.rotation = 180
             self.agents_node.add(mother)

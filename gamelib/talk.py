@@ -50,7 +50,6 @@ class TalkLayer(cocos.layer.Layer):
                 'faces/Punkie zombie.png',
                 'faces/Afro zombie.png',
                 'faces/Fat zombie byn.png',
-                'faces/Maicol zombie.png',
                 'faces/Bitch zombie.png',
             ])
             face = Sprite(img)
