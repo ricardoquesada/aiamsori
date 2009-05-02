@@ -13,6 +13,7 @@ import sys
 import random
 import optparse
 import avbin
+import time
 
 from pyglet import gl, font
 from pyglet.window import key
@@ -63,8 +64,8 @@ UNKNOWN_PLACE_PROBABILTY = 0.1
 options = None
 has_grabber = True
 
-WAVE_DELAY = [30, 30, 25, 25, 20, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11]
-WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  3, 3, 3, 3, 4, 4, 4]
+WAVE_DELAY = [15, 30, 25, 25, 20, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11]
+WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  2, 3, 3, 3, 4, 4, 4]
 
 PWUP_MIN_TIME = 10
 PWUP_MAX_TIME = 30
@@ -263,16 +264,18 @@ class ImageLayer(Layer):
             director.replace(get_game_scene())
             self.state = 2
 
+
 class GameOverLayer(Layer):
     is_event_handler = True
 
     def __init__(self):
         super(GameOverLayer, self).__init__()
         w, h = director.get_window_size()
-        label = Label('Game Over, you sucker...', font_name='youmurdererbb_reg', font_size=52, bold=True)
+        label = Label("You've lasted  %ds..." % director.return_value, font_name='youmurdererbb_reg', font_size=42, bold=True)
         label.position = w / 2 - 340 , h / 2 + 100
-        label.element.color = 40,179,75,180
-        label2 = Label('do you want to play again?', font_name='youmurderer', font_size=52, bold=True)
+#        label.element.color = 40,179,75,180
+        label.element.color = 255,255,255,255
+        label2 = Label('do you want to play again?', font_name='youmurderer', font_size=42, bold=True)
         label2.position = w / 2 - 420 , h / 2
         label2.element.color = 40,179,75,180
         label3 = Label('(Y/N)', font_name='youmurdererbb', font_size=52, bold=True)
@@ -648,6 +651,7 @@ class GameLayer(Layer):
             self.talk_layer.talk(who, what, duration=duration, transient=transient)
 
     def on_enter(self):
+        self.enter_time = time.time()
         super(GameLayer, self).on_enter()
         x, y = director.get_window_size()
         self.lights.on_enter()
@@ -656,11 +660,11 @@ class GameLayer(Layer):
         self.do( Delay(3) + CallFunc(lambda: sound.stop_music()) +
                 CallFunc(lambda: sound.play_music('game_music')) )
 
-
         #self.light.set_position(x/2, y/2)
         #self.light.enable()
 
     def on_exit(self):
+        print "Exiting GameLayer"
         super(GameLayer, self).on_exit()
         #self.light.disable()
         self.lights.on_exit()
@@ -752,6 +756,7 @@ class GameLayer(Layer):
         return self.wallmask.is_empty(x,y)
 
     def game_over(self):
+        director.return_value = time.time() - self.enter_time
         director.replace(get_end_scene())
 
 
