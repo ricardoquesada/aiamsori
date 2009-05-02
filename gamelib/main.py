@@ -234,7 +234,7 @@ class ImageLayer(Layer):
             delay += 0.7
 
         self.borrar = labels + sprites
-        self.do(Delay(delay+3) + CallFunc(lambda: self.on_key_press(0,0)))
+        self.do(Delay(delay+3) + CallFunc(lambda: self.goto_title()))
         sound.play_music("intro_music")
 
 #    def on_key_press(self, k, m):
