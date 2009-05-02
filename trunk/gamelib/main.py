@@ -118,7 +118,6 @@ def main():
 
     #Fonts stuff
     fonts_path = os.path.join(basepath, 'data/fonts')
-    print fonts_path
     font.add_directory(fonts_path)
 
     #Load avbin
