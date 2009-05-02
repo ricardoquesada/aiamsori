@@ -71,13 +71,14 @@ class Agent(Sprite):
 
         # check collisions with static objects
         if not self.game_layer.is_empty(*self.position):
-            self.x = self.old_position[0]
-            if not self.game_layer.is_empty(*self.position):
-                self.y = self.old_position[1]
-                self.x = position[0]
+            if not self.just_born:
+                self.x = self.old_position[0]
                 if not self.game_layer.is_empty(*self.position):
-                    self.position = self.old_position
-                    return
+                    self.y = self.old_position[1]
+                    self.x = position[0]
+                    if not self.game_layer.is_empty(*self.position):
+                        self.position = self.old_position
+                        return
 
         # check collisions with dynamic objects
         agents = self.parent.children
@@ -86,6 +87,8 @@ class Agent(Sprite):
             distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
             collision = distance <= COLLISION_DISTANCE_SQUARED
             if collision:
+                if not isinstance(self, ZombieBoid):
+                    print "Colisione", self.__class__
                 #print self, 'COLLISION', agent
                 # objects collided
                 if self.just_born:
@@ -95,7 +98,7 @@ class Agent(Sprite):
                     ###while collision:
                     self.x += random.choice([-1,1])*RANDOM_DELTA
                     self.y += random.choice([-1,1])*RANDOM_DELTA
-                    self.target = self.position = (self.x, self.y)
+                    self.position = (self.x, self.y)
                     self.target = self.position
                     ###self.just_born = False
                     return
@@ -119,6 +122,7 @@ class Agent(Sprite):
                 #        self.position = self.old_position
             else:
                 if self.just_born:
+                    print "just_born to False"
                     self.just_born = False
 
 

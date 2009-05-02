@@ -78,7 +78,7 @@ class MouseGameCtrl(Layer):
         py = py - self.game_layer.y
 
         ## select a relative or set target for the one already selected
-        if button == 4:
+        if button == 1:
             if self.game_layer.player.selected_relative:
                 self.game_layer.player.selected_relative.target = (px, py)
                 self.game_layer.player.selected_relative = None
@@ -91,5 +91,6 @@ class MouseGameCtrl(Layer):
                         self.game_layer.player.selected_relative = relative
 
         ## test for is empty, cambien el button cuando quieran(pero avisen)
-        if button ==1:
+        ## te aviso: lo cambie :P
+        if button == 4:
             print '** is_empty:',self.game_layer.is_empty(px,py)
