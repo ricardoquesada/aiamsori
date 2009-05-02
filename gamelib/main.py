@@ -23,9 +23,11 @@ from cocos.batch import BatchNode
 from cocos.scene import Scene
 from cocos.layer.base_layers import Layer
 from cocos.sprite import Sprite
-from cocos.scenes.transitions import ShuffleTransition as TransitionScene
+from cocos.scenes.transitions import TransitionScene
 from cocos.text import Label
 from cocos.sprite import Sprite
+from cocos.actions.instant_actions import Hide, Show
+from cocos.actions.interval_actions import Delay
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
 #from tiless_editor.layers.collision import CollisionLayer
@@ -155,10 +157,11 @@ class ImageLayer(Layer):
         bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
         self.add(bg)
 
-        label = Label('Press any key to start!', font_name='Times New Roman', font_size=32)
+        label = Label('Press any key to start!', font_name='Times New Roman', font_size=52)
         label.position = self.w / 2 ,10
-        label.element.color = 0,0,0,255
+        label.element.color = 0,0,0,180
         self.add(label, z=1)
+        label.do(Hide() + Delay(10) + Show())
 
     def on_key_press(self, k, m):
         print "aprento una tecla"
