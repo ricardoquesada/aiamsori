@@ -250,6 +250,7 @@ class GameLayer(Layer):
             self.grabber.grab(self.texture)
             print self.grabber
 
+
         self.map_node = LayersNode()
         self.projectiles = []
         self.dead_items = set()

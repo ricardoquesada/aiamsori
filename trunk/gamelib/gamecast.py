@@ -482,8 +482,7 @@ class ZombieBoid(Agent):
             )
         else:
             self.target = self
-        self.target = self.player
-
+        
     def update(self, dt):
         # save old position
         self._old_state = {'position': self.position, 'rotation': self.rotation}
