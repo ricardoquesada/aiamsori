@@ -155,12 +155,12 @@ class ImageLayer(Layer):
         super(ImageLayer, self).__init__()
         self.w = x
         self.h = y
-        bg = Sprite('data/img/ppl.jpg')
+        bg = Sprite('data/img/ppl.png')
         bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
         self.add(bg)
         
         label = Label('Press any key to start!', font_name='Times New Roman', font_size=32)
-        label.position = 0,0
+        label.position = self.w / 2 ,10
         label.element.color = 0,0,0,255
         self.add(label, z=1)
         
