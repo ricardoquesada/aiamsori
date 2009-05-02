@@ -1,6 +1,4 @@
 
-from math import floor
-
 
 class WallMask(object):
     def __init__(self,fname,tilesize):
@@ -14,7 +12,7 @@ class WallMask(object):
         if ((sprite.width!=self.tilesize) or
             (sprite.height!=self.tilesize)):
             print '*** Unexpected : wall tile is not square!!!'
-        self.wallmask[floor(sprite.x/self.tilesize),floor(sprite.y/self.tilesize)]=1
+        self.wallmask[int(sprite.x/self.tilesize),int(sprite.y/self.tilesize)]=1
 
     def _fill_gaps(self): # asumes no holes
         #calc bounds
@@ -37,8 +35,8 @@ class WallMask(object):
         return self.wallmask
 
     def is_empty(self,x,y):
-        key = (floor(x/self.tilesize),floor(y/tilesize))
-        return (key in self.wallmask) and self.wallmask(k)
+        key = (int(x/self.tilesize),int(y/self.tilesize))
+        return not ((key in self.wallmask) and self.wallmask[key])
 
 
 
