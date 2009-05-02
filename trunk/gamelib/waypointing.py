@@ -96,7 +96,7 @@ class WaypointNav:
             if abs(dmin-(abs(self.points[i]-self.points[k])+self.min_dist[k,j]))<1.0e-4:
                 return k
         #must not get there
-        assert(0) #TODO: remove for release
+        #assert(0) #TODO: remove for release
         return i
 
     def get_near_wps(self,a):
