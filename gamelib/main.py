@@ -62,8 +62,11 @@ UNKNOWN_PLACE_PROBABILTY = 0.1
 options = None
 has_grabber = True
 
-WAVE_DELAY = [20, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
-WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
+WAVE_DELAY = [30, 30, 25, 25, 20, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11]
+WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  3, 3, 3, 3, 4, 4, 4]
+
+PWUP_MIN_TIME = 10
+PWUP_MAX_TIME = 30
 
 def get_intro_scene():
     x,y = director.get_window_size()
@@ -543,7 +546,7 @@ class GameLayer(Layer):
         self.spawn_powerup('shotgun')
 
     def spawn_powerup(self, type=''):
-        delay = random.randrange(10, 30)
+        delay = random.randrange(PWUP_MIN_TIME, PWUP_MAX_TIME)
         self.do(Delay(delay) + CallFunc(lambda: self.add_powerup(type)))
 
     def add_powerup(self, type='', msg=''):
@@ -597,7 +600,9 @@ class GameLayer(Layer):
             waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
             delay = WAVE_DELAY[ waveno ]
             if self.z_spawn_lifetime >= delay:
-                if len([c for c in self.agents_node.get_children() if isinstance(c, Zombie)]) < 12:
+                z_count = len([c for c in self.agents_node.get_children() if isinstance(c, Zombie)])
+                if z_count < 12:
+                    print "Wave Numer:", waveno, z_count
                     # we have a zombie wave
                     msg = random.choice([
                         "cerebroooo.....",
