@@ -7,7 +7,9 @@ sound_resources =  {
 #    'player_punch':  'sounds/player_punch.ogg',
     'game_music': 'sounds/Music01.ogg',
     'intro_music': 'sounds/Musictitle.ogg',
-    'zombie_eat': 'sounds/ZombieEat.ogg'
+    'zombie_eat': 'sounds/ZombieEat.ogg',
+    'fire_shotgun': 'sounds/Shoot01.ogg',
+    'melee': 'sounds/player_punch.ogg',
 ##    'game_music': 'sounds/player_die.mp3',
 ##    'intro_music': 'sounds/player_die.mp3',
 ##    'zombie_eat': 'sounds/player_die.mp3'

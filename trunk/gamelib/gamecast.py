@@ -37,6 +37,8 @@ class Agent(Sprite):
 
         ###self.shape = AgentShape(self)
         self.just_born = True
+        self.life = 100
+        self.collided_agent = None
 
     def update_position(self, position):
         self.old_position = self.position
@@ -94,41 +96,9 @@ class Agent(Sprite):
                 if self.just_born:
                     self.just_born = False
 
-        return
-        # test for collisions
-        self.old_position = self.position
-        self.updating = True
-        collision_layer = self.parent
 
         self.position = position
-        return
-        self.collision = None
-        collision_layer.step()
-        if self.collision:
-            if self.just_born:
-                self.x += random.choice([-1,1])*RANDOM_DELTA
-                self.y += random.choice([-1,1])*RANDOM_DELTA
-                self.target = self.position = (self.x, self.y)
-                self.target = self.position
-                return
 
-            self.on_collision(self.collision)
-            f = getattr(self.collision, "on_collision", None)
-            if f is not None:
-                f(self)
-
-            self.position = position[0], self.old_position[1]
-            self.collision = None
-            collision_layer.step()
-            if self.collision:
-                self.position = self.old_position[0], position[1]
-                self.collision = None
-                collision_layer.step()
-                if self.collision:
-                    self.position = self.old_position
-        else:
-            if self.just_born:
-                self.just_born = False
 
     def _on_collision(self, other):
         # used internally for collision testing
@@ -136,7 +106,7 @@ class Agent(Sprite):
             self.on_collision(other)
         if not self.updating:
             return
-        self.collision = other
+
 
     def play_anim(self, anim_name):
         self.image = self.anims[anim_name]
@@ -147,11 +117,22 @@ class Agent(Sprite):
     def on_collision(self, other):
         #print 'self', self, 'other', other
         if isinstance(other, Bullet):
-            self.die()
+            if not isinstance(self, Father):
+                bullet = other
+                self.receive_damage(bullet.player.weapon.damage)
+        elif isinstance(other, Agent):
+            self.collided_agent = other
 
     def _get_game_layer(self):
         raise NotImplementedError
 
+    def receive_damage(self, damage):
+        self.life -= damage
+        ## return True if died
+        if self.life <= 0:
+            self.die()
+            return True
+        return False
 
 class Father(Agent):
     def __init__(self, game_layer, img, position):
@@ -179,9 +160,12 @@ class Father(Agent):
         self.weapon = self.weapons['shotgun']
         self.time_since_attack = 0
 
-    def on_collision(self, other):
-        if isinstance(self.collision, Agent):
-            pass#sound.play("player_punch")
+
+##     def on_collision(self, other):
+##         pass
+##         if isinstance(other, Agent):
+##             self.collided_agent = other
+## #            pass#sound.play("player_punch")
 
     def update(self, dt):
         # update speed
@@ -213,14 +197,9 @@ class Father(Agent):
 
     def attack(self):
         if self.time_since_attack > self.weapon.frequency:
-            if self.weapon.range > 0:
-                print "RANGED"
-                projectile = self.weapon.get_projectile()
-                self.game_layer.add_projectile(projectile)
-            else:
-                print "MELEE"
-
+            self.weapon.attack()
             self.time_since_attack = 0
+
     def die(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
         # as segfaults might occur
@@ -238,21 +217,36 @@ class Weapon(object):
         self.range = atk_range
         self.frequency = frequency
         self.sound = sound
+        self.time_since_attack = 0
 
-##     def play_sound():
+    def _play_sound(self):
+        sound.play(self.sound)
 
 
 class RangedWeapon(Weapon):
-    def __init__(self, player, damage=100, atk_range=1000, frequency=1.2):
-        super(RangedWeapon, self).__init__(player, damage, atk_range, frequency)
+    def __init__(self, player, damage=50, atk_range=1000, frequency=1.2, sound='fire_shotgun'):
+        super(RangedWeapon, self).__init__(player, damage, atk_range, frequency, sound)
+        self.ammo = 10
 
-    def get_projectile(self):
-        return Bullet(get_animation('bullet'), self.player)
+
+    def attack(self):
+        projectile = Bullet(get_animation('bullet'), self.player)
+        self.player.game_layer.add_projectile(projectile)
+        self._play_sound()
+
 
 
 class MeleeWeapon(Weapon):
-    def __init__(self, player, damage=30, atk_range=0, frequency=0.5):
-        super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency)
+    def __init__(self, player, damage=35, atk_range=0, frequency=0.5, sound='melee'):
+        super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
+
+    def attack(self):
+        if self.player.collided_agent != None:
+            print 'morite!!', self.player.collided_agent
+            died = self.player.collided_agent.receive_damage(self.damage)
+            if died:
+                self.player.collided_agent = None            
+            self._play_sound()
 
 
 class Relative(Agent):
@@ -407,6 +401,7 @@ class ZombieBoid(Agent):
     def _get_game_layer(self):
         return self.player.game_layer
 
+
 # actualmente es copia de ZombieBoid, esto es preparacion para implantar
 class ZombieWpt(Agent):
     def __init__(self, game_layer, img, player):
@@ -484,11 +479,11 @@ class ZombieWpt(Agent):
         return self.player.game_layer
 
 class Bullet(Sprite):
-    def __init__(self, img, agent):
-        super(Bullet, self).__init__(img, agent.position, agent.rotation, agent.scale)
+    def __init__(self, img, player):        
+        super(Bullet, self).__init__(img, player.position, player.rotation, player.scale)
 
         self.anims = {}
-        self.agent = agent
+        self.player = player
         self.speed = 400
         self.schedule(self.update)
 
@@ -499,7 +494,7 @@ class Bullet(Sprite):
         #from pymunk.vec2d import Vec2d
         #offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
         #target = offset+position
-        position = agent.position
+        position = player.position
         nx = WEAPON_RANGE * cos( radians(-self.rotation) )
         ny = WEAPON_RANGE * sin( radians(-self.rotation) )
         target = (position[0] + nx, position[1] + ny)
@@ -508,7 +503,7 @@ class Bullet(Sprite):
         #print 'BULLET CREATED'
 
         ###shape = BulletShape(self, position, target)
-        ###shape.group = agent.shape.group
+        ###shape.group = player.shape.group
         ###self.shape = shape
 
     def update(self, dt):
@@ -532,13 +527,13 @@ class Bullet(Sprite):
     def on_collision(self, other):
         #print 'BULLET DIED'
         #print self, self.position, other, other.position
-        if self.agent != other:
+        if self.player != other:
             self.die()
 
     def die(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
         # as segfaults might occur
-        game_layer = self.agent.game_layer
+        game_layer = self.player.game_layer
         game_layer.dead_items.add(self)
 
 
