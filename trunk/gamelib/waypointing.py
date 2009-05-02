@@ -175,11 +175,15 @@ class WaypointNav:
         #choose the best combo
         d, i, j = self.best_pair( a, candidates_a, b, candidates_b)
         #advance in the waypoint route to b while waypoint is visible
+        steps = 0
         while 1:
+            steps += 1
             last_visible = i
             i = self._next_waypoint(i,j)
             if not self.fn_visibles(a,points[i]):
                 break
             if i == j:
+                break
+            if steps > 10:
                 break
         return points[last_visible]

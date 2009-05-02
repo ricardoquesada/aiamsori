@@ -512,6 +512,9 @@ class Zombie(Agent):
 
     def on_enter(self):
         super(Zombie, self).on_enter()
+        self.pick_target()
+
+    def pick_target(self):
         family = [ p for p in self.parent.get_children() if isinstance(p, Family) ]
         if family:
             self.target = random.choice(
@@ -519,7 +522,7 @@ class Zombie(Agent):
             )
         else:
             self.target = self
-        
+
     def update(self, dt):
         # save old position
         self._old_state = {'position': self.position, 'rotation': self.rotation}
@@ -532,8 +535,11 @@ class Zombie(Agent):
             if self.target is None:
                 target = self
             else:
+                if self.target.life <= 0:
+                    self.pick_target()
                 target = self.target
-        self.goal = self.game_layer.ways.get_dest(self.position, self.target.position)
+            self.goal = self.game_layer.ways.get_dest(self.position, self.target.position)
+
         gx, gy = self.goal
         goal = seek(b.x, b.y, gx, gy)
         #print "GOAL", goal
@@ -649,7 +655,7 @@ class Bullet(Sprite):
         #print self, self.position, other, other.position
         if self.player != other:
             self.hit()
-            
+
 
 #    def die(self):
     def hit(self):
@@ -694,4 +700,3 @@ class PowerUp(Sprite):
     def die(self):
         self.game_layer.dead_items.add(self)
         self.game_layer.spawn_powerup()
-

@@ -15,7 +15,6 @@ import optparse
 import avbin
 
 from pyglet import gl, font
-from pyglet.window import key
 
 import cocos
 from cocos import euclid
@@ -62,43 +61,9 @@ UNKNOWN_ITEM_PROBABILTY = 0.1
 UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
-has_grabber = False
 
-def get_intro_scene():
-    x,y = director.get_window_size()
-    image_layer = ImageLayer(x,y)
-    scene = Scene()
-    scene.add(image_layer)
-
-    return scene
-
-def get_game_scene():
-    global has_grabber
-    # create game scene
-    hud_layer = gamehud.HudLayer()
-    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
-
-    scene = Scene()
-    scene.add(game_layer)
-    scene.add(hud_layer, z = 1)
-    if options.wpt_on:
-        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
-    else:
-        from gamectrl import MouseGameCtrl, KeyGameCtrl
-    scene.add(KeyGameCtrl(game_layer))
-    scene.add(MouseGameCtrl(game_layer))
-
-    return scene
-
-def get_end_scene():
-    scene = Scene()
-    scene.add(GameOverLayer())
-    return scene
-
-WAVE_DELAY = [5, 35, 27, 25, 24, 23, 22, 21, 20, 18, 16, 14, 12, 10, 8]
-WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  3, 3, 3, 3, 3, 3, 3]
-
-MAX_ZOMBIE_COUNT = 20
+WAVE_DELAY = [5, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
+WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
 
 def main():
     # make available options
@@ -128,7 +93,6 @@ def main():
 
 #    avbin.init_avbin() #warn: if uncomented windows crash
 
-    global has_grabber
     try:
         import cocos.gl_framebuffer_object as FG
         FG.FramebufferObject().check_status()
@@ -144,16 +108,31 @@ def main():
     #director.init(fullscreen=True)
     director.init(options.width, options.height, resizable=True)
     sound.init()
+    # create game scene
+    hud_layer = gamehud.HudLayer()
+    game_layer = GameLayer(MAPFILE, hud_layer, has_grabber)
+#    game_layer.position = (400, 300)
+    x,y = director.get_window_size()
+    image_layer = ImageLayer(x,y)
 
     director.set_3d_projection()
 #    director.set_2d_projection()
 
-    # FIXME: transition between scenes are not working
-    #scene = get_intro_scene()
-    scene = get_game_scene()
-    #scene = get_end_scene()
-    director.run(scene)
+    main_scene = Scene()
+    first_scene = Scene()
+    first_scene.add(image_layer)
+    image_layer.next = (director, main_scene)   #ugly?.. WHO CARES!
+    main_scene.add(game_layer)
+    main_scene.add(hud_layer, z = 1)
+    if options.wpt_on:
+        from gamectrl_wpt import MouseGameCtrl, KeyGameCtrl
+    else:
+        from gamectrl import MouseGameCtrl, KeyGameCtrl
+    main_scene.add(KeyGameCtrl(game_layer))
+    main_scene.add(MouseGameCtrl(game_layer))
 
+    director.run(main_scene)
+    #director.run(first_scene)
 
 
 def make_sprites_layer(layer_data, atlas):
@@ -196,7 +175,6 @@ class ImageLayer(Layer):
         print "aprento una tecla"
         director.replace(get_game_scene())
 
-
 class GameOverLayer(Layer):
     is_event_handler = True
 
@@ -207,7 +185,7 @@ class GameOverLayer(Layer):
         label.position = w / 2 - 340 , h / 2 + 100
         label.element.color = 40,179,75,180
         label2 = Label('do you want to play again?', font_name='youmurderer', font_size=52, bold=True)
-        label2.position = w / 2 - 420 , h / 2 
+        label2.position = w / 2 - 420 , h / 2
         label2.element.color = 40,179,75,180
         label3 = Label('(Y/N)', font_name='youmurdererbb', font_size=52, bold=True)
         label3.position = w / 2 - 40, h / 2 - 100
@@ -228,6 +206,7 @@ class GameOverLayer(Layer):
         elif k == key.N:
             director.pop()
             return True
+
 
 
 class DeadStuffLayer(cocos.cocosnode.CocosNode):
@@ -252,12 +231,10 @@ class GameLayer(Layer):
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
+            self.fire_lights = Layer()
 
             self.grabber = framegrabber.TextureGrabber()
             self.grabber.grab(self.texture)
-            print self.grabber
-
-
         self.map_node = LayersNode()
         self.projectiles = []
         self.dead_items = set()
@@ -280,7 +257,6 @@ class GameLayer(Layer):
         pyglet.gl.glTexParameteri( img.texture.target, pyglet.gl.GL_TEXTURE_WRAP_T, pyglet.gl.GL_CLAMP_TO_EDGE )
 
         self.show_fire_frames = 0
-        self.fire_lights = Layer()
         self.fire_light = Sprite("data/newtiles/luz_escopeta.png")
         self.fire_light.scale = 1
         self.fire_lights.add(self.fire_light)
@@ -368,8 +344,8 @@ class GameLayer(Layer):
         light = random.choice(self.lights.get_children())
 
         for i in range(random.randint(5, 10)):
-            micro_delay = random.random()*0.10
-            micro_delay2 = random.random()*0.10
+            micro_delay = random.random()*0.50
+            micro_delay2 = random.random()*0.50
             action = action + FadeTo(50, micro_delay) + FadeTo(255, micro_delay2)
         action = action + CallFunc(self.flicker)
         light.do(action)
@@ -379,9 +355,12 @@ class GameLayer(Layer):
         if self.has_grabber:
             width, height = w, h
             print "RESETING TEXTURE", width, height
+
+
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
+
 
     def visit(self):
         if not self.has_grabber:
@@ -452,7 +431,7 @@ class GameLayer(Layer):
             q = euclid.Vector2(*q)
             d = p-q
 
-            steps = d.magnitude() / 10
+            steps = d.magnitude() / 30
             for i in range(int(steps+1)):
                 c = q+d*(i/float(steps))
                 if not self.is_empty(*c):
@@ -540,37 +519,29 @@ class GameLayer(Layer):
 
 
             self.z_spawn_lifetime += 1
-
         else:
-            waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
-#            if zombie_count + WAVE_NUM[waveno] >= MAX_ZOMBIE_COUNT:
-#                return
-
             self.z_spawn_lifetime += dt
+            waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
             delay = WAVE_DELAY[ waveno ]
             if self.z_spawn_lifetime >= delay:
-                # we have a zombie wave
-                msg = random.choice([
-                    "cerebroooo.....",
-                    "brraaaaaiins....",
-                    "arrghhhhh....",
-                    "me hungry!"
-                ])
-                self.talk("zombie", msg)
-                for i in range(WAVE_NUM[ waveno ]):
-                    print "Wave Number: ", self.zombie_wave_number
-                    for c in self.zombie_spawn.get_children():
-                        z = Zombie(self, get_animation('zombie1_walk'), self.player)
-                        z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
-                        z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
-                        z.position = z.x, z.y
-                        self.agents_node.add(z)
-
-                zombie_count = len([z for z in self.agents_node.get_children() if isinstance(z, Zombie)])
-                print "Zombie Count", zombie_count
-
-                self.z_spawn_lifetime = 0
-                self.zombie_wave_number += 1
+                if len([c for c in self.agents_node.get_children() if isinstance(c, Zombie)]) < 12:
+                    # we have a zombie wave
+                    msg = random.choice([
+                        "cerebroooo.....",
+                        "brraaaaaiins....",
+                        "arrghhhhh....",
+                        "me hungry!"
+                    ])
+                    self.talk("zombie", msg)
+                    for i in range(WAVE_NUM[ waveno ]):
+                        for c in self.zombie_spawn.get_children():
+                            z = Zombie(self, get_animation('zombie1_idle'), self.player)
+                            z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
+                            z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
+                            z.position = z.x, z.y
+                            self.agents_node.add(z)
+                    self.z_spawn_lifetime = 0
+                    self.zombie_wave_number += 1
 
 
     def talk(self, who, what, duration=5, transient=False):
@@ -587,10 +558,6 @@ class GameLayer(Layer):
 
         #self.light.set_position(x/2, y/2)
         #self.light.enable()
-
-    def game_over(self):
-        end_scene = get_end_scene()
-        director.replace(end_scene)
 
     def on_exit(self):
         super(GameLayer, self).on_exit()
@@ -679,6 +646,7 @@ class GameLayer(Layer):
     def is_empty(self,x,y):
         # note: ATM only walls, not muebles
         return self.wallmask.is_empty(x,y)
+
 
 
 
