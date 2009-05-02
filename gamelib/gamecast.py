@@ -80,6 +80,11 @@ class Agent(Sprite):
                     if not self.game_layer.is_empty(*self.position):
                         self.position = self.old_position
                         return
+            else:
+                self.x += random.random() * 40 - 20
+                self.y += random.random() * 40 - 20
+                return
+
 
         # check collisions with dynamic objects
         agents = self.parent.children

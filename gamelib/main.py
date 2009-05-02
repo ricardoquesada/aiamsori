@@ -263,9 +263,6 @@ class GameLayer(Layer):
         #self.talk("Dad", "hello hello hello"*5)
         #self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
 
-        # create agents (player and NPCs)
-        self._create_agents()
-
 
         x, y = director.get_window_size()
         #self.light = light.Light(x/2, y/2)
@@ -276,6 +273,11 @@ class GameLayer(Layer):
             for child in layer.get_children():
                 self.wallmask.add(child)
         # now is safe to call self.is_empty()
+
+        # create agents (player and NPCs)
+        self._create_agents()
+
+        # calculate waypoints
         self.setup_waypoints(waypoints)
         # if waypoint editing mode, create waypoints
         if options.wpt_on:
