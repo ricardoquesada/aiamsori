@@ -207,13 +207,14 @@ class ImageLayer(Layer):
             l.do(Hide())
 
         delay = 1
+        ft = 1
         for l,s in zip(labels, sprites):
-            l.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
-            s.do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
-            delay += 5
+            l.do(Delay(delay) + Show() + FadeIn(ft) + Delay(1) + FadeOut(ft))
+            s.do(Delay(delay) + Show() + FadeIn(ft) + Delay(1) + FadeOut(ft))
+            delay += 3
 
         labels[5].do(Delay(delay) + Show() + FadeIn(2) + Delay(1) + FadeOut(2))
-        delay += 5
+        delay += 3
 
         self.borrar = labels + sprites
         self.do(Delay(delay) + CallFunc(lambda: self.on_key_press(0,0)))
