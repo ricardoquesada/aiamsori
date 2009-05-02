@@ -540,7 +540,9 @@ class ZombieBoid(Agent):
 
     def on_collision(self, other):
         super(ZombieBoid, self).on_collision(other)
-        self.attack()
+        if isinstance(other, Family):
+            # zombies don't attach each other
+            self.attack()
 
     def die(self):
         # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
