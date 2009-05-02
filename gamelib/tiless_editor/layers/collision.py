@@ -105,25 +105,14 @@ class Segment(Shape):
         self.radius = radius
         self._rebuild_endpoints(Vec2d(0,0), Vec2d(target)-Vec2d(origin), scale, rotation)
 
-#    def _position_updated(self, offset):
-#        self._rebuild_endpoints()
-
     def _scale_updated(self, factor):
         self.radius *= factor
         self.length *= factor
         self._rebuild_endpoints()
 
-    def _rotation_updated(self, angle):
-        import pdb; pdb.set_trace()
-        print 'rotation updated: ', angle
-
     def _rebuild_endpoints(self, origin=(0, 0), target=(0, 0), scale=1.0, rotation=0):
-        print 'in shape direction origin', origin, 'target', target
         self.a = Vec2d(origin)
         self.b = Vec2d(target)
-        #self.a.rotate(self.rotation)
-        #self.b.rotate(self.rotation)
-        #print 'a', self.a, 'b', self.b
 
     def draw(self):
         import shape
@@ -315,7 +304,6 @@ class CollisionSpace(object):
             moment = pm.moment_for_poly(mass, vertices, offset)
             pm_body = pm.Body(mass, moment)
             pm_obj = pm.Poly(pm_body, vertices, offset)
-        shape.pm_obj = pm_obj
         return pm_obj
 
     def _on_collide(self, pm_shapeA, pm_shapeB, contacts, normal_coef, data):
@@ -323,11 +311,9 @@ class CollisionSpace(object):
             shapeA = self._get_shape(pm_shapeA)
             shapeB = self._get_shape(pm_shapeB)
             shapeA.data['collided'] = True
-            shapeA.data['other'] = shapeB
-            shapeA.data['contacts'] = contacts
+            #shapeA.data['other'] = shapeB
             shapeB.data['collided'] = True
-            shapeB.data['other'] = shapeA
-            shapeB.data['contacts'] = contacts
+            #shapeB.data['other'] = shapeA
             self.callback(shapeA, shapeB)
         return True
 
@@ -346,11 +332,6 @@ class CollisionSpace(object):
     def update(self, shape):
         pm_obj = self._get_pm_object(shape)
         if pm_obj is not None:
-            #if isinstance(shape, Segment):
-            #    print shape.position
-            #    print pm_obj.body.position
-            #    print shape.length
-            #    print pm_obj.a, pm_obj.b, abs(pm_obj.a - pm_obj.b)
             for attr in _get_vars(shape):
                 if attr == 'body':
                     # special case: the 'body' attribute has to be exploded
@@ -377,13 +358,6 @@ class CollisionSpace(object):
                     value = getattr(shape, attr)
                     setattr(pm_obj, attr, value)
 
-        #if isinstance(shape, Segment):
-        #    print '---'
-        #    print shape.position
-        #    print pm_obj.body.position
-        #    print shape.length
-        #    print pm_obj.a, pm_obj.b, abs(pm_obj.a - pm_obj.b)
-        #    print '==='
         if self.is_static(shape):
             # since a static shape has been moved, we need to rehash them
             self._space.rehash_static()
@@ -430,8 +404,6 @@ class CollisionLayer(PickerBatchNode):
 
     def step(self, dt=0):
         self.space.step(dt)
-
-
 
     #################
     # Helper methods (for debugging collisions)

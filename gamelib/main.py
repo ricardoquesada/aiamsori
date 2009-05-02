@@ -28,8 +28,6 @@ from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from tiless_editor.atlas import SavedAtlas
 
-#from shapes import BulletShape, RayShape, WallShape
-#from shapes import COLLISION_GROUP_AGENT, COLLISION_GROUP_ZOMBIE
 from walls import create_wall_layer
 import talk
 import gamehud
@@ -146,6 +144,7 @@ class GameLayer(Layer):
         super(GameLayer, self).__init__()
         self.map_node = LayersNode()
         self.bullets = []
+        self.dead_items = set()
 
         # get layers from map
         for_collision_layers = []
@@ -265,14 +264,10 @@ class GameLayer(Layer):
     def _create_collision_layer(self, layers):
         collision_layer = CollisionLayer(self.on_collision)
         # README: uncomment this to debug collision shapes
-        collision_layer.show_shapes = False
+        #collision_layer.show_shapes = False
 
         for layer in layers:
             for z, child in layer.children:
-                #img = {'filename': child.path, 'position': child.position,
-                #       'rotation': child.rotation, 'scale': child.scale,
-                #       'opacity': child.opacity, 'rect': child.rect}
-                #wall = self._create_wall(img)
                 wall = Wall(child)
                 collision_layer.add(wall, static=wall.shape.static)
         return collision_layer
@@ -285,6 +280,9 @@ class GameLayer(Layer):
         # clear out any non-collisioned bullets
         self._remove_bullets()
 
+        # clear out any dead items
+        self._remove_dead_items()
+
     def add_bullet(self, bullet):
         self.bullets.append(bullet)
         self.add(bullet)
@@ -292,30 +290,20 @@ class GameLayer(Layer):
         collision_layer.add(bullet, static=bullet.shape.static)
 
     def remove_bullet(self, bullet):
-        collision_layer = self.map_node.get('collision')
-        collision_layer.remove(bullet, static=bullet.shape.static)
-        self.remove(bullet)
         self.bullets.remove(bullet)
+        # delay objects deletion until later, to avoid segfaults
+        self.dead_items.add(bullet)
 
     def _remove_bullets(self):
-        pass
-        #print self.bullets
-        #for bullet in self.bullets:
-        #    self.remove_bullet(bullet)
-        #print self.bullets
-        #collision_layer = self.map_node.get('collision')
-        #for z, child in self.children:
-        #    if isinstance(child, NotifierSprite) and isinstance(child, Bullet):
-        #        if not child.shape.data['collided']:
-        #            # only remove non collided shapes, as collided shapes will be removed by
-        #            # the collided object
-        #            print 'removing BULLET'
-        #            #collision_layer.remove(child, static=child.shape.static)
-        #            self.remove(child)
-        #        else:
-        #            print 'bullet collided. NOT REMOVING'
-        #            print 'other:', child.shape.data['other'].sprite
-        #            pass
+        for bullet in self.bullets:
+            self.remove_bullet(bullet)
+
+    def _remove_dead_items(self):
+        collision_layer = self.map_node.get('collision')
+        for item in self.dead_items:
+            collision_layer.remove(item, static=item.shape.static)
+            self.remove(item)
+        self.dead_items.clear()
 
 
 
