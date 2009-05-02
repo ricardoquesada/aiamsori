@@ -1,8 +1,8 @@
 import pyglet
 
 sound_resources =  {
-#    'zombie_attack': 'sounds/zombie_attack.wav',
-#    'player_defend': 'sounds/player_defend.mp3',
+    'ZombieDie': 'sounds/ZombieDie.ogg',
+    'ZombieGerman': 'sounds/ZombieGerman.ogg',
     'player_die':    'sounds/player_die.mp3',
 #    'player_punch':  'sounds/player_punch.ogg',
     'game_music': 'sounds/Music01.ogg',
