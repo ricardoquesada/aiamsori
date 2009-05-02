@@ -197,7 +197,7 @@ class ImageLayer(Layer):
         labels = []
         for t in texts:
             l = Label(t, font_name='Times New Roman', font_size=52, bold=True)
-            #l.position = self.w / 2 - 340 , 15
+            l.position = self.w / 2 - 340 , self.h / 2
             l.element.color = 255,255,255,255
             labels.append(l)
             self.add(l, z=1)
