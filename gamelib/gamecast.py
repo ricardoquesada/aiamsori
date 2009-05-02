@@ -133,14 +133,6 @@ class Agent(Sprite):
                 self.just_born = False
 
 
-
-    def _on_collision(self, other):
-        # used internally for collision testing
-        if isinstance(other, Bullet):
-            self.on_collision(other)
-        if not self.updating:
-            return
-
     def play_anim(self, anim_name):
         self.image = self.anims[anim_name]
         self.image_anchor = (self.image.frames[0].image.width / 2,
@@ -150,7 +142,8 @@ class Agent(Sprite):
     def on_collision(self, other):
         #print 'self', self, 'other', other
         if isinstance(other, Bullet):
-            if not isinstance(self, Father):
+#            if not isinstance(self, Father):
+            if isinstance(self, ZombieBoid):
                 bullet = other
                 self.receive_damage(bullet.player.weapon.damage, bullet)
         elif isinstance(other, Agent):
@@ -308,7 +301,7 @@ class Weapon(object):
 
 
 class RangedWeapon(Weapon):
-    def __init__(self, player, damage=60, atk_range=1000, frequency=1, sound='fire_shotgun'):
+    def __init__(self, player, damage=100, atk_range=1000, frequency=1, sound='fire_shotgun'):
         super(RangedWeapon, self).__init__(player, damage, atk_range, frequency, sound)
         self.ammo = 0
 
