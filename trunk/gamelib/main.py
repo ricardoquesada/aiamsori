@@ -222,7 +222,7 @@ class ImageLayer(Layer):
             x,y = self.w, self.h
             labelkey = Label('Press any key to start!', font_name='Times New Roman', font_size=52, bold=True)
             labelkey.position = self.w / 2 - 340 , self.h / 2
-            labelkey.element.color = 40,179,75,180
+            labelkey.element.color = 40,179,75,50
             self.add(labelkey, z=1)
             labelkey.do(Hide())
                 
