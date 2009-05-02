@@ -62,7 +62,7 @@ UNKNOWN_PLACE_PROBABILTY = 0.1
 
 options = None
 
-WAVE_DELAY = [5, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
+WAVE_DELAY = [20, 20, 17, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4]
 WAVE_NUM   = [1,  1,  2,  3,  3,  4,  5,  5,  6, 6, 7, 7, 7, 7, 8]
 
 def main():
@@ -466,7 +466,10 @@ class GameLayer(Layer):
         for c in layer.get_children():
             self.item_spawn.append( c.position )
         # wait 4 seconds before displaying first message
-        self.do(Delay(4) + CallFunc(lambda: self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")))
+        self.do(Delay(3) + CallFunc(lambda: self.talk('Bee', "Zombies are coming!", duration=2, transient=False)))
+        self.do(Delay(5) + CallFunc(lambda: self.talk('Mom', "Protect your family!", duration=2, transient=False)))
+        self.do(Delay(7) + CallFunc(lambda: self.talk('Zack', "Click on us to move us", duration=2, transient=False)))
+        self.do(Delay(9) + CallFunc(lambda: self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")))
         self.spawn_powerup('shotgun')
 
     def spawn_powerup(self, type=''):

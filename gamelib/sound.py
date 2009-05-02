@@ -3,7 +3,7 @@ import pyglet
 sound_resources =  {
 #    'zombie_attack': 'sounds/zombie_attack.wav',
 #    'player_defend': 'sounds/player_defend.mp3',
-#    'player_die':    'sounds/player_die.mp3',
+    'player_die':    'sounds/player_die.mp3',
 #    'player_punch':  'sounds/player_punch.ogg',
     'game_music': 'sounds/Music01.ogg',
     'intro_music': 'sounds/Musictitle.ogg',
@@ -58,7 +58,7 @@ class Sounds(object):
                 music_player.queue(self.sounds[m])
             music_player.play()
             music_player.volume = vol
-            music_player.eos_action = 'loop'   
+            music_player.eos_action = 'loop'
 
 play = None
 def init():
