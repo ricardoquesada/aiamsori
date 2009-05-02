@@ -388,7 +388,7 @@ class RangedWeapon(Weapon):
 
 
 class MeleeWeapon(Weapon):
-    def __init__(self, player, damage=10, atk_range=0, frequency=0.2, sound='melee'):
+    def __init__(self, player, damage=20, atk_range=0, frequency=0.2, sound='melee'):
         super(MeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
 
     def attack(self):
@@ -404,7 +404,7 @@ class MeleeWeapon(Weapon):
             self._play_sound()
 
 class ZombieMeleeWeapon(MeleeWeapon):
-    def __init__(self, player, damage=20, atk_range=0, frequency=2, sound='melee'):
+    def __init__(self, player, damage=8, atk_range=0, frequency=2, sound='melee'):
         super(ZombieMeleeWeapon, self).__init__(player, damage, atk_range, frequency, sound)
 
 
