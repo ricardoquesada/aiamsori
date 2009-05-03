@@ -191,7 +191,7 @@ class ImageLayer(Layer):
         super(ImageLayer, self).__init__()
         self.w = x
         self.h = y
-        self.state = 0
+        self.state = "intro"
 
         grossini = Sprite('data/img/grossini.png')
         mom = Sprite('data/img/Mom.png')
@@ -252,6 +252,7 @@ class ImageLayer(Layer):
 
 #    def on_key_press(self, k, m):
     def goto_title(self):
+        self.state = "title"
         [self.remove(h) for h in self.borrar]
         x,y = self.w, self.h
 ##        labelkey = Label('press any key to start', font_name='Times New Roman', font_size=28, bold=True, anchor_x='center')
@@ -264,8 +265,17 @@ class ImageLayer(Layer):
         self.add(bg)
         bg._vertex_list.vertices = [0,0,x,0,x,y,0,y]
 #        labelkey.do(Delay(5) + Show() + FadeIn(2))
-        self.do(Delay(3) + CallFunc(lambda: self.goto_game()))
+        self.do(Delay(4) + CallFunc(lambda: self.goto_game()))
 
+
+    def on_key_press( self, symbol, modifiers ):
+        if symbol == pyglet.window.key.ESCAPE:
+            if self.state == "intro":
+                self.goto_title()
+            if self.state == "title":
+                self.goto_game()
+
+            return True
 
     def goto_game(self):
         sound.stop_music()
