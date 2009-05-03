@@ -125,6 +125,18 @@ def main():
     fonts_path = os.path.join(basepath, 'data/fonts')
     font.add_directory(fonts_path)
 
+    print "#####################################################################"
+    print "#####################################################################"
+    print "###                                                               ###"
+    print "###                 if you get a segfault                         ###"
+    print "###                                                               ###"
+    print "###                    please try again                           ###"
+    print "###                                                               ###"
+    print "###                multiplatform sound sucks                      ###"
+    print "###                                                               ###"
+    print "#####################################################################"
+    print "#####################################################################"
+
     #Load avbin
     avbin.init_avbin()
 
