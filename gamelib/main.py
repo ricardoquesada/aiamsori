@@ -210,7 +210,8 @@ class ImageLayer(Layer):
         texts = ['productions.png'] + ['none.png'] * 4 + ['neigs.png', 'none.png', 'in.png']
         labels = []
         for t in texts:
-            l = Sprite(os.path.join('data', 'img', t))
+#            l = Sprite(os.path.join('data', 'img', t)) # not found in win
+            l = Sprite('/'.join(['data', 'img', t]))
             l.position = self.w / 2, self.h / 2
             labels.append(l)
             self.add(l, z=1)
