@@ -6,7 +6,7 @@ class WallMask(object):
         self.wallmask = set()
 
     def add(self,sprite): #only if apropiate
-        padding = 2
+        padding = 1
         a = sprite.rotation%360
         if abs(a-90) < 45 or abs(a-270) < 45:
             w = sprite.height
