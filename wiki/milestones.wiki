@@ -1,5 +1,4 @@
-#summary One-sentence summary of this page.
-Guia rapida a cambiios y revisiones interesantes
+#summary Guia rapida a cambios y revisiones interesantes
 
 = Introduction =
 Los puntos de desarrollo interesantes los pongo acá, los mas nuevos arriba
