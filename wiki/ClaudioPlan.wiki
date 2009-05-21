@@ -3,7 +3,9 @@
 <pre>
 Me quedé con las ganas de hacer algunas cosas, asi que le pregunté a Lucio si podría hacer un branch.
 Dijo que sí, asi que le doy.
+</pre>
 
+<pre>
 Esta pagina en particular dá una vista desde lo alto, sin detalles, de temas que pueden interesarme. Lo que está marcado con '+' ya lo hice, lo que está con w es lo que estoy viendo.
 
 Arranco con branch1 ; si necesito mas serán con sufixes (branch1_1...)
