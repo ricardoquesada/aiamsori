@@ -33,13 +33,14 @@ class KeyGameCtrl(Layer):
             x, y = self.game_layer.player.position
             origin = (x, y)
             target = self.game_layer.player.target
-            collided = self.game_layer.is_collide(origin, target)
-            if collided:
-                print 'PIZZA'
+            is_clear = self.game_layer.is_clear_path(origin, target)
+            if not is_clear:
+                pass
+                print 'OBSTACLE'
+            else:
+                pass
+                print 'FREE PATH'
                 
-        ## fire weapon
-        if k == key.SPACE:
-            self.game_layer.player.fire()
 
 
     def on_key_release(self, k, m):
@@ -83,7 +84,7 @@ class MouseGameCtrl(Layer):
     def on_mouse_press(self, px, py, button, m):
         px = px - self.game_layer.x
         py = py - self.game_layer.y
-
+    
         ## select a relative or set target for the one already selected
         if button == 4:
             if self.game_layer.player.selected_relative:
