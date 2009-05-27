@@ -1,0 +1,106 @@
+Milestone 2:
+Enflaquecer GameLayer
+Introducir Script director:
+        Responsabilidad:
+               secuencia el gameplay
+               (posiblemente) despache gameplay events
+               (quizas) proporciona al editor info acerca de que eventos hay disponibles
+        Descripcion Inicial:
+                Tomaria un file de text simple de la forma
+                 <line>=<time> <event_name> <event_params>
+                Ej: 1.00 spawn_zombie_at  122,123, visual_variant,...
+  
+                Cuando llega el tiempo pedido llama al class method registrado para name con el
+                 string de todos los params ( o una lista ...), que tipicamente seria de la form
+                .CreateInstance(...) o SpawnInstance(...
+                Hay que evitar que ScriptDirector se convierta en otro kitchen sink, por eso hay que
+                encontrar la forma de autoregistrar / escanear. Algo onda como se declaran los
+                EventHandlers ?
+	View Ideal:
+		Notebook con tres tabs ('properties', 'entities', 'script')... Esto seria muy lento de hacer, habria que hacer primero una gui... Vamos por lo minimal
+	view minimal:
+		un modo de editor nuevo, con una ventana extra pyglet que muestra un unico field: sprite-selected: instance id
+		El script en si se escribira en un editor de texto externo; el nuevo modo del editor se usara para ubicar cual es la entidad que precisamos.
+	Problema: aparentemente el editor solo entiende modos para un layer; el modo ScripDirector tiene que ver todos los layers al mismo tiempo. Modificar el editor parece denso; quizas podria ser factible hacer un modo de Game que nos dé lo deseado.
+		Modificando el juego necesitariamos:
+			funcionalidad que dado el click entregara que entidad esta debajo
+				Un 
+			soportar el comando select sprite: la vista verifica que el sprite esté visible, si no hace scroll hasta que lo este y pone un resaltador marcando el objeto selecionado.
+		Adicionalmente:
+			script para asignar id a las entidades actuales
+			modificar editor para que al agregar una entidad le asigne una id apropiada ('type':cnt podria ser)
+
+	Sub-desarrollos necesarios:
+	w	Hacer que los sprites tengan un instance identifier, onda light1,..., para que ScriptDirector pueda referenciar instancias especificas.
+		+ prueba a ver si podemos crear una ventana secundaria pyglet para exhibir texto ( lo usaremos para acceder a las properties de un sprite. )
+		w Nuevo modo del editor donde
+			 seleccionar un sprite hace que sus properties se muestren en la ventana de properties
+			cambiando el field entity name el mapa hace scroll para mostrar el entity	
+		w comu entre editor y properties
+		  editor mode donde podemos hacer scroll en el mapa y al hacer click sobre un sprite se actualiza la ventana de properties ( para scripter lo indispensable seria conocer el id y la class )
+		  deseable pero no indispensable: que la ventana extra tenga tabs: properties, entities, script
+		  entities seria una lista ordenada de entities, para poder localizar facilmente cada entity available al script. clickeando sobre una entity en particular el mapa haria el scroll necesario para que la entidad sea visible, la current entity en el popup se cambiaria a la entidad clickeada.
+		El tab script ofreceria acceso a las lineas de texto que componen el script.
+
+
+		
+   
+_______________________________
+etapa 1:
+codigo candidato a mover bajo control de ScriptDirector:
+
+Gamelayer.flicker() -> secuencia la intensidad de luz, actualmente con base al azar.
+         .setup_powerups -> 
+	 .spawn_powerup
+	 .add_powerup
+ 
+En realidad para algunas cosas, como flicker o spawn powerups ( si poweraps aparecen en posiciones fijas) no deberian pasar por layers; Script director publicaria un mensaje del tipo:
+'light id', 'fade to' , val, time_delta; la luz se aplicaria el correspondiente action.
+'light id', 'flicker' , fade1, time1, fade2, time2
+
+En el diseño actual los lights son simplemente sprites comunes; habria que hacerles subclass para que ofrezcan una interfase.
+
+La interfase generica que un objeto ofreceria a ScriptDirector es do --> hay que ver si ese nombre preciso no lo esta utilizando action --> la subclase podria interceptar do; si el action es reconocido como custom lo desvia al metodo propio, si no lo ejecuta como action standart.
+
+En el caso de las lights tanto flicker como fade to son actions comunes.
+
+Como llega el mensaje de scripter al objeto ? Aca no hay necesidad de multiples escuchas; layer o scripter podrian guardar un diccionario nombre instancia:entity.
+
+Si scripter dirige mensajes a entidades que pueden estar muertas, puede necesitarse proteccion.
+Scripter puede necesitar ser informado de ciertos eventos especiales:
+muerte de algunos de algunos de los buenos
+nro de zombies en el nivel llegó a cero.
+Lo que hay que evitar es la situacion en que gamescene importa scripter y scripter importa gamescene.
+
+Una posibilidad es que scripter se ponga como la parte model tipo tetrico. 
+
+Nota: en la actualidad aparentemente los sprites no reciben un instance id. Mirando en el codigo del editor no es evidente en que momento se agrega un sprite a un layer. Tampoco parece haber un 'sprite selected', como para desde una consola asignarle un id.
+
+Para los familiares podria ser hecho en code, pero para las lights o spawn points deberia ser hecho desde el editor..
+Preguntarle a lucio ? --> en donde se agrega un sprite al layer ?
+
+Despues si queremos definir patrullas, tambien deberia ser desde el editor. Se podria usar los wpts para marcar las patrullas. En principio marcariamos principio y fin; una lista de puntos a pasar. El editor mostraria el camino que seguiria usando la navegacion de minima distancia; si no nos gusta insertamos un punto intermedio para darle mas pistas.
+Otra opcion seria :begin ruta, recorrer los wpts del camino deseado, end ruta. Puede ser mas trabajoso, pero no necesitaria de gui con texto.
+
+P: podriamos usar una ventana pyglet extra para manejar el texto de la gui ? Basandonos en el ejemplo examples/text_input.py  de pyglet.
+
+En el editor habria que agregar un modo properties donde: si hacemos click sobre un sprite, aparecen las properties en la ventana pyglet. posiblemente deberia ser una ventana dibujada on-top de la del editor. Aparentemente podriamos usar layer.childrenAt(x,y) para seleccionar el elemento.
+seria bueno si ademas del prperty de un sprite tuvieramos otra solapa o ventana para mostrar la lista de sprites definidos, quizas con la opcion de mostrar por categorias.
+
+
+
+hay un ejemplo pyglet de multiple windows (multiple_windows.py).
+
+______________________________________________________________________________________________
+
+Componente properties:
+(para hacer el view habia una gui GL linda, pero está medio abandonada y no esta particularmente integrada con pyglet. ( pyui, pyui0.95, pyui_0.95_cla2009.zip), en dns 2009
+
+En todo caso, el ScriptDirector view-model se veria como:
+
+class ScriptDirectorViewModel:
+	def __init__(self,...):
+	 
+
+
+ 
