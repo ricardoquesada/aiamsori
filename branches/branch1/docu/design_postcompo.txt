@@ -1,0 +1,66 @@
+Esta es la pagina que muestra el diseño
+ 
+La idea es que se van agregando y refinando cosas en una estructura de forest ( varias jerarquias )
+Cuando parezca apropiado los detalles se mueven a otra pagina en design.
+Si hubiese tags seria util para marcar status
+ 
+Gameplay:
+        Descripcion:
+            Estamos en nuestra casa con jardin, junto con nuestra familia y vienen oleadas de zombies.
+ 
+           Vista desde arriba, no entra todo el mapa en el screen ( para darle dinámica y para que el arte grafico pueda apreciarse)
+ 
+            Hay familiares que podemos controlar.
+ 
+            De vez en cuando aparecen powerups.
+ 
+        Entidades y Roles:
+                 
+Implementación:
+        Dividimos la app en startup , servicios, escenas
+            Startup:
+                    Responsabilidades:
+                            obtener opciones de linea de comandos
+                            diagnosticar disponibilidad de modulos y funcionalidad problematicos ( avbin, modo GL deseado)
+                            inicializar modulos que lo precisen
+                            registrar servicios ofrecidos por diferentes modulos 
+                            cargar recursos y variables que no cambian en toda la session.
+ 
+            Servicios:
+                    Un servicio es un callable que no recibe parametros, registrado como servicio.
+                    Debe ser válido llamarlo en cualquier momento desde el fin del startup hasta que la sesion termina.
+                    Para registrar como servicio a una funcion foo definida en el modulo zzz, haga esto:
+                     En zzz:
+                    import foo
+                    ...
+                    def foo():
+                    ...
+                    # registrar servicios
+                    gg['s_foo'] = foo
+    
+                    <end zzz>
+                    y luego en main.py
+                     import zzz
+ 
+            Escenas:
+                    Los helpers no compartidos de una escena estan en el mismo file que la escena.
+                    El modulo donde se define la escena debe registrar un servicio que al ser invocado
+                    retorna una instancia de  cocos.scene.Scene
+                    Escenas chicas pueden compartir un modulo, grandes no.
+                    En el codigo actual  
+                   
+                    game scene
+                            un layer hud                            
+                view y model:
+                    cocos Scene GameLayer, file main.py
+ 
+                controller(s):
+                    in game: file gamecontrol.py
+                    waypointing in game: file gamecontrol_wpt.py
+            
+            Game over
+ 
+            outro(?)
+ 
+            settings(?)
+ 
