@@ -24,23 +24,10 @@ Introducir Script director:
 	Problema: aparentemente el editor solo entiende modos para un layer; el modo ScripDirector tiene que ver todos los layers al mismo tiempo. Modificar el editor parece denso; quizas podria ser factible hacer un modo de Game que nos dé lo deseado.
 		Modificando el juego necesitariamos:
 			funcionalidad que dado el click entregara que entidad esta debajo
-				Un 
 			soportar el comando select sprite: la vista verifica que el sprite esté visible, si no hace scroll hasta que lo este y pone un resaltador marcando el objeto selecionado.
 		Adicionalmente:
-			script para asignar id a las entidades actuales
-			modificar editor para que al agregar una entidad le asigne una id apropiada ('type':cnt podria ser)
+		+	script para asignar id a las entidades actuales que no tengan label.
 
-	Sub-desarrollos necesarios:
-	w	Hacer que los sprites tengan un instance identifier, onda light1,..., para que ScriptDirector pueda referenciar instancias especificas.
-		+ prueba a ver si podemos crear una ventana secundaria pyglet para exhibir texto ( lo usaremos para acceder a las properties de un sprite. )
-		w Nuevo modo del editor donde
-			 seleccionar un sprite hace que sus properties se muestren en la ventana de properties
-			cambiando el field entity name el mapa hace scroll para mostrar el entity	
-		w comu entre editor y properties
-		  editor mode donde podemos hacer scroll en el mapa y al hacer click sobre un sprite se actualiza la ventana de properties ( para scripter lo indispensable seria conocer el id y la class )
-		  deseable pero no indispensable: que la ventana extra tenga tabs: properties, entities, script
-		  entities seria una lista ordenada de entities, para poder localizar facilmente cada entity available al script. clickeando sobre una entity en particular el mapa haria el scroll necesario para que la entidad sea visible, la current entity en el popup se cambiaria a la entidad clickeada.
-		El tab script ofreceria acceso a las lineas de texto que componen el script.
 
 
 		
@@ -92,15 +79,6 @@ seria bueno si ademas del prperty de un sprite tuvieramos otra solapa o ventana 
 hay un ejemplo pyglet de multiple windows (multiple_windows.py).
 
 ______________________________________________________________________________________________
-
-Componente properties:
-(para hacer el view habia una gui GL linda, pero está medio abandonada y no esta particularmente integrada con pyglet. ( pyui, pyui0.95, pyui_0.95_cla2009.zip), en dns 2009
-
-En todo caso, el ScriptDirector view-model se veria como:
-
-class ScriptDirectorViewModel:
-	def __init__(self,...):
-	 
 
 
  
