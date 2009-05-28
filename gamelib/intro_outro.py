@@ -1,3 +1,6 @@
+import pyglet
+from pyglet.window import key
+
 from cocos.director import director
 from cocos.layer.base_layers import Layer
 from cocos.scene import Scene
