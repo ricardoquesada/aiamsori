@@ -26,7 +26,9 @@ Introducir Script director:
 			funcionalidad que dado el click entregara que entidad esta debajo
 			soportar el comando select sprite: la vista verifica que el sprite esté visible, si no hace scroll hasta que lo este y pone un resaltador marcando el objeto selecionado.
 		Adicionalmente:
-		+	script para asignar id a las entidades actuales que no tengan label.
+		+	script para asignar id a las entidades actuales que no tengan label.-> identify2.py
+            no redefine labels no nulos, define los nuevos como <layername>:<shortname>#num
+            donde shortname se deriva del filename ( eliminando extension y dir )
 
 
 
