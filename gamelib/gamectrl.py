@@ -29,17 +29,6 @@ class KeyGameCtrl(Layer):
         if k in [key.LEFT, key.A]:
             self.game_layer.player.strafe_speed = -1
 
-        if k == key.R:
-            x, y = self.game_layer.player.position
-            origin = (x, y)
-            target = self.game_layer.player.target
-            is_clear = self.game_layer.is_clear_path(origin, target)
-            if not is_clear:
-                pass
-#                print 'OBSTACLE'
-            else:
-                pass
-#                print 'FREE PATH'
 
         if k == key._1:
             self.game_layer.player.switch_weapon('fist')

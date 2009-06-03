@@ -3,20 +3,54 @@ Enflaquecer GameLayer
 Introducir Script director:
         Responsabilidad:
                secuencia el gameplay
-               (posiblemente) despache gameplay events
-               (quizas) proporciona al editor info acerca de que eventos hay disponibles
-        Descripcion Inicial:
-                Tomaria un file de text simple de la forma
-                 <line>=<time> <event_name> <event_params>
-                Ej: 1.00 spawn_zombie_at  122,123, visual_variant,...
-  
-                Cuando llega el tiempo pedido llama al class method registrado para name con el
-                 string de todos los params ( o una lista ...), que tipicamente seria de la form
-                .CreateInstance(...) o SpawnInstance(...
-                Hay que evitar que ScriptDirector se convierta en otro kitchen sink, por eso hay que
-                encontrar la forma de autoregistrar / escanear. Algo onda como se declaran los
-                EventHandlers ?
-	View Ideal:
+					level change
+					spawn entities
+					light control
+					hint talk
+					(quizas) hints alto nivel para estrategia zombie atack
+        Descripcion tentativa inicial:
+            Tomaria un file de text simple de la forma
+                 <line>=<cmd> {<cmd_params>}
+                Ej:
+				  spawn_zombie_at , 122,123, visual_variant,...
+				  wait , 2
+				  wait_for_event, event
+			y lo iria ejecutando
+			Adicionalmente, responde/identifica ciertas situaciones interesantes
+			Situaciones interesantes:
+				un miembro de la familia está alejado de los demas
+				el pawn del player está en el cuarto x (para apagar luces alli)
+				powerup presente en tal locacion ( para mandar algunos zombies a la locacion )
+				uno de la familia esta atacando en determinada direccion ( para tratar de flanquearlo)
+		Interaccion GameLayer - ScriptDirector:
+			  GameLayer ofrece una interfase Info a la cual puede llamar ScriptDirector y una interfase de acciones:
+				Acciones:
+				+	on_relay( entity_id, msg) # dimm lights, zombi goes bersek, zombie_spawn spawns
+				+	on_talk (...)
+				Info: (candidates)
+					distance(  enta, entb )
+					location( ent ) -> room, pos
+					zombies_near(ent, cutout_radius)
+					num_zombies
+					alive_family_members
+				Eventos que game_layer (o una parte de el) comunica a ScriptDirector, llamando a
+				script_director.game_event_handler:
+				+	map_loaded ( al terminar GameLayer.__init__ )
+					pickup powerup ( pop up use hint, maybe stopping time )
+					light_changed ( por accion de zombie o family member )
+					
+		Implantacion en el game loop:
+			game loop:
+				update script_director
+				update game_layer
+				
+		funcionalidad necesaria:
+		+	line to (cmd,args,...) parser
+		+	exec loop del script
+		+	definir como los eventos de gamelayer se comunican a ScriptDirector: -> game_layer.script_director.game_event_handler
+---------------------------------------------------------------------------------------------------
+	Idea abandonada: modificar el editor para que soporte una ventana secundaria que seria el view de ScriptDirector en el modo edicion.
+  View Ideal:
 		Notebook con tres tabs ('properties', 'entities', 'script')... Esto seria muy lento de hacer, habria que hacer primero una gui... Vamos por lo minimal
 	view minimal:
 		un modo de editor nuevo, con una ventana extra pyglet que muestra un unico field: sprite-selected: instance id

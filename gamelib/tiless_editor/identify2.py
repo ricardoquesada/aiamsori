@@ -6,6 +6,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 import simplejson
 
 
+
+
 class MapManipulator(object):
     def __init__(self, output_filename):
 	self.output_filename = output_filename
@@ -93,6 +95,24 @@ class MapManipulator(object):
 ##                    print 'fname:',e['filename']
                     num +=1
 
+    def dump_interesting_entities(self):
+        interesting = ['furniture', 'zombie_spawn', 'item_spawn',
+                       'waypoints','lights' ]
+        layers = self.map['layers']
+        print "#interesting entities"
+        for layer in layers:
+            layer_type = layer['layer_type']
+            if layer_type!='sprite':
+                continue
+            if layer['label'] not in interesting:
+                continue
+            print "%s = [\n"%layer['label']
+            for e in layer['data']['sprites']:
+                if e['label'] != None:
+                    print '\t"%s",'%e['label']
+            print ']'
+        
+
     def write_json(self):
         if self.map is None:
             return
@@ -119,4 +139,5 @@ if __name__ == '__main__':
     test.read_map()
     test.name_instances()
     test.write_json()
+    test.dump_interesting_entities()
     

@@ -86,8 +86,8 @@ def main():
     #<----- startup end - all subsystem initialized - services availables
 
     # FIXME: transition between scenes are not working
-    scene = gg.services["s_get_intro_scene"]()
-##    scene = gg.services["s_get_game_scene"]()
+##    scene = gg.services["s_get_intro_scene"]()
+    scene = gg.services["s_get_game_scene"]()
 ##    scene = gg.services["s_get_end_scene"]()
     director.run(scene)
 

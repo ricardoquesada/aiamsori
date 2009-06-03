@@ -1,18 +1,18 @@
+# -*- coding: cp1252 -*-
+import collections
+import math
 from glob import glob
 import geom
 import random
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
 from pyglet.image import Animation, AnimationFrame, load
-#from pymunk.vec2d import Vec2d
 
 RANDOM_DELTA = 128
 
 from cocos.sprite import Sprite
-from cocos.actions.interval_actions import MoveBy
+from cocos.actions import MoveBy, FadeTo, CallFunc
 from cocos.euclid import Point2
 from boids import merge, seek, cap, avoid_group
-#from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
-#from tiless_editor.layers.collision import Circle
 import sound
 
 # NOTE: select wich class will be used as Zombie near EOF
@@ -86,6 +86,7 @@ class Gore(Sprite):
         img = random.choice(self.images)
         super(Gore, self).__init__(img, *a, **kw)
         self.scale = 1.5
+        self.label = None
 
 class Blood(Gore):
     images = globx("data/img/sangre[0-9]*.png")
@@ -98,13 +99,13 @@ class BodyParts(Gore):
 
 class Agent(Sprite):
 
-    def __init__(self, game_layer, img, position=(0,0)):
+    def __init__(self, game_layer, img, position=(0,0), label=None):
         super(Agent, self).__init__(img, position)
         self.anims = {}
         self.game_layer = game_layer
         self.current_anim = 'idle'
+        self.label = label
 
-        ###self.shape = AgentShape(self)
         self.just_born = True
         self.life = PLAYER_MAX_LIFE
         self.collided_agent = None
@@ -222,7 +223,6 @@ class Agent(Sprite):
         self.current_anim = anim_name
 
     def on_collision(self, other):
-        #print 'self', self, 'other', other
         if isinstance(other, Bullet):
 #            if not isinstance(self, Father):
             if isinstance(self, Zombie):
@@ -270,6 +270,7 @@ class Father(Family):
         super(Father, self).__init__(game_layer, img, position)
         ###self.shape.group = COLLISION_GROUP_FATHER
 
+        self.label = 'father'
         self._old_state = {'position': position}
         self.speed = 0
         self.position = position
@@ -387,10 +388,8 @@ class Father(Family):
             self.time_since_attack = 0
 
     def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.game_layer
-        game_layer.dead_items.add(self)
+        game_layer.kill(self)
         game_layer.game_over()
 
     def _get_game_layer(self):
@@ -429,7 +428,6 @@ class RangedWeapon(Weapon):
         self._play_sound()
         self.ammo -= 1
         if self.ammo < 1:
-            # defensive progamming
             self.ammo = 0
             self.player.switch_weapon('fist')
         self.player.game_layer.hud.set_bullets(self.ammo)
@@ -539,10 +537,8 @@ class Relative(Family):
 
 
     def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
+        game_layer.kill(self)
 
         # mark relative as dead in the HUD
         game_layer.hud.faces[self.name].color = (172, 0, 0)
@@ -578,6 +574,7 @@ class Boy(Relative):
                       'walk': get_animation('boy_walk'),
                       }
         self.sounds = {}
+        self.label = 'boy'
         player.family['boy'] = self
 
     def die(self):
@@ -593,6 +590,7 @@ class Girl(Relative):
                       'walk': get_animation('girl_walk'),
                       }
         self.sounds = {}
+        self.label = 'girl'
         player.family['girl'] = self
 
     def die(self):
@@ -608,6 +606,7 @@ class Mother(Relative):
                       'walk': get_animation('mother_walk'),
                       }
         self.sounds = {}
+        self.label = 'mother'
         player.family['mother'] = self
 
     def die(self):
@@ -616,8 +615,8 @@ class Mother(Relative):
 
 
 class Zombie(Agent):
-    def __init__(self, game_layer, img, player):
-        super(Zombie, self).__init__(game_layer, img)
+    def __init__(self, game_layer, img, player, label):
+        super(Zombie, self).__init__(game_layer, img, label=label)
         self._old_state = {}
         self.speed = 100
         self.schedule(self.update)
@@ -635,7 +634,6 @@ class Zombie(Agent):
         self.weapon = ZombieMeleeWeapon(self)
         self.time_since_attack = 0
 
-        ###self.shape = ZombieShape(self)
         self.last_goal = random.random()*0.3
         self.goal = self.position
         self.target = self.player
@@ -725,15 +723,11 @@ class Zombie(Agent):
             self.attack()
 
     def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
+        game_layer.kill(self)
 
     def _get_game_layer(self):
         return self.player.game_layer
-
-
 
 
 class Bullet(Sprite):
@@ -743,26 +737,17 @@ class Bullet(Sprite):
         self.anims = {}
         self.player = player
         self.speed = 1000
+        self.label = None
         self.schedule(self.update)
-
-
+        
         # get target
         WEAPON_RANGE = self.player.weapon.range
 
-        #from pymunk.vec2d import Vec2d
-        #offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
-        #target = offset+position
         position = player.position
         nx = WEAPON_RANGE * cos( radians(-self.rotation) )
         ny = WEAPON_RANGE * sin( radians(-self.rotation) )
         target = (position[0] + nx, position[1] + ny)
-        #print 'target ', target
         self.target = target
-        #print 'BULLET CREATED'
-
-        ###shape = BulletShape(self, position, target)
-        ###shape.group = player.shape.group
-        ###self.shape = shape
 
     def update(self, dt):
         goal = seek(self.x, self.y, self.target[0], self.target[1])
@@ -773,7 +758,6 @@ class Bullet(Sprite):
         nx = (self.x + cos( radians(a) ) * self.speed * dt)
         ny = (self.y + sin( radians(a) ) * self.speed * dt)
 
-        #print 'updating bullet position', self.position, (nx,ny)
         self.update_position((nx, ny))
         # FIXME: this goes away as soon as bullets collide agains walls
 ##         if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
@@ -785,26 +769,13 @@ class Bullet(Sprite):
         self.position = position
 
     def on_collision(self, other):
-        #print 'BULLET DIED'
-        #print self, self.position, other, other.position
         if self.player != other:
             self.hit()
 
 
     def hit(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
-
-
-class Ray(Sprite):
-    def __init__(self, agent, target):
-        super(Ray, self).__init__('img/bullet.png', agent.position, agent.rotation, agent.scale)
-        ###shape = RayShape(self, agent.position, target)
-        ###shape.group = agent.shape.group
-        ###self.shape = shape
-
+        game_layer.kill(self)
 
 class Wall(Sprite):
     def __init__(self, child):
@@ -817,13 +788,13 @@ class Wall(Sprite):
         self.label = None
         self.path = img['filename']
         self.rect = img['rect']
-        ###self.shape = WallShape(self)
 
 class PowerUp(Sprite):
     def __init__(self, type, position, game_layer):
         image = 'hud/%s.png' % type
         super(PowerUp, self).__init__(image, position)
         self.type = type
+        self.label = None
         self.game_layer = game_layer
 
     def on_collision(self, other):
@@ -831,5 +802,79 @@ class PowerUp(Sprite):
         self.die()
 
     def die(self):
-        self.game_layer.dead_items.add(self)
+        self.game_layer.kill(self)
         self.game_layer.spawn_powerup()
+
+
+class ZombieSpawn(Sprite):
+    def __init__(self,game_layer,img):#child):
+##        img = {'filename': child.path, 'position': child.position,
+##               'rotation': child.rotation, 'scale': child.scale,
+##               'opacity': child.opacity, 'rect': child.rect}
+        super(ZombieSpawn, self).__init__(str(img['filename']), img['position'],
+                                   img['rotation'], img['scale'],
+                                   img['opacity'])
+        self.label = img['label']
+        self.path = img['filename']
+        self.rect = img['rect']
+        self.radius = self.rect[2]
+        assert(self.rect[2]== self.rect[3])
+        self.game_layer = game_layer
+        self.que = collections.deque()
+        self.allow_attack_time = self.game_layer.frame_time
+        self.allow_retry_time = self.game_layer.frame_time
+        self.schedule(self.update)
+        self.stname = 'sleeping'
+
+    #the 'a_' methods are for servicing ScriptDirector.
+    def a_spawn_zombie(self,zombie_params):
+        self.que.append(zombie_params)
+
+    #spawn cycle: glow hi, spawn, glow lo; if self actually visible, spawn sound
+    def update(self, dt):
+        if self.stname=='sleeping':
+            if self.que:
+                self.stname = 'prespawn'
+                action = FadeTo(255,2) + CallFunc(self._try_spawn)
+                self.do(action)
+        if self.stname=='spawn' and self.game_layer.frame_time<self.allow_retry_time:
+            self._spawn()
+
+    def _try_spawn(self):
+        self.stname = 'spawn'
+
+    def _can_spawn(self):
+        # checkear por area libre;
+        #   si zombie in, pasar
+        #   si family member, infligir daño y pasar
+        #   si area libre, hacer _spawn
+        x0 = self.x
+        y0 = self.y
+        radius = self.radius
+        touched = [e for e in self.game_layer.agents if math.hypot(x0-e.x,y0-e.y)<radius+e.rect[2]/2.0]
+        if touched and self.game_layer.frame_time<self.allow_attack_time:
+            potentially_attack = [ e for e in touched if isinstance(e,Family)]
+            if potentially_attack:
+                self.allow_attack_time = self.game_layer.frame_time+gg.zombie_spawn_recovery_time
+                e = potentially_attack[0]
+                e.receive_damage(gg.zombie_spawn_attack_damage, self)
+        return len(touched)>0
+
+    def _spawn(self):
+        if self._can_spawn():
+            self.stname = 'posspawn'
+            #Zombie(self, game_layer, img, player):
+            zombie_num,  = self.que.popleft()
+            ent = Zombie(self, get_animation('zombie1_idle'), target,'zombie#%d'%zombie_num)
+            ent.position = self.position
+            self.game_layer.add_agent(ent)
+            action = FadeTo(128,1) + CallFunc(self._end_spawn)
+            self.do(action)
+        self.allow_retry_time = self.game_layer.frame_time + gg.zombie_spawn_retry_time
+        
+    def _end_spawn(self):
+        self.stname = 'sleeping'
+        
+# ok, los spawn son visibles ahora. pero se verian mejor si estuviesen en lights,
+# preferiblemte con alguna animacion. Todavia no esta probado el mecanismo de spawn.
+
