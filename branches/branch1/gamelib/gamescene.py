@@ -22,7 +22,6 @@ from cocos.text import Label
 from cocos.sprite import Sprite
 
 from tiless_editor.plugins.sprite_layer import SpriteLayerFactory
-#from tiless_editor.layers.collision import CollisionLayer
 from tiless_editor.tiless_editor import LayersNode
 from tiless_editor.tilesslayer import TilessLayer
 from tiless_editor.atlas import SavedAtlas
@@ -34,29 +33,18 @@ import sound
 from light import Light
 import waypointing
 
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, Ray, get_animation
+from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn, get_animation
 from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
 from wallmask import WallMask
+
+import scripter
 
 import gg
 
 #WIDTH, HEIGHT = 1024, 768
 MAPFILE = 'data/map.json'
-RETREAT_DELAY = 0.1
+#RETREAT_DELAY = 0.1
 
-ZOMBIE_WAVE_COUNT = 4
-ZOMBIE_DEBUG = 0
-ZOMBIE_WAVE_DURATION = 60
-
-RANDOM_DELTA = 128
-UNKNOWN_ITEM_PROBABILTY = 0.1
-UNKNOWN_PLACE_PROBABILTY = 0.1
-
-WAVE_DELAY = [15, 30, 25, 25, 20, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11]
-WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  2, 3, 3, 3, 4, 4, 4]
-
-PWUP_MIN_TIME = 10
-PWUP_MAX_TIME = 30
 
 has_grabber = True # potentially reset at startup or in .visit() 
 
@@ -77,6 +65,19 @@ def make_sprites_layer(layer_data, atlas):
     for item in layer_data["sprites"]:
         sprite = build_sprite(item)
         layer.add(sprite)
+    return layer
+
+def make_special_sprites_layer(layer_data, atlas, cls, game_layer):
+    # cls reqires an init as def __init__(self,game_layer,json_obtained_dict):
+    # the concrete use case is for ZombieSpawn
+    # probably better if json_obtained_dict has key 'cls_name', wich will resolve here with
+    # the aid of a name to class name 
+    saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
+
+    layer = BatchNode()
+    for item in layer_data["sprites"]:
+        obj = cls(game_layer,item)
+        layer.add(obj, name=obj.label)
     return layer
 
 class DeadStuffLayer(cocos.cocosnode.CocosNode):
@@ -105,20 +106,18 @@ class GameLayer(Layer):
             self.grabber = framegrabber.TextureGrabber()
             self.grabber.grab(self.texture)
 
+        self.frame_time = 0.0
         self.map_node = LayersNode()
-        self.projectiles = []
         self.dead_items = set()
         self.wallmask = WallMask()
         self.agents_node = LayersNode()
+        self.script_director = scripter.ScriptDirector(scripter.script)
+        self.objs_by_label = {}
 
 
         # get layers from map
         collision_layers = []
         walls_layers = []
-        self.zombie_spawn = None
-        self.z_spawn_lifetime = 0
-        self.zombie_wave_number = 0
-        self.schedule(self.respawn_zombies)
 
         img = pyglet.image.load(  'data/atlas-fixed.png' )
         self.atlas = pyglet.image.atlas.TextureAtlas( img.width, img.height )
@@ -136,7 +135,13 @@ class GameLayer(Layer):
         for layer_data in layers:
             layer_type = layer_data['layer_type']
             layer_label = layer_data['label']
-            if layer_type == 'sprite':
+            if layer_type == 'sprite' and layer_label=='zombie_spawn':
+                sprite_layer = make_special_sprites_layer(layer_data['data'], self.atlas, ZombieSpawn, self)
+                self.map_node.add_layer(layer_data['label'], layer_data['z'],sprite_layer)
+                for z,c in sprite_layer.children:
+                    self.objs_by_label[c.label] = c
+                continue
+            elif layer_type == 'sprite':
                 sprite_layer = make_sprites_layer(layer_data['data'], self.atlas)
                 if layer_label in ["floor", "furninture"]:
                     self.map_node.add_layer(layer_data['label'], layer_data['z'],
@@ -145,14 +150,16 @@ class GameLayer(Layer):
                     collision_layers.append(sprite_layer)
                 if layer_label in ['walls', 'gates']:
                     walls_layers.append(sprite_layer)
-                if layer_label in ['zombie_spawn']:
-                    self.zombie_spawn = sprite_layer
                 if layer_label in ['item_spawn']:
                     item_spawn = sprite_layer
                 if layer_label in ['waypoints']:
                     waypoints = sprite_layer
+                    for z,c in sprite_layer.children: #? probably innecesary
+                        self.objs_by_label[c.label] = c
                 if layer_label in ['lights']:
                     self.lights = Light(sprite_layer)
+                    for z,c in sprite_layer.children:
+                        self.objs_by_label[c.label] = c
 
 
         # temporary dead stuff layer
@@ -160,9 +167,7 @@ class GameLayer(Layer):
         self.deadstuff_layer = DeadStuffLayer()
         self.map_node.add(self.deadstuff_layer)
 
-        # create collision shapes
-        ###collision_layer = self._create_collision_layer(for_collision_layers)
-        ###self.map_node.add_layer('collision', 1000, collision_layer)
+        # create collision info
         self.map_node.add(create_wall_layer(walls_layers), z=10)
         # add scene map node to the main layer
         self.add(self.map_node)
@@ -205,22 +210,8 @@ class GameLayer(Layer):
             wpts = [ (s.x,s.y) for s in waypoints.get_children()] #Esta bien asi Lucio?
             # a seguir
 
-        self.setup_powerups(item_spawn)
-
-        self.flicker()
-
-    def flicker(self):
-        delay = random.random()*5+2
-        action = Delay(delay)
-        light = random.choice(self.lights.get_children())
-
-        for i in range(random.randint(5, 10)):
-            micro_delay = random.random()*0.50
-            micro_delay2 = random.random()*0.50
-            action = action + FadeTo(50, micro_delay) + FadeTo(255, micro_delay2)
-        action = action + CallFunc(self.flicker)
-        light.do(action)
-
+        # init terminates
+        self.script_director.game_event_handler('map_loaded')
 
     def on_resize(self, w, h):
         global has_grabber
@@ -232,7 +223,6 @@ class GameLayer(Layer):
             self.texture = pyglet.image.Texture.create_for_size(
                     gl.GL_TEXTURE_2D, width,
                     height, gl.GL_RGBA)
-
 
     def visit(self):
         global has_grabber
@@ -338,98 +328,6 @@ class GameLayer(Layer):
         self.ways = waypointing.WaypointNav(points, visible)
         print "Navigation setup done."
 
-    def setup_powerups(self, layer):
-        self.item_spawn = []
-        for c in layer.get_children():
-            self.item_spawn.append( c.position )
-        # wait 4 seconds before displaying first message
-        self.do(Delay(3) + CallFunc(lambda: self.talk('Bee', "Zombies are coming!", duration=2, transient=False)))
-        self.do(Delay(5) + CallFunc(lambda: self.talk('Mom', "Protect your family!", duration=2, transient=False)))
-        self.do(Delay(7) + CallFunc(lambda: self.talk('Zack', "Click on us to move us", duration=2, transient=False)))
-        self.do(Delay(9) + CallFunc(lambda: self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")))
-        self.spawn_powerup()
-
-    def spawn_powerup(self, type=''):
-        delay = random.randrange(PWUP_MIN_TIME, PWUP_MAX_TIME)
-        self.do(Delay(delay) + CallFunc(lambda: self.add_powerup(type)))
-
-    def add_powerup(self, type='', msg=''):
-        position = random.choice(self.item_spawn)
-        if not type:
-            # make ammo and life categories equally probable
-            type = random.choice(POWERUP_TYPE_AMMO_LIST*3 + POWERUP_TYPE_LIFE_LIST)
-        powerup = PowerUp(type, position, self)
-        self.agents_node.add(powerup)
-        item = type
-        if item == 'burger':
-            item = 'a burger'
-        elif item == 'medicine':
-            item = 'some medicine'
-        if random.random() < UNKNOWN_ITEM_PROBABILTY:
-            item = ''
-        place = powerup.label if hasattr(powerup, 'label') else ''
-        if random.random() < UNKNOWN_PLACE_PROBABILTY:
-            place = ''
-        if not msg:
-            msg = "I think I remember seeing "
-            if item:
-                msg += item
-            else:
-                msg += 'something'
-            if place:
-                msg += " in the %s." % place
-            else:
-                msg += ' somewhere.'
-        self.talk("Dad", msg, transient=False)
-        #print "powerup ", powerup, 'at', place, position
-
-    def respawn_zombies(self, dt):
-
-        if ZOMBIE_DEBUG:
-            if self.z_spawn_lifetime == 0:
-                print "NEW ZOMBIE"
-                p = self.zombie_spawn.get_children()[0]
-                z = Zombie(self, get_animation('zombie1_idle'), self.player)
-                z.position = p.position
-                self.agents_node.add(z)
-                print "NEW ZOMBIE"
-                z = Zombie(self, get_animation('zombie1_idle'), self.player)
-                z.position = p.position
-                self.agents_node.add(z)
-
-
-            self.z_spawn_lifetime += 1
-        else:
-            self.z_spawn_lifetime += dt
-            waveno = min(self.zombie_wave_number,len(WAVE_DELAY)-1)
-            delay = WAVE_DELAY[ waveno ]
-            if self.z_spawn_lifetime >= delay:
-                z_count = len([c for c in self.agents_node.get_children() if isinstance(c, Zombie)])
-                if z_count < 12:
-                    print "Wave Numer:", waveno, z_count
-                    # we have a zombie wave
-                    msg = random.choice([
-                        "cerebroooo.....",
-                        "brraaaaaiins....",
-                        "arrghhhhh....",
-                        "me hungry!"
-                    ])
-                    self.talk("zombie", msg)
-                    for i in range(WAVE_NUM[ waveno ]):
-                        for c in self.zombie_spawn.get_children():
-                            z = Zombie(self, get_animation('zombie1_idle'), self.player)
-                            z.x = c.x + random.choice([-1,1])*RANDOM_DELTA
-                            z.y = c.y + random.choice([-1,1])*RANDOM_DELTA
-                            z.position = z.x, z.y
-                            self.agents_node.add(z)
-                    self.z_spawn_lifetime = 0
-                    self.zombie_wave_number += 1
-
-
-    def talk(self, who, what, duration=5, transient=False):
-        if who not in self.hud.deads:
-            self.talk_layer.talk(who, what, duration=duration, transient=transient)
-
     def on_enter(self):
         self.enter_time = time.time()
         super(GameLayer, self).on_enter()
@@ -440,9 +338,6 @@ class GameLayer(Layer):
         self.do( Delay(3) + CallFunc(lambda: sound.stop_music()) +
                 CallFunc(lambda: sound.play_music('game_music', 0.25)) )
 
-        #self.light.set_position(x/2, y/2)
-        #self.light.enable()
-
     def on_exit(self):
         print "Exiting GameLayer"
         super(GameLayer, self).on_exit()
@@ -451,9 +346,6 @@ class GameLayer(Layer):
         sound.stop_music()
 
     def _create_agents(self):
-        # get collision layer
-
-        # create agent sprite
         father = Father(self, get_animation('father_idle'), (40,-900))
         father.rotation = 90
         self.player = father
@@ -463,7 +355,7 @@ class GameLayer(Layer):
         else:
             # fist weapon has no bullets
             self.hud.set_bullets(0)
-        self.agents_node.add(father)
+        self.add_agent(father)
 
         # any actor except father must be added into the if, else they
         # pester you when editing waypoints
@@ -471,72 +363,80 @@ class GameLayer(Layer):
             position = 40, -1200
             boy = Boy(self, get_animation('boy_idle'), position, self.player)
             boy.rotation = -90
-            self.agents_node.add(boy)
+            self.add_agent(boy)
 
             position = -100, -1050
             girl = Girl(self, get_animation('girl_idle'), position, self.player)
-            self.agents_node.add(girl)
+            self.add_agent(girl)
 
             position = 180, - 1050
             mother = Mother(self, get_animation('mother_idle'), position, self.player)
             mother.rotation = 180
-            self.agents_node.add(mother)
+            self.add_agent(mother)
 
     def update(self, dt):
+        if dt>0.25:
+            dt = 0.25
+        self.frame_time += dt
+
+        self.script_director.update(dt, self.frame_time)
+
         x, y = director.get_window_size()
         self.x = -self.player.x + x/2
         self.y = -self.player.y + y/2
-        #self.lights.sprite.position = self.player.position
-
-        # clear out any non-collisioned projectiles
-#        self._remove_projectiles()
-
-        # clear out any dead items
+        
         self._remove_dead_items()
 
+    def talk(self, who, what, duration=5, transient=False):
+        if who not in self.hud.deads:
+            self.talk_layer.talk(who, what, duration=duration, transient=transient)
+
+    def add_agent(self,obj):
+        if obj.label:
+            self.objs_by_label[obj.label] = obj
+        self.agents_node.add(obj)
+
+    def kill(self, obj):
+        label = obj.label
+        try:
+            del self.objs_by_label[label]
+        except KeyError:
+            pass
+        self.dead_items.add(obj)        
 
     def add_projectile(self, projectile):
-        self.projectiles.append(projectile)
-        self.agents_node.add(projectile)
+        self.add_agent(projectile)
 
         self.fire_light.x = self.player.x
         self.fire_light.y = self.player.y
         self.fire_light.rotation = self.player.rotation
         self.show_fire_frames = 3
 
-    def remove_projectile(self, projectile):
-        self.projectiles.remove(projectile)
-        # delay objects deletion until later, to avoid segfaults
-        self.dead_items.add(projectile)
+    def game_over(self):
+        director.return_value = time.time() - self.enter_time
+        director.replace(gg.services["s_get_end_scene"]())
 
-    def _remove_projectiles(self):
-        for projectile in self.projectiles:
-            self.remove_projectile(projectile)
-        #print self.projectiles
+    def on_talk(self,who, what, duration):
+        self.talk(who, what, duration=duration, transient=False)
+
+    def on_relay(self, label, *args, **kwargs):
+        try:
+            obj = self.objs_by_label[label]
+        except KeyError:
+            print 'relay error: unknown label',label
+            return
+        obj.do_cmd(*args,**kwargs)
 
     def _remove_dead_items(self):
-        ###collision_layer = self.map_node.get('collision')
         for item in self.dead_items:
-            ###collision_layer.remove(item, static=item.shape.static)
             if item in self.agents_node:
                 self.agents_node.remove(item)
         self.dead_items.clear()
-
-    def is_clear_path(self, origin, target):
-        ray = Ray(self.player, target)
-        ###collision_layer = self.map_node.get('collision')
-        ###collision_layer.add(ray, static=ray.shape.static)
-        ###collision_layer.step()
-        ###collision_layer.remove(ray)
-        return not ray.shape.data['collided']
 
     def is_empty(self,x,y):
         # note: ATM only walls, not muebles
         return self.wallmask.is_empty(x,y)
 
-    def game_over(self):
-        director.return_value = time.time() - self.enter_time
-        director.replace(gg.services["s_get_end_scene"]())
 
 # service
 def get_game_scene():

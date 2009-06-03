@@ -5,3 +5,10 @@
 # convention : services['s_foo'] = foo
 services = {}
 
+#consts to tweak gameplay
+zombie_spawn_recovery_time = 1.0
+zombie_spawn_attack_damage = 20
+zombie_spawn_retry_time = 0.5
+
+
+

@@ -13,6 +13,21 @@ Gameplay:
             Hay familiares que podemos controlar.
  
             De vez en cuando aparecen powerups.
+
+Una variacion:
+	Hay puntos estrategicos de posicion fija:
+		caja de luz
+		ammo spawn point
+		botiquin
+
+	Algunos powerups aparecen al matar a un zombie (armas nuevas)
+
+	El player humano elige que pawn controlar (ie, actua desde el POV del personaje)
+	En el hud hay alguna marca de cuantos zombies tiene cerca cada family member 
+
+	Las armas podrian no disparar si un familiar saldria posiblemente herido ( diferentes armas tendrian distinta dispersion )
+
+	Segun cuan apretado de espacio este el atacante podemos modular el daño infligigo y o animacion; por ejemplo mucho espacio + sable : mata en un golpe, quizas cortando cabeza. Si poco espacio, daño proporcional a distancia desde punto impacto a centro del enemigo.
  
         Entidades y Roles:
                  
