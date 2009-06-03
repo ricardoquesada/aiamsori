@@ -211,7 +211,9 @@ class GameLayer(Layer):
             # a seguir
 
         # init terminates
+        self.script_director.push_handlers(self.on_talk, self.on_relay)
         self.script_director.game_event_handler('map_loaded')
+        print '+++ GameLayer init completado'
 
     def on_resize(self, w, h):
         global has_grabber
