@@ -99,12 +99,17 @@ PWUP_MAX_TIME = 30
 ##
 ##        self.flicker()
 script = """
-wait_for_event, map_loaded
+#wait_for_event, map_loaded
 wait, 3
 talk, Bee, "Zombies are coming!", 2
 talk, Mom, "Protect your family!", 2
 talk, Zack, "Click on us to move us", 2
 wait, 6
+add_zombie, zombie_spawn:zombie-spawm#0, zombie#1
+add_zombie, zombie_spawn:zombie-spawm#0, zombie#2
+add_zombie, zombie_spawn:zombie-spawm#0, zombie#3
+wait, 500
+
 add_powerup, 'shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!"
 # level 0
 play level_begin
@@ -176,20 +181,20 @@ class ScriptDirector(pyglet.event.EventDispatcher):
                             res = float(part)
                         except ValueError:
                             pass
-                    if res is None:
-                        res = part
-                        
+                    if res is not None:
+                        part = res
+
                 parts.append(part)
                 start = match.end()+1
             if bValid:
                 return parts
 
     def game_event_handler(self,event):
+        print '>>> scripter.game_event_handler() received',event 
         if event==self.awaiting_event:
             self.awaiting_event = None
 
     def update(self,dt,level_time):
-        return
         self.level_time = level_time
         # update waiting state
         self.waiting = self.waiting_time>level_time or self.awaiting_event
@@ -199,6 +204,7 @@ class ScriptDirector(pyglet.event.EventDispatcher):
             # process script commands
             parts = self.next_command()
             cmd = parts.popleft()
+            print '*** scripter loop got cmd, params', cmd, parts
             try:
                 fn = getattr(self, 'c_%s'%cmd)
             except AttributeError:
@@ -215,12 +221,15 @@ class ScriptDirector(pyglet.event.EventDispatcher):
 
     def c_wait_for_event(self,parts):
         if len(parts)!=1:
-            print "error cmd script 'wait' bad parameter quantity; ignoring line",self.linenum
+            print "error cmd script 'wait_for_event' bad parameter quantity; ignoring line",self.linenum
             return
         self.awaiting_event = parts[0]
         
     def c_talk(self,parts):
-        self.dispatch_event("on_talk",parts[0],parts[1],parts[2]) #who, what, duration        
+        self.dispatch_event("on_talk",parts[0],parts[1],parts[2]) #who, what, duration
+
+    def c_add_zombie(self,parts):
+        self.dispatch_event("on_relay",parts[0],'spawn_zombie',parts[1]) # zombie_spawn label, zombie label
 
 def test_next_command():
     script_director = ScriptDirector(script)
@@ -316,3 +325,4 @@ if __name__ == '__main__':
 
 # register the events scriptdirector will trigger
 ScriptDirector.register_event_type('on_talk')
+ScriptDirector.register_event_type('on_relay')

@@ -826,6 +826,15 @@ class ZombieSpawn(Sprite):
         self.schedule(self.update)
         self.stname = 'sleeping'
 
+    def do_cmd(self,cmd, *args,**kwargs): #? move to Agent ?
+        print '>> agent %s received relayed command %s \n\targs=%s , kwargs=%s'%(self.label, cmd, args, kwargs)
+        try:
+            fn = getattr(self, 'a_%s'%cmd)
+        except AttributeError:
+            print 'error - %s received the unknown command %s'%(self.label,cmd)
+            return
+        fn(*args,**kwargs)        
+
     #the 'a_' methods are for servicing ScriptDirector.
     def a_spawn_zombie(self,zombie_params):
         self.que.append(zombie_params)
@@ -834,14 +843,15 @@ class ZombieSpawn(Sprite):
     def update(self, dt):
         if self.stname=='sleeping':
             if self.que:
-                self.stname = 'prespawn'
+                self.stname = 'prespawn'; print 'stname=',self.stname
                 action = FadeTo(255,2) + CallFunc(self._try_spawn)
                 self.do(action)
-        if self.stname=='spawn' and self.game_layer.frame_time<self.allow_retry_time:
+        if(self.stname=='spawn' and
+           self.game_layer.frame_time>self.allow_retry_time):
             self._spawn()
 
     def _try_spawn(self):
-        self.stname = 'spawn'
+        self.stname = 'spawn';print 'stname=',self.stname
 
     def _can_spawn(self):
         # checkear por area libre;
@@ -851,29 +861,33 @@ class ZombieSpawn(Sprite):
         x0 = self.x
         y0 = self.y
         radius = self.radius
-        touched = [e for e in self.game_layer.agents if math.hypot(x0-e.x,y0-e.y)<radius+e.rect[2]/2.0]
+        touched = [e for z,e in self.game_layer.agents_node.children
+                       if math.hypot(x0-e.x,y0-e.y)<radius+e.rect[2]/2.0]
         if touched and self.game_layer.frame_time<self.allow_attack_time:
             potentially_attack = [ e for e in touched if isinstance(e,Family)]
             if potentially_attack:
-                self.allow_attack_time = self.game_layer.frame_time+gg.zombie_spawn_recovery_time
+                self.allow_attack_time = (self.game_layer.frame_time +
+                                          gg.zombie_spawn_recovery_time)
                 e = potentially_attack[0]
                 e.receive_damage(gg.zombie_spawn_attack_damage, self)
-        return len(touched)>0
+        return 1#len(touched)==0
 
     def _spawn(self):
         if self._can_spawn():
-            self.stname = 'posspawn'
+            self.stname = 'posspawn';print 'stname=',self.stname
             #Zombie(self, game_layer, img, player):
-            zombie_num,  = self.que.popleft()
-            ent = Zombie(self, get_animation('zombie1_idle'), target,'zombie#%d'%zombie_num)
+            zombie_label,  = self.que.popleft()
+            ent = Zombie(self.game_layer, get_animation('zombie1_idle'),
+                         target,zombie_label)
             ent.position = self.position
             self.game_layer.add_agent(ent)
             action = FadeTo(128,1) + CallFunc(self._end_spawn)
             self.do(action)
-        self.allow_retry_time = self.game_layer.frame_time + gg.zombie_spawn_retry_time
+        self.allow_retry_time = (self.game_layer.frame_time +
+                                 gg.zombie_spawn_retry_time)
         
     def _end_spawn(self):
-        self.stname = 'sleeping'
+        self.stname = 'sleeping';print 'stname=',self.stname
         
 # ok, los spawn son visibles ahora. pero se verian mejor si estuviesen en lights,
 # preferiblemte con alguna animacion. Todavia no esta probado el mecanismo de spawn.
