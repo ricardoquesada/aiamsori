@@ -15,7 +15,7 @@ from cocos.euclid import Point2
 from boids import merge, seek, cap, avoid_group
 import sound
 
-# NOTE: select wich class will be used as Zombie near EOF
+import gg
 
 COLLISION_GROUP_FATHER = 1
 
@@ -100,10 +100,17 @@ class BodyParts(Gore):
 class Agent(Sprite):
 
     def __init__(self, game_layer, img, position=(0,0), label=None):
+        print '+++ in Agent._init__ , img =',img
         super(Agent, self).__init__(img, position)
         self.anims = {}
         self.game_layer = game_layer
         self.current_anim = 'idle'
+        #? suppose same size all cells all anims to estimate radius
+        self.radius = (self._texture.width + self._texture.height)/4.0
+
+##        self.radius = (self.image.frames[0].image.width +
+##               self.image.frames[0].image.height)/2.0
+
         self.label = label
 
         self.just_born = True
@@ -831,13 +838,13 @@ class ZombieSpawn(Sprite):
         try:
             fn = getattr(self, 'a_%s'%cmd)
         except AttributeError:
-            print 'error - %s received the unknown command %s'%(self.label,cmd)
+            print 'error - agent %s received the unknown command %s'%(self.label,cmd)
             return
         fn(*args,**kwargs)        
 
     #the 'a_' methods are for servicing ScriptDirector.
-    def a_spawn_zombie(self,zombie_params):
-        self.que.append(zombie_params)
+    def a_spawn_zombie(self,*params):
+        self.que.append(params)
 
     #spawn cycle: glow hi, spawn, glow lo; if self actually visible, spawn sound
     def update(self, dt):
@@ -860,9 +867,9 @@ class ZombieSpawn(Sprite):
         #   si area libre, hacer _spawn
         x0 = self.x
         y0 = self.y
-        radius = self.radius
+        radius = self.radius + 40
         touched = [e for z,e in self.game_layer.agents_node.children
-                       if math.hypot(x0-e.x,y0-e.y)<radius+e.rect[2]/2.0]
+                       if math.hypot(x0-e.x,y0-e.y)<radius]
         if touched and self.game_layer.frame_time<self.allow_attack_time:
             potentially_attack = [ e for e in touched if isinstance(e,Family)]
             if potentially_attack:
@@ -870,13 +877,16 @@ class ZombieSpawn(Sprite):
                                           gg.zombie_spawn_recovery_time)
                 e = potentially_attack[0]
                 e.receive_damage(gg.zombie_spawn_attack_damage, self)
-        return 1#len(touched)==0
+        return len(touched)==0
 
     def _spawn(self):
         if self._can_spawn():
-            self.stname = 'posspawn';print 'stname=',self.stname
-            #Zombie(self, game_layer, img, player):
-            zombie_label,  = self.que.popleft()
+            self.stname = 'posspawn'            
+            zombie_label , target_label = self.que.popleft()
+            try:
+                target = self.game_layer.objs_by_label[target_label]
+            except KeyError:
+                target = self.game_layer.player
             ent = Zombie(self.game_layer, get_animation('zombie1_idle'),
                          target,zombie_label)
             ent.position = self.position
@@ -890,5 +900,5 @@ class ZombieSpawn(Sprite):
         self.stname = 'sleeping';print 'stname=',self.stname
         
 # ok, los spawn son visibles ahora. pero se verian mejor si estuviesen en lights,
-# preferiblemte con alguna animacion. Todavia no esta probado el mecanismo de spawn.
+# preferiblemte con alguna animacion.
 
