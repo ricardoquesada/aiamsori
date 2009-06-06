@@ -105,6 +105,9 @@ talk, Bee, "Zombies are coming!", 2
 talk, Mom, "Protect your family!", 2
 talk, Zack, "Click on us to move us", 2
 wait, 6
+##relay, zombie_spawn:zombie-spawm#0, set_devflag, trace_cmds, 1
+##relay, zombie_spawn:zombie-spawm#0, set_devflag, trace_state_changes, 1
+##relay, zombie_spawn:zombie-spawm#0, set_devflag, show_errors, 1
 add_zombie, zombie_spawn:zombie-spawm#0, zombie#1, boy
 add_zombie, zombie_spawn:zombie-spawm#0, zombie#2, girl
 add_zombie, zombie_spawn:zombie-spawm#0, zombie#3, mother
@@ -231,6 +234,9 @@ class ScriptDirector(pyglet.event.EventDispatcher):
 
     def c_add_zombie(self,parts):
         self.dispatch_event("on_relay",parts[0],'spawn_zombie',parts[1],parts[2]) # zombie_spawn label, zombie label, target_label
+
+    def c_relay(self,parts):
+        self.dispatch_event("on_relay",*parts)
 
 def test_next_command():
     script_director = ScriptDirector(script)
