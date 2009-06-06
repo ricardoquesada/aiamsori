@@ -8,12 +8,12 @@ from cocos.sprite import Sprite
 def cap(value, min_v, max_v):
     return max(min(value, max_v), min_v)
 
-class Light(BatchNode):
+class LightGroup(BatchNode):
     def __init__(self, layer):
-        super(Light, self).__init__()
+        super(LightGroup, self).__init__()
         for c in layer.get_children():
             sp = Sprite(c.image)
-            sp.source_position = c.position
+#            sp.source_position = c.position
             sp.position = c.position
             sp.scale = c.scale
             sp.source_scale = c.scale
