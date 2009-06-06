@@ -1,11 +1,9 @@
 # -*- coding: cp1252 -*-
 import collections
 import math
-from glob import glob
 import geom
 import random
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
-from pyglet.image import Animation, AnimationFrame, load
 
 RANDOM_DELTA = 128
 
@@ -15,14 +13,8 @@ from cocos.euclid import Point2
 from boids import merge, seek, cap, avoid_group
 import sound
 
+import base_entities as be
 import gg
-
-COLLISION_GROUP_FATHER = 1
-
-COLLISION_DISTANCE_SQUARED = 64**2
-
-TOP_SPEED = 430
-ACCEL_FACTOR = 300
 
 POWERUP_TYPE_AMMO_LIST = ['bullets']
 POWERUP_TYPE_WEAPON_LIST = ['shotgun']
@@ -32,250 +24,26 @@ POWERUP_TYPE_LIFE_LIST = POWERUP_TYPE_FOOD_LIST + POWERUP_TYPE_HEALTH_LIST
 POWERUP_AMMO = 25
 POWERUP_LIFE = {'chicken': 20, 'burger': 20, 'medicine': 50}
 WEAPON_FULL_AMMO = 25
-PLAYER_MAX_LIFE = 100
-
-BLOOD_SPLATTER_RANGE = 50, 200
-BLOOD_SPLATTER_SECONDS = .7
 
 BLOODY_HANDS_EASTEREGG = False
 
-####Pruebas hechas en win:
-####No conversion , glob encuentra nombres, pero los entrga con barras mezcladas,
-####cuelga el app no encontrando file (ej: "data/img\sangre1.png" not found )
-####Convertir a win antes de glob, salen barras parejas tipo windows, igual
-#### el app saca "data\img\sangre2.png" not found ( la intercepcion de glob
-#### mostraba que habia encontrado  'data\\img\\sangre2.png' )
-####Convertir antes a win y despues del glob a unix: BINGO!!!. take that, sucker!!!
-##def globx(s):
-##    import os
-##    print '*** globx'
-##    print 's:',s
-##    if os.sep == '\\':
-##        z = s.replace('/',os.sep)
-##        s = z
-##        print 'z:',z
-##    li = glob(s)
-##    print 'glob results unconverted:'
-##    print li
-##    if os.sep == '\\':
-##        li2 = [ s.replace('\\','/') for s in li ]
-##        li = li2
-##        print 'glob result converted back to unix:'
-##        li
-##    return li
-
-def globx(s):
-    import os
-    if os.sep == '\\':
-        z = s.replace('/',os.sep)
-        s = z
-    li = glob(s)
-    if os.sep == '\\':
-        li2 = [ s.replace('\\','/') for s in li ]
-        li = li2
-        # 'glob result converted back to unix:'
-    return li
-
-
-def get_animation(anim_name):
-    return Animation([AnimationFrame(load(img_file), 0.15)
-                      for img_file in  globx('data/img/%s*.png' % anim_name)])
-
-class Gore(Sprite):
-    def __init__(self, *a, **kw):
-        img = random.choice(self.images)
-        super(Gore, self).__init__(img, *a, **kw)
-        self.scale = 1.5
-        self.label = None
-
-class Blood(Gore):
-    images = globx("data/img/sangre[0-9]*.png")
-
-class BloodPool(Gore):
-    images = globx("data/img/sangre_mancha[0-9]*.png")
-
-class BodyParts(Gore):
-    images = globx("data/img/cacho[0-9]*.png") + BloodPool.images
-
-class Agent(Sprite):
-
-    def __init__(self, game_layer, img, position=(0,0), label=None):
-        print '+++ in Agent._init__ , img =',img
-        super(Agent, self).__init__(img, position)
-        self.anims = {}
-        self.game_layer = game_layer
-        self.current_anim = 'idle'
-        #? suppose same size all cells all anims to estimate radius
-        self.radius = (self._texture.width + self._texture.height)/4.0
-
-##        self.radius = (self.image.frames[0].image.width +
-##               self.image.frames[0].image.height)/2.0
-
-        self.label = label
-
-        self.just_born = True
-        self.life = PLAYER_MAX_LIFE
-        self.collided_agent = None
-        self.zombie_crash = 0
-
-    def update_position(self, position):
-        self.collided_agent = None
-        self.old_position = self.position
-        self.position = position
-
-        # check collisions with static objects
-        if not self.game_layer.is_empty(*self.position):
-            if not self.just_born:
-                self.x = self.old_position[0]
-                if not self.game_layer.is_empty(*self.position):
-                    self.y = self.old_position[1]
-                    self.x = position[0]
-                    if not self.game_layer.is_empty(*self.position):
-                        self.position = self.old_position
-                        return
-            else:
-                self.x += random.random() * 40 - 20
-                self.y += random.random() * 40 - 20
-                return
-
-        if self.just_born:
-            self.old_position = position
-
-        is_zombie = isinstance(self, Zombie)
-        is_family = isinstance(self, Relative)
-        # check collisions with dynamic objects
-        agents = self.parent.children
-        collided = False
-        for z, agent in agents:
-            if agent is self: continue
-            distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
-            if isinstance(agent, Zombie):
-                if is_zombie:
-                    collision_distance = 32**2
-                elif is_family:
-                    collision_distance = 64**2
-                elif self == self.game_layer.player:
-                    collision_distance = 64**2
-                else:
-                    collision_distance = 96**2
-            elif isinstance(agent, Family):
-                if is_zombie:
-                    collision_distance = 64**2
-                elif is_family:
-                    collision_distance = 64**2
-                elif self == self.game_layer.player:
-                    collision_distance = 64**2
-                else:
-                    collision_distance = 96**2
-            elif isinstance(agent, Bullet):
-                    collision_distance = 64**2
-            else:
-                collision_distance = 96**2
-
-            collision = distance <= collision_distance
-
-            if is_zombie and isinstance(agent, Zombie):
-                self.zombie_crash += 1
-            if is_family:
-                if isinstance(agent, Father):
-                    if distance > 1100**2:
-                        self.alone = True
-                    else:
-                        self.alone = False
-
-
-            if collision:
-                collided = True
-                if self.zombie_crash > 100000:
-                    self.just_born = True
-                    self.zombie_crash = 0
-                # objects collided
-                if self.just_born:
-                    ###distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
-                    ###collision = distance <= COLLISION_DISTANCE_SQUARED
-                    ###while collision:
-                    self.x += random.choice([-1,1])*RANDOM_DELTA
-                    self.y += random.choice([-1,1])*RANDOM_DELTA
-                    self.position = (self.x, self.y)
-                    ###self.just_born = False
-                    return
-
-                #nx = self.old_position[0] + random.choice([-1,1])*RANDOM_DELTA
-                #ny = self.old_position[1] + random.choice([-1,1])*RANDOM_DELTA
-                #self.position = (nx, ny)
-                self.position = self.old_position
-                self.on_collision(agent)
-                agent.on_collision(self)
-                #f = getattr(self.collision, "on_collision", None)
-                #if f is not None:
-                #    f(self)
-
-                #self.position = position[0], self.old_position[1]
-                #collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
-                #if collision:
-                #    self.position = self.old_position[0], position[1]
-                #    collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
-                #    if collision:
-                #        self.position = self.old_position
-
-        if not collided:
-            if self.just_born:
-                self.just_born = False
-
-
-    def play_anim(self, anim_name):
-        self.image = self.anims[anim_name]
-        self.image_anchor = (self.image.frames[0].image.width / 2,
-                             self.image.frames[0].image.height / 2)
-        self.current_anim = anim_name
-
-    def on_collision(self, other):
-        if isinstance(other, Bullet):
-#            if not isinstance(self, Father):
-            if isinstance(self, Zombie):
-                bullet = other
-                self.receive_damage(bullet.player.weapon.damage, bullet)
-        elif isinstance(other, Agent):
-            self.collided_agent = other
-
-    def _get_game_layer(self):
-        raise NotImplementedError
-
-    def receive_damage(self, damage, other):
-        self.life -= damage
-        ## return True if died
-        if self.life <= 0:
-            self.die()
-            self.add_gore(BodyParts, other, duration=5)
-            return True
-        self.add_gore(Blood, other, duration=.5)
-        return False
-
-    def add_gore(self, gore_class, other, duration=5):
-        gore = gore_class((self.x, self.y), other.rotation)
-        dist = random.randrange(*BLOOD_SPLATTER_RANGE)
-        alpha = radians(-other.rotation)
-        gore.do(MoveBy( (cos(alpha)*dist, sin(alpha)*dist), BLOOD_SPLATTER_SECONDS))
-        self.player.game_layer.deadstuff_layer.add(gore, duration)
-
-
-class Family(Agent):
+class Family(be.Agent):
     def receive_damage(self, damage, other):
         self.life -= damage
         self.game_layer.hud.set_life(self.name, self.life)
         ## return True if died
         if self.life <= 0:
             self.die()
-            self.add_gore(BloodPool, other, duration=5)
+            self.add_gore(be.BloodPool, other, duration=5)
             return True
-        self.add_gore(Blood, other, duration=.5)
+        self.add_gore(be.Blood, other, duration=.5)
         return False
 
 class Father(Family):
     name = "Dad"
-    def __init__(self, game_layer, img, position):
+    def __init__(self, game_layer, img_name, position):
+        img = be.get_animation(img_name)
         super(Father, self).__init__(game_layer, img, position)
-        ###self.shape.group = COLLISION_GROUP_FATHER
 
         self.label = 'father'
         self._old_state = {'position': position}
@@ -287,26 +55,21 @@ class Father(Family):
         self.updating = False
         self.rotation_speed = 0
         self.collision = False
-        self.anims = {'idle': get_animation('father_idle'),
-                      'walk': get_animation('father_walk'),
+        self.anims = {'idle': be.get_animation('father_idle'),
+                      'walk': be.get_animation('father_walk'),
                       }
-        self.anim_sets = {'fist': {'idle': get_animation('father_idle'),
-                                   'walk': get_animation('father_walk'),
+        self.anim_sets = {'fist': {'idle': be.get_animation('father_idle'),
+                                   'walk': be.get_animation('father_walk'),
                                    },
-                          'shotgun': {'idle': get_animation('father_shotgun_idle'),
-                                      'walk': get_animation('father_shotgun_walk'),
+                          'shotgun': {'idle': be.get_animation('father_shotgun_idle'),
+                                      'walk': be.get_animation('father_shotgun_walk'),
                                       },
                           }
 
-##         self.anims = {'idle': get_animation('father_idle'),
-##                       'walk': get_animation('father_walk'),
-##                       }
         self.current_anim = 'idle'
         self.family = {}
         self.selected_relative = None
         self.just_born = False
-        #self.weapons = {'shotgun': RangedWeapon(self),
-        #                'fist': MeleeWeapon(self)}
         self.weapons = {'fist': MeleeWeapon(self)}
         self.weapon = self.weapons['fist']
         self.ammo = 0
@@ -329,8 +92,8 @@ class Father(Family):
                     hud.set_bullets(self.ammo)
             elif other.type in POWERUP_TYPE_LIFE_LIST:
                 self.life += POWERUP_LIFE[other.type]
-                if self.life > PLAYER_MAX_LIFE:
-                    self.life = PLAYER_MAX_LIFE
+                if self.life > gg.player_max_life:
+                    self.life = gg.player_max_life
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
@@ -362,8 +125,8 @@ class Father(Family):
 
     def update(self, dt):
         # update speed
-        if self.acceleration != 0 and abs(self.speed) < TOP_SPEED:
-            self.speed += self.acceleration*ACCEL_FACTOR*dt
+        if self.acceleration != 0 and abs(self.speed) < gg.top_speed:
+            self.speed += self.acceleration*gg.accel_factor*dt
 
 ##        self.rotation += 110 * self.rotation_speed * dt
 
@@ -376,10 +139,8 @@ class Father(Family):
         self.update_position(new_position)
 
         # update layer position (center camera)
-        self.game_layer.update(dt)
+        self.game_layer.update(dt) #? 
         self.time_since_attack += dt
-
-
 
     def look_at(self, px, py):
         # translate mouse position to world
@@ -447,7 +208,7 @@ class MeleeWeapon(Weapon):
     def attack(self):
 #        print "ATTACK"
         if BLOODY_HANDS_EASTEREGG:
-            self.player.add_gore(Blood, self.player, duration=.5)
+            self.player.add_gore(be.Blood, self.player, duration=.5)
 
         if self.player.collided_agent != None:
 #            print 'morite!!', self.player.collided_agent
@@ -462,7 +223,8 @@ class ZombieMeleeWeapon(MeleeWeapon):
 
 
 class Relative(Family):
-    def __init__(self, game_layer, img, position, player):
+    def __init__(self, game_layer, img_name, position, player):
+        img = be.get_animation(img_name)
         super(Relative, self).__init__(game_layer, img, position)
         self._old_state = {}
         self.speed = 300
@@ -517,11 +279,10 @@ class Relative(Family):
         else:
             self.update_position(self.position)
 
+        self.alone = geom.dist(self.position,self.player.position)>1100
         if not self.last_alone and self.alone:
             if random.random() < 0.10:
                 self.panic()
-        if not self.alone and self.last_alone:
-            print "NOT ALONE", self
         self.last_alone = self.alone
 
         if self.position != self.old_position:
@@ -568,17 +329,17 @@ class Relative(Family):
                 self.ammo += POWERUP_AMMO
             elif other.type in POWERUP_TYPE_LIFE_LIST:
                 self.life += POWERUP_LIFE[other.type]
-                if self.life > PLAYER_MAX_LIFE:
-                    self.life = PLAYER_MAX_LIFE
+                if self.life > gg.player_max_life:
+                    self.life = gg.player_max_life
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
 
 class Boy(Relative):
     name = "Zack"
-    def __init__(self, game_layer, img, position, player):
-        super(Boy, self).__init__(game_layer, img, position, player)
-        self.anims = {'idle': get_animation('boy_idle'),
-                      'walk': get_animation('boy_walk'),
+    def __init__(self, game_layer, img_name, position, player):
+        super(Boy, self).__init__(game_layer, img_name, position, player)
+        self.anims = {'idle': be.get_animation('boy_idle'),
+                      'walk': be.get_animation('boy_walk'),
                       }
         self.sounds = {}
         self.label = 'boy'
@@ -591,10 +352,10 @@ class Boy(Relative):
 
 class Girl(Relative):
     name = "Bee"
-    def __init__(self, game_layer, img, position, player):
-        super(Girl, self).__init__(game_layer, img, position, player)
-        self.anims = {'idle': get_animation('girl_idle'),
-                      'walk': get_animation('girl_walk'),
+    def __init__(self, game_layer, img_name, position, player):
+        super(Girl, self).__init__(game_layer, img_name, position, player)
+        self.anims = {'idle': be.get_animation('girl_idle'),
+                      'walk': be.get_animation('girl_walk'),
                       }
         self.sounds = {}
         self.label = 'girl'
@@ -607,10 +368,10 @@ class Girl(Relative):
 
 class Mother(Relative):
     name = "Mom"
-    def __init__(self, game_layer, img, position, player):
-        super(Mother, self).__init__(game_layer, img, position, player)
-        self.anims = {'idle': get_animation('mother_idle'),
-                      'walk': get_animation('mother_walk'),
+    def __init__(self, game_layer, img_name, position, player):
+        super(Mother, self).__init__(game_layer, img_name, position, player)
+        self.anims = {'idle': be.get_animation('mother_idle'),
+                      'walk': be.get_animation('mother_walk'),
                       }
         self.sounds = {}
         self.label = 'mother'
@@ -621,8 +382,9 @@ class Mother(Relative):
         super(Mother, self).die()
 
 
-class Zombie(Agent):
-    def __init__(self, game_layer, img, player, label):
+class Zombie(be.Agent):
+    def __init__(self, game_layer, img_name, player, label):
+        img = be.get_animation(img_name)
         super(Zombie, self).__init__(game_layer, img, label=label)
         self._old_state = {}
         self.speed = 100
@@ -633,8 +395,8 @@ class Zombie(Agent):
 
         n_zombie = random.choice([1,2,3])
 
-        self.anims = {'idle': get_animation('zombie%d_idle'%n_zombie),
-                      'walk': get_animation('zombie%d_walk'%n_zombie),
+        self.anims = {'idle': be.get_animation('zombie%d_idle'%n_zombie),
+                      'walk': be.get_animation('zombie%d_walk'%n_zombie),
                       }
         self.current_anim = 'idle'
 
@@ -813,7 +575,7 @@ class PowerUp(Sprite):
         self.game_layer.spawn_powerup()
 
 
-class ZombieSpawn(Sprite):
+class ZombieSpawn(Sprite,be.CmdMixin):
     def __init__(self,game_layer,img):#child):
 ##        img = {'filename': child.path, 'position': child.position,
 ##               'rotation': child.rotation, 'scale': child.scale,
@@ -821,6 +583,9 @@ class ZombieSpawn(Sprite):
         super(ZombieSpawn, self).__init__(str(img['filename']), img['position'],
                                    img['rotation'], img['scale'],
                                    img['opacity'])
+        # mixins initialize members
+        self._devflags = {}
+
         self.label = img['label']
         self.path = img['filename']
         self.rect = img['rect']
@@ -832,15 +597,6 @@ class ZombieSpawn(Sprite):
         self.allow_retry_time = self.game_layer.frame_time
         self.schedule(self.update)
         self.stname = 'sleeping'
-
-    def do_cmd(self,cmd, *args,**kwargs): #? move to Agent ?
-        print '>> agent %s received relayed command %s \n\targs=%s , kwargs=%s'%(self.label, cmd, args, kwargs)
-        try:
-            fn = getattr(self, 'a_%s'%cmd)
-        except AttributeError:
-            print 'error - agent %s received the unknown command %s'%(self.label,cmd)
-            return
-        fn(*args,**kwargs)        
 
     #the 'a_' methods are for servicing ScriptDirector.
     def a_spawn_zombie(self,*params):
@@ -887,7 +643,7 @@ class ZombieSpawn(Sprite):
                 target = self.game_layer.objs_by_label[target_label]
             except KeyError:
                 target = self.game_layer.player
-            ent = Zombie(self.game_layer, get_animation('zombie1_idle'),
+            ent = Zombie(self.game_layer, 'zombie1_idle',
                          target,zombie_label)
             ent.position = self.position
             self.game_layer.add_agent(ent)

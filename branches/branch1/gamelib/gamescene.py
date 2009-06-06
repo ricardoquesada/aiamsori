@@ -30,10 +30,10 @@ from walls import create_wall_layer
 import talk
 import gamehud
 import sound
-from light import Light
+from light import LightGroup
 import waypointing
 
-from gamecast import Agent, Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn, get_animation
+from gamecast import Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn
 from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
 from wallmask import WallMask
 
@@ -157,7 +157,7 @@ class GameLayer(Layer):
                     for z,c in sprite_layer.children: #? probably innecesary
                         self.objs_by_label[c.label] = c
                 if layer_label in ['lights']:
-                    self.lights = Light(sprite_layer)
+                    self.lights = LightGroup(sprite_layer)
                     for z,c in sprite_layer.children:
                         self.objs_by_label[c.label] = c
 
@@ -182,9 +182,7 @@ class GameLayer(Layer):
         #self.talk("Dad", "hello hello hello"*5)
         #self.talk("Bee", "Bye Bye"*5, transient=False, duration=2)
 
-
         x, y = director.get_window_size()
-        #self.light = light.Light(x/2, y/2)
 
         # ends wallmask preparation, makes available service .is_empty(x,y)
         #self.wallmask.get_mask() #called for side effect _fill_gaps
@@ -348,7 +346,7 @@ class GameLayer(Layer):
         sound.stop_music()
 
     def _create_agents(self):
-        father = Father(self, get_animation('father_idle'), (40,-900))
+        father = Father(self, 'father_idle', (40,-900))
         father.rotation = 90
         self.player = father
         self.hud.set_life("Dad", father.life)
@@ -363,20 +361,21 @@ class GameLayer(Layer):
         # pester you when editing waypoints
         if not gg.wpt_on:
             position = 40, -1200
-            boy = Boy(self, get_animation('boy_idle'), position, self.player)
+            boy = Boy(self, 'boy_idle', position, self.player)
             boy.rotation = -90
             self.add_agent(boy)
 
             position = -100, -1050
-            girl = Girl(self, get_animation('girl_idle'), position, self.player)
+            girl = Girl(self, 'girl_idle', position, self.player)
             self.add_agent(girl)
 
             position = 180, - 1050
-            mother = Mother(self, get_animation('mother_idle'), position, self.player)
+            mother = Mother(self, 'mother_idle', position, self.player)
             mother.rotation = 180
             self.add_agent(mother)
 
-    def update(self, dt):
+    def update(self, dt): #? from gamecast seems its called from father.
+                          #original functionality was center the camera on player
         if dt>0.25:
             dt = 0.25
         self.frame_time += dt
