@@ -575,7 +575,7 @@ class PowerUp(Sprite):
         self.game_layer.spawn_powerup()
 
 
-class ZombieSpawn(Sprite,be.CmdMixin):
+class ZombieSpawn(Sprite,be.CmdAndStateMixin):
     def __init__(self,game_layer,img):#child):
 ##        img = {'filename': child.path, 'position': child.position,
 ##               'rotation': child.rotation, 'scale': child.scale,
@@ -585,7 +585,9 @@ class ZombieSpawn(Sprite,be.CmdMixin):
                                    img['opacity'])
         # mixins initialize members
         self._devflags = {}
-
+        self.stname = 'sleeping'
+        self.next_stname = 'sleeping'
+        
         self.label = img['label']
         self.path = img['filename']
         self.rect = img['rect']
@@ -596,37 +598,59 @@ class ZombieSpawn(Sprite,be.CmdMixin):
         self.allow_attack_time = self.game_layer.frame_time
         self.allow_retry_time = self.game_layer.frame_time
         self.schedule(self.update)
-        self.stname = 'sleeping'
 
     #the 'a_' methods are for servicing ScriptDirector.
     def a_spawn_zombie(self,*params):
         self.que.append(params)
 
+    #the 'e_' methods implements state functionality
     #spawn cycle: glow hi, spawn, glow lo; if self actually visible, spawn sound
-    def update(self, dt):
-        if self.stname=='sleeping':
-            if self.que:
-                self.stname = 'prespawn'; print 'stname=',self.stname
-                action = FadeTo(255,2) + CallFunc(self._try_spawn)
+
+    def e_sleeping(self,dt):
+        """ do nothing until thereis something to spawn"""
+        if self.que:
+            self.next_stname = 'wait'
+            action = FadeTo(255,2) + CallFunc(self._try_spawn)
+            self.do(action)
+
+    def e_wait(self,dt):
+        """ wait till state is changed externally or by callback """
+        pass
+            
+    def e_spawn(self,dt):
+        """ if no other entity overlaping, spawn the first entity in the queue.
+            if good guy overlapping, attack it so it will move or die"""
+        if self.game_layer.frame_time>self.allow_retry_time:
+            if self._can_spawn():
+                self.next_stname = 'wait'            
+                zombie_label , target_label = self.que.popleft()
+                try:
+                    target = self.game_layer.objs_by_label[target_label]
+                except KeyError:
+                    target = self.game_layer.player
+                ent = Zombie(self.game_layer, 'zombie1_idle',
+                             target,zombie_label)
+                ent.position = self.position
+                self.game_layer.add_agent(ent)
+                action = FadeTo(128,1) + CallFunc(self._end_spawn)
                 self.do(action)
-        if(self.stname=='spawn' and
-           self.game_layer.frame_time>self.allow_retry_time):
-            self._spawn()
+            self.allow_retry_time = (self.game_layer.frame_time +
+                                     gg.zombie_spawn_retry_time)
 
     def _try_spawn(self):
-        self.stname = 'spawn';print 'stname=',self.stname
+        self.next_stname = 'spawn'
+
+    def _end_spawn(self):
+        self.next_stname = 'sleeping'
 
     def _can_spawn(self):
-        # checkear por area libre;
-        #   si zombie in, pasar
-        #   si family member, infligir daño y pasar
-        #   si area libre, hacer _spawn
+        """ true if no overlapping agent. Side effect: damage overlapping goog guys"""
         x0 = self.x
         y0 = self.y
         radius = self.radius + 40
         touched = [e for z,e in self.game_layer.agents_node.children
                        if math.hypot(x0-e.x,y0-e.y)<radius]
-        if touched and self.game_layer.frame_time<self.allow_attack_time:
+        if touched and self.game_layer.frame_time>self.allow_attack_time:
             potentially_attack = [ e for e in touched if isinstance(e,Family)]
             if potentially_attack:
                 self.allow_attack_time = (self.game_layer.frame_time +
@@ -634,26 +658,6 @@ class ZombieSpawn(Sprite,be.CmdMixin):
                 e = potentially_attack[0]
                 e.receive_damage(gg.zombie_spawn_attack_damage, self)
         return len(touched)==0
-
-    def _spawn(self):
-        if self._can_spawn():
-            self.stname = 'posspawn'            
-            zombie_label , target_label = self.que.popleft()
-            try:
-                target = self.game_layer.objs_by_label[target_label]
-            except KeyError:
-                target = self.game_layer.player
-            ent = Zombie(self.game_layer, 'zombie1_idle',
-                         target,zombie_label)
-            ent.position = self.position
-            self.game_layer.add_agent(ent)
-            action = FadeTo(128,1) + CallFunc(self._end_spawn)
-            self.do(action)
-        self.allow_retry_time = (self.game_layer.frame_time +
-                                 gg.zombie_spawn_retry_time)
-        
-    def _end_spawn(self):
-        self.stname = 'sleeping';print 'stname=',self.stname
         
 # ok, los spawn son visibles ahora. pero se verian mejor si estuviesen en lights,
 # preferiblemte con alguna animacion.

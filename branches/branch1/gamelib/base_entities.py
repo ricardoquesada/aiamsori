@@ -116,19 +116,19 @@ class CmdAndStateMixin(object):
         return self._devflags.setdefault(flag_name,False)
 
     def update(self,*args,**kwargs):
-        if is_set_devflag('trace state steps'):
+        if self.stname != self.next_stname:
+            if self.is_set_devflag('trace_state_changes'):
+                print 'state> entity |%s| changestate from: |%s| to: |%s|'%(self.label,self.stname,self.next_stname)
+            self.stname = self.next_stname
+        if self.is_set_devflag('trace_state_steps'):
             print 'state> entity |%s| in state |%s| doing update'%(self.label, self.stname)
         try:
-            fn = getattr(self, 'e_%s'%cmd)
+            fn = getattr(self, 'e_%s'%self.stname)
         except AttributeError:
-            if self.is_set_devflag('show errors'):
+            if self.is_set_devflag('show_errors'):
                 print 'state_error> entity |%s| in unknown state |%s|'%(self.label,self.stname)
             return
         fn(*args,**kwargs)        
-        if self.stname == self.next_stname:
-            if self.is_set_devflag('trace state changes'):
-                print 'state> entity |%s| changestate from: |%s| to: |%s|'%(self.label,self.stname,self.next_stname)
-            self.stname = self.next_stname
             
 ##############################################################################
 
