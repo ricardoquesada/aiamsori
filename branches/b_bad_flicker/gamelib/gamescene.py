@@ -33,7 +33,7 @@ import sound
 from light import LightGroup
 import waypointing
 
-from gamecast import Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn, PowerUpSpawn
+from gamecast import Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn, PowerUpSpawn, Light
 from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
 from wallmask import WallMask
 
@@ -67,19 +67,6 @@ def make_sprites_layer(layer_data, atlas):
         layer.add(sprite)
     return layer
 
-def make_special_sprites_layer(layer_data, atlas, cls, game_layer):
-    # cls reqires an init as def __init__(self,game_layer,json_obtained_dict):
-    # the concrete use case is for ZombieSpawn
-    # probably better if json_obtained_dict has key 'cls_name', wich will resolve here with
-    # the aid of a name to class name 
-    saved_atlas = SavedAtlas('data/atlas-fixed.png', 'data/atlas-coords.json')
-
-    layer = BatchNode()
-    for item in layer_data["sprites"]:
-        obj = cls(game_layer,item)
-        layer.add(obj)
-    return layer
-
 class DeadStuffLayer(cocos.cocosnode.CocosNode):
     """Everything added to this node disappears a few seconds later"""
 
@@ -111,6 +98,7 @@ class GameLayer(Layer):
         self.dead_items = set()
         self.wallmask = WallMask()
         self.agents_node = LayersNode()
+        self.lights = LightGroup()
         self.script_director = scripter.ScriptDirector(scripter.script)
         self.objs_by_label = {}
 
@@ -140,12 +128,7 @@ class GameLayer(Layer):
                     cls = ZombieSpawn
                 else:
                     cls = PowerUpSpawn                
-                sprite_layer = make_special_sprites_layer(layer_data['data'], self.atlas, cls, self)
-                # would be better in the lights layer, but even with some refactoring
-                # pyglet refuses...
-                self.map_node.add_layer(layer_data['label'], layer_data['z'],sprite_layer)
-                for z,c in sprite_layer.children:
-                    self.objs_by_label[c.label] = c
+                self.lights.add_special(layer_data['data'], cls, self)
                 continue
             elif layer_type == 'sprite':
                 sprite_layer = make_sprites_layer(layer_data['data'], self.atlas)
@@ -161,10 +144,10 @@ class GameLayer(Layer):
                     for z,c in sprite_layer.children: #? probably innecesary
                         self.objs_by_label[c.label] = c
                 if layer_label in ['lights']:
-                    self.lights = LightGroup(sprite_layer)
-                    for c in self.lights.get_children():
-                        self.objs_by_label[c.label] = c
-                        print c.label
+                    self.lights.add_lights(sprite_layer,Light)
+        for c in self.lights.get_children():
+            self.objs_by_label[c.label] = c
+            print c.label
 
         # temporary dead stuff layer
         # it should be above the furniture, but below the walls

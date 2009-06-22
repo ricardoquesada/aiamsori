@@ -32,6 +32,8 @@ def main():
                       help="set window width", metavar="WIDTH")
     parser.add_option("-y", "--height", type="int", dest="height", default='768',
                       help="set window height", metavar="HEIGHT")
+    parser.add_option("-F", "--fullscreen", dest="fullscreen", default=False,
+                      help="set fullscreen mode on", action="store_true")
 
     global options
     (options, args) = parser.parse_args()
@@ -76,8 +78,10 @@ def main():
     gamescene.has_grabber = has_grabber
 
     # initialize cocos director
-#    director.init(fullscreen=True)
-    director.init(options.width, options.height, resizable=True)
+    if options.fullscreen:
+        director.init(fullscreen=options.fullscreen)
+    else:
+        director.init(width=int(options.width), height=int(options.height), resizable=True)
     sound.init()
 
     director.set_3d_projection()
