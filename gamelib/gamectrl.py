@@ -29,27 +29,13 @@ class KeyGameCtrl(Layer):
         if k in [key.LEFT, key.A]:
             self.game_layer.player.strafe_speed = -1
 
-        if k == key.R:
-            x, y = self.game_layer.player.position
-            origin = (x, y)
-            target = self.game_layer.player.target
-            is_clear = self.game_layer.is_clear_path(origin, target)
-            if not is_clear:
-                pass
-#                print 'OBSTACLE'
-            else:
-                pass
-#                print 'FREE PATH'
-
         if k == key._1:
             self.game_layer.player.switch_weapon('fist')
 #            self.game_layer.player.weapon = self.game_layer.player.weapons['fist']
 
-
         if k == key._2:
             self.game_layer.player.switch_weapon('shotgun')
 #            self.game_layer.player.weapon = self.game_layer.player.weapons['shotgun']
-
 
         ## attack
         if k == key.SPACE:
@@ -88,7 +74,7 @@ class MouseGameCtrl(Layer):
             hud = self.game_layer.hud
             current_selected_relative = self.game_layer.player.selected_relative
             new_selected_relative = self._get_hud_face(px, py, hud)
-            print new_selected_relative, current_selected_relative
+#            print new_selected_relative, current_selected_relative
             if current_selected_relative is not None:
                 if new_selected_relative is not None:
                     self.game_layer.player.selected_relative = None
@@ -109,8 +95,7 @@ class MouseGameCtrl(Layer):
                 #    if mouse_over:
                 #        self.game_layer.player.selected_relative = relative
 
-        ## test for is empty, cambien el button cuando quieran(pero avisen)
-        ## te aviso: lo cambie :P
+        ## test for is empty
         if button == 4:
             print '** is_empty:',self.game_layer.is_empty(px,py)
 
@@ -121,7 +106,7 @@ class MouseGameCtrl(Layer):
             mouse_over = (px-x)**2+(py-y)**2 < 100**2
             if mouse_over:
                 #self.game_layer.player.selected_relative = relative
-                print "MOUSE OVER", relative
+                #print "MOUSE OVER", relative
                 return relative
 
             # test for mouse over on the faces
@@ -129,8 +114,8 @@ class MouseGameCtrl(Layer):
             x, y = face.position
             npx = px + self.game_layer.x
             npy = py + self.game_layer.y
-            print "CHECK PSRITE", relative, x, y, npx, npy
+            # print "CHECK PSRITE", relative, x, y, npx, npy
             mouse_over = (npx-x)**2+(npy-y)**2 < 100**2
             if mouse_over:
-                print "MOUSE OVER2", relative
+                # print "MOUSE OVER2", relative
                 return relative

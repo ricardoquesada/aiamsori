@@ -1,28 +1,21 @@
-from glob import glob
+# -*- coding: cp1252 -*-
+import collections
+import math
 import geom
 import random
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
-from pyglet.image import Animation, AnimationFrame, load
-#from pymunk.vec2d import Vec2d
+from cocos.actions import Delay, CallFunc, FadeTo, FadeOut, Show, Hide, FadeIn, FadeOut
 
 RANDOM_DELTA = 128
 
 from cocos.sprite import Sprite
-from cocos.actions.interval_actions import MoveBy
+from cocos.actions import MoveBy, FadeTo, CallFunc
 from cocos.euclid import Point2
 from boids import merge, seek, cap, avoid_group
-#from shapes import BulletShape, RayShape, AgentShape, ZombieShape, WallShape
-#from tiless_editor.layers.collision import Circle
 import sound
 
-# NOTE: select wich class will be used as Zombie near EOF
-
-COLLISION_GROUP_FATHER = 1
-
-COLLISION_DISTANCE_SQUARED = 64**2
-
-TOP_SPEED = 430
-ACCEL_FACTOR = 300
+import base_entities as be
+import gg
 
 POWERUP_TYPE_AMMO_LIST = ['bullets']
 POWERUP_TYPE_WEAPON_LIST = ['shotgun']
@@ -32,244 +25,28 @@ POWERUP_TYPE_LIFE_LIST = POWERUP_TYPE_FOOD_LIST + POWERUP_TYPE_HEALTH_LIST
 POWERUP_AMMO = 25
 POWERUP_LIFE = {'chicken': 20, 'burger': 20, 'medicine': 50}
 WEAPON_FULL_AMMO = 25
-PLAYER_MAX_LIFE = 100
-
-BLOOD_SPLATTER_RANGE = 50, 200
-BLOOD_SPLATTER_SECONDS = .7
 
 BLOODY_HANDS_EASTEREGG = False
 
-####Pruebas hechas en win:
-####No conversion , glob encuentra nombres, pero los entrga con barras mezcladas,
-####cuelga el app no encontrando file (ej: "data/img\sangre1.png" not found )
-####Convertir a win antes de glob, salen barras parejas tipo windows, igual
-#### el app saca "data\img\sangre2.png" not found ( la intercepcion de glob
-#### mostraba que habia encontrado  'data\\img\\sangre2.png' )
-####Convertir antes a win y despues del glob a unix: BINGO!!!. take that, sucker!!!
-##def globx(s):
-##    import os
-##    print '*** globx'
-##    print 's:',s
-##    if os.sep == '\\':
-##        z = s.replace('/',os.sep)
-##        s = z
-##        print 'z:',z
-##    li = glob(s)
-##    print 'glob results unconverted:'
-##    print li
-##    if os.sep == '\\':
-##        li2 = [ s.replace('\\','/') for s in li ]
-##        li = li2
-##        print 'glob result converted back to unix:'
-##        li
-##    return li
-
-def globx(s):
-    import os
-    if os.sep == '\\':
-        z = s.replace('/',os.sep)
-        s = z
-    li = glob(s)
-    if os.sep == '\\':
-        li2 = [ s.replace('\\','/') for s in li ]
-        li = li2
-        # 'glob result converted back to unix:'
-    return li
-
-
-def get_animation(anim_name):
-    return Animation([AnimationFrame(load(img_file), 0.15)
-                      for img_file in  globx('data/img/%s*.png' % anim_name)])
-
-class Gore(Sprite):
-    def __init__(self, *a, **kw):
-        img = random.choice(self.images)
-        super(Gore, self).__init__(img, *a, **kw)
-        self.scale = 1.5
-
-class Blood(Gore):
-    images = globx("data/img/sangre[0-9]*.png")
-
-class BloodPool(Gore):
-    images = globx("data/img/sangre_mancha[0-9]*.png")
-
-class BodyParts(Gore):
-    images = globx("data/img/cacho[0-9]*.png") + BloodPool.images
-
-class Agent(Sprite):
-
-    def __init__(self, game_layer, img, position=(0,0)):
-        super(Agent, self).__init__(img, position)
-        self.anims = {}
-        self.game_layer = game_layer
-        self.current_anim = 'idle'
-
-        ###self.shape = AgentShape(self)
-        self.just_born = True
-        self.life = PLAYER_MAX_LIFE
-        self.collided_agent = None
-        self.zombie_crash = 0
-
-    def update_position(self, position):
-        self.collided_agent = None
-        self.old_position = self.position
-        self.position = position
-
-        # check collisions with static objects
-        if not self.game_layer.is_empty(*self.position):
-            if not self.just_born:
-                self.x = self.old_position[0]
-                if not self.game_layer.is_empty(*self.position):
-                    self.y = self.old_position[1]
-                    self.x = position[0]
-                    if not self.game_layer.is_empty(*self.position):
-                        self.position = self.old_position
-                        return
-            else:
-                self.x += random.random() * 40 - 20
-                self.y += random.random() * 40 - 20
-                return
-
-        if self.just_born:
-            self.old_position = position
-
-        is_zombie = isinstance(self, Zombie)
-        is_family = isinstance(self, Relative)
-        # check collisions with dynamic objects
-        agents = self.parent.children
-        collided = False
-        for z, agent in agents:
-            if agent is self: continue
-            distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
-            if isinstance(agent, Zombie):
-                if is_zombie:
-                    collision_distance = 32**2
-                elif is_family:
-                    collision_distance = 64**2
-                elif self == self.game_layer.player:
-                    collision_distance = 64**2
-                else:
-                    collision_distance = 96**2
-            elif isinstance(agent, Family):
-                if is_zombie:
-                    collision_distance = 64**2
-                elif is_family:
-                    collision_distance = 64**2
-                elif self == self.game_layer.player:
-                    collision_distance = 64**2
-                else:
-                    collision_distance = 96**2
-            elif isinstance(agent, Bullet):
-                    collision_distance = 64**2
-            else:
-                collision_distance = 96**2
-
-            collision = distance <= collision_distance
-
-            if is_zombie and isinstance(agent, Zombie):
-                self.zombie_crash += 1
-            if is_family:
-                if isinstance(agent, Father):
-                    if distance > 1100**2:
-                        self.alone = True
-                    else:
-                        self.alone = False
-
-
-            if collision:
-                collided = True
-                if self.zombie_crash > 100000:
-                    self.just_born = True
-                    self.zombie_crash = 0
-                # objects collided
-                if self.just_born:
-                    ###distance = (self.position[0]-agent.position[0])**2+(self.position[1]-agent.position[1])**2
-                    ###collision = distance <= COLLISION_DISTANCE_SQUARED
-                    ###while collision:
-                    self.x += random.choice([-1,1])*RANDOM_DELTA
-                    self.y += random.choice([-1,1])*RANDOM_DELTA
-                    self.position = (self.x, self.y)
-                    ###self.just_born = False
-                    return
-
-                #nx = self.old_position[0] + random.choice([-1,1])*RANDOM_DELTA
-                #ny = self.old_position[1] + random.choice([-1,1])*RANDOM_DELTA
-                #self.position = (nx, ny)
-                self.position = self.old_position
-                self.on_collision(agent)
-                agent.on_collision(self)
-                #f = getattr(self.collision, "on_collision", None)
-                #if f is not None:
-                #    f(self)
-
-                #self.position = position[0], self.old_position[1]
-                #collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
-                #if collision:
-                #    self.position = self.old_position[0], position[1]
-                #    collision = Vec2d(self.position).get_distance(agent.position) <= COLLISION_DISTANCE
-                #    if collision:
-                #        self.position = self.old_position
-
-        if not collided:
-            if self.just_born:
-                self.just_born = False
-
-
-    def play_anim(self, anim_name):
-        self.image = self.anims[anim_name]
-        self.image_anchor = (self.image.frames[0].image.width / 2,
-                             self.image.frames[0].image.height / 2)
-        self.current_anim = anim_name
-
-    def on_collision(self, other):
-        #print 'self', self, 'other', other
-        if isinstance(other, Bullet):
-#            if not isinstance(self, Father):
-            if isinstance(self, Zombie):
-                bullet = other
-                self.receive_damage(bullet.player.weapon.damage, bullet)
-        elif isinstance(other, Agent):
-            self.collided_agent = other
-
-    def _get_game_layer(self):
-        raise NotImplementedError
-
-    def receive_damage(self, damage, other):
-        self.life -= damage
-        ## return True if died
-        if self.life <= 0:
-            self.die()
-            self.add_gore(BodyParts, other, duration=5)
-            return True
-        self.add_gore(Blood, other, duration=.5)
-        return False
-
-    def add_gore(self, gore_class, other, duration=5):
-        gore = gore_class((self.x, self.y), other.rotation)
-        dist = random.randrange(*BLOOD_SPLATTER_RANGE)
-        alpha = radians(-other.rotation)
-        gore.do(MoveBy( (cos(alpha)*dist, sin(alpha)*dist), BLOOD_SPLATTER_SECONDS))
-        self.player.game_layer.deadstuff_layer.add(gore, duration)
-
-
-class Family(Agent):
+class Family(be.Agent):
     def receive_damage(self, damage, other):
         self.life -= damage
         self.game_layer.hud.set_life(self.name, self.life)
         ## return True if died
         if self.life <= 0:
             self.die()
-            self.add_gore(BloodPool, other, duration=5)
+            self.add_gore(be.BloodPool, other, duration=5)
             return True
-        self.add_gore(Blood, other, duration=.5)
+        self.add_gore(be.Blood, other, duration=.5)
         return False
 
 class Father(Family):
     name = "Dad"
-    def __init__(self, game_layer, img, position):
+    def __init__(self, game_layer, img_name, position):
+        img = be.get_animation(img_name)
         super(Father, self).__init__(game_layer, img, position)
-        ###self.shape.group = COLLISION_GROUP_FATHER
 
+        self.label = 'father'
         self._old_state = {'position': position}
         self.speed = 0
         self.position = position
@@ -279,26 +56,21 @@ class Father(Family):
         self.updating = False
         self.rotation_speed = 0
         self.collision = False
-        self.anims = {'idle': get_animation('father_idle'),
-                      'walk': get_animation('father_walk'),
+        self.anims = {'idle': be.get_animation('father_idle'),
+                      'walk': be.get_animation('father_walk'),
                       }
-        self.anim_sets = {'fist': {'idle': get_animation('father_idle'),
-                                   'walk': get_animation('father_walk'),
+        self.anim_sets = {'fist': {'idle': be.get_animation('father_idle'),
+                                   'walk': be.get_animation('father_walk'),
                                    },
-                          'shotgun': {'idle': get_animation('father_shotgun_idle'),
-                                      'walk': get_animation('father_shotgun_walk'),
+                          'shotgun': {'idle': be.get_animation('father_shotgun_idle'),
+                                      'walk': be.get_animation('father_shotgun_walk'),
                                       },
                           }
 
-##         self.anims = {'idle': get_animation('father_idle'),
-##                       'walk': get_animation('father_walk'),
-##                       }
         self.current_anim = 'idle'
         self.family = {}
         self.selected_relative = None
         self.just_born = False
-        #self.weapons = {'shotgun': RangedWeapon(self),
-        #                'fist': MeleeWeapon(self)}
         self.weapons = {'fist': MeleeWeapon(self)}
         self.weapon = self.weapons['fist']
         self.ammo = 0
@@ -321,8 +93,8 @@ class Father(Family):
                     hud.set_bullets(self.ammo)
             elif other.type in POWERUP_TYPE_LIFE_LIST:
                 self.life += POWERUP_LIFE[other.type]
-                if self.life > PLAYER_MAX_LIFE:
-                    self.life = PLAYER_MAX_LIFE
+                if self.life > gg.player_max_life:
+                    self.life = gg.player_max_life
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
             elif other.type in POWERUP_TYPE_WEAPON_LIST:
@@ -340,6 +112,7 @@ class Father(Family):
                     weapon.ammo += WEAPON_FULL_AMMO
                     hud.set_bullets(weapon.ammo)
                     self.weapons['shotgun'] = weapon
+                other.picked_up()
                 self.switch_weapon('shotgun')
                 sound.play('pickup_shotgun')
         elif isinstance(other, Relative):
@@ -354,8 +127,8 @@ class Father(Family):
 
     def update(self, dt):
         # update speed
-        if self.acceleration != 0 and abs(self.speed) < TOP_SPEED:
-            self.speed += self.acceleration*ACCEL_FACTOR*dt
+        if self.acceleration != 0 and abs(self.speed) < gg.top_speed:
+            self.speed += self.acceleration*gg.accel_factor*dt
 
 ##        self.rotation += 110 * self.rotation_speed * dt
 
@@ -368,10 +141,8 @@ class Father(Family):
         self.update_position(new_position)
 
         # update layer position (center camera)
-        self.game_layer.update(dt)
+        self.game_layer.update(dt) #? 
         self.time_since_attack += dt
-
-
 
     def look_at(self, px, py):
         # translate mouse position to world
@@ -387,10 +158,8 @@ class Father(Family):
             self.time_since_attack = 0
 
     def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.game_layer
-        game_layer.dead_items.add(self)
+        game_layer.kill(self)
         game_layer.game_over()
 
     def _get_game_layer(self):
@@ -429,7 +198,6 @@ class RangedWeapon(Weapon):
         self._play_sound()
         self.ammo -= 1
         if self.ammo < 1:
-            # defensive progamming
             self.ammo = 0
             self.player.switch_weapon('fist')
         self.player.game_layer.hud.set_bullets(self.ammo)
@@ -442,7 +210,7 @@ class MeleeWeapon(Weapon):
     def attack(self):
 #        print "ATTACK"
         if BLOODY_HANDS_EASTEREGG:
-            self.player.add_gore(Blood, self.player, duration=.5)
+            self.player.add_gore(be.Blood, self.player, duration=.5)
 
         if self.player.collided_agent != None:
 #            print 'morite!!', self.player.collided_agent
@@ -457,7 +225,8 @@ class ZombieMeleeWeapon(MeleeWeapon):
 
 
 class Relative(Family):
-    def __init__(self, game_layer, img, position, player):
+    def __init__(self, game_layer, img_name, position, player):
+        img = be.get_animation(img_name)
         super(Relative, self).__init__(game_layer, img, position)
         self._old_state = {}
         self.speed = 300
@@ -512,11 +281,10 @@ class Relative(Family):
         else:
             self.update_position(self.position)
 
+        self.alone = geom.dist(self.position,self.player.position)>1100
         if not self.last_alone and self.alone:
             if random.random() < 0.10:
                 self.panic()
-        if not self.alone and self.last_alone:
-            print "NOT ALONE", self
         self.last_alone = self.alone
 
         if self.position != self.old_position:
@@ -539,10 +307,8 @@ class Relative(Family):
 
 
     def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
+        game_layer.kill(self)
 
         # mark relative as dead in the HUD
         game_layer.hud.faces[self.name].color = (172, 0, 0)
@@ -565,19 +331,20 @@ class Relative(Family):
                 self.ammo += POWERUP_AMMO
             elif other.type in POWERUP_TYPE_LIFE_LIST:
                 self.life += POWERUP_LIFE[other.type]
-                if self.life > PLAYER_MAX_LIFE:
-                    self.life = PLAYER_MAX_LIFE
+                if self.life > gg.player_max_life:
+                    self.life = gg.player_max_life
                 sound.play('pickup_helth')
                 hud.set_life(self.name, self.life)
 
 class Boy(Relative):
     name = "Zack"
-    def __init__(self, game_layer, img, position, player):
-        super(Boy, self).__init__(game_layer, img, position, player)
-        self.anims = {'idle': get_animation('boy_idle'),
-                      'walk': get_animation('boy_walk'),
+    def __init__(self, game_layer, img_name, position, player):
+        super(Boy, self).__init__(game_layer, img_name, position, player)
+        self.anims = {'idle': be.get_animation('boy_idle'),
+                      'walk': be.get_animation('boy_walk'),
                       }
         self.sounds = {}
+        self.label = 'boy'
         player.family['boy'] = self
 
     def die(self):
@@ -587,12 +354,13 @@ class Boy(Relative):
 
 class Girl(Relative):
     name = "Bee"
-    def __init__(self, game_layer, img, position, player):
-        super(Girl, self).__init__(game_layer, img, position, player)
-        self.anims = {'idle': get_animation('girl_idle'),
-                      'walk': get_animation('girl_walk'),
+    def __init__(self, game_layer, img_name, position, player):
+        super(Girl, self).__init__(game_layer, img_name, position, player)
+        self.anims = {'idle': be.get_animation('girl_idle'),
+                      'walk': be.get_animation('girl_walk'),
                       }
         self.sounds = {}
+        self.label = 'girl'
         player.family['girl'] = self
 
     def die(self):
@@ -602,12 +370,13 @@ class Girl(Relative):
 
 class Mother(Relative):
     name = "Mom"
-    def __init__(self, game_layer, img, position, player):
-        super(Mother, self).__init__(game_layer, img, position, player)
-        self.anims = {'idle': get_animation('mother_idle'),
-                      'walk': get_animation('mother_walk'),
+    def __init__(self, game_layer, img_name, position, player):
+        super(Mother, self).__init__(game_layer, img_name, position, player)
+        self.anims = {'idle': be.get_animation('mother_idle'),
+                      'walk': be.get_animation('mother_walk'),
                       }
         self.sounds = {}
+        self.label = 'mother'
         player.family['mother'] = self
 
     def die(self):
@@ -615,9 +384,10 @@ class Mother(Relative):
         super(Mother, self).die()
 
 
-class Zombie(Agent):
-    def __init__(self, game_layer, img, player):
-        super(Zombie, self).__init__(game_layer, img)
+class Zombie(be.Agent):
+    def __init__(self, game_layer, img_name, player, label):
+        img = be.get_animation(img_name)
+        super(Zombie, self).__init__(game_layer, img, label=label)
         self._old_state = {}
         self.speed = 100
         self.schedule(self.update)
@@ -627,15 +397,14 @@ class Zombie(Agent):
 
         n_zombie = random.choice([1,2,3])
 
-        self.anims = {'idle': get_animation('zombie%d_idle'%n_zombie),
-                      'walk': get_animation('zombie%d_walk'%n_zombie),
+        self.anims = {'idle': be.get_animation('zombie%d_idle'%n_zombie),
+                      'walk': be.get_animation('zombie%d_walk'%n_zombie),
                       }
         self.current_anim = 'idle'
 
         self.weapon = ZombieMeleeWeapon(self)
         self.time_since_attack = 0
 
-        ###self.shape = ZombieShape(self)
         self.last_goal = random.random()*0.3
         self.goal = self.position
         self.target = self.player
@@ -725,15 +494,11 @@ class Zombie(Agent):
             self.attack()
 
     def die(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
+        game_layer.kill(self)
 
     def _get_game_layer(self):
         return self.player.game_layer
-
-
 
 
 class Bullet(Sprite):
@@ -743,26 +508,18 @@ class Bullet(Sprite):
         self.anims = {}
         self.player = player
         self.speed = 1000
+        self.label = None
+        self.collision_radius = (self.width+self.height)/4
         self.schedule(self.update)
-
-
+        
         # get target
         WEAPON_RANGE = self.player.weapon.range
 
-        #from pymunk.vec2d import Vec2d
-        #offset = Vec2d(WEAPON_RANGE, 0).rotated(-self.rotation)
-        #target = offset+position
         position = player.position
         nx = WEAPON_RANGE * cos( radians(-self.rotation) )
         ny = WEAPON_RANGE * sin( radians(-self.rotation) )
         target = (position[0] + nx, position[1] + ny)
-        #print 'target ', target
         self.target = target
-        #print 'BULLET CREATED'
-
-        ###shape = BulletShape(self, position, target)
-        ###shape.group = player.shape.group
-        ###self.shape = shape
 
     def update(self, dt):
         goal = seek(self.x, self.y, self.target[0], self.target[1])
@@ -773,7 +530,6 @@ class Bullet(Sprite):
         nx = (self.x + cos( radians(a) ) * self.speed * dt)
         ny = (self.y + sin( radians(a) ) * self.speed * dt)
 
-        #print 'updating bullet position', self.position, (nx,ny)
         self.update_position((nx, ny))
         # FIXME: this goes away as soon as bullets collide agains walls
 ##         if nx > 1000 or nx < -1000 or ny > 1000 or ny < -1000:
@@ -785,26 +541,13 @@ class Bullet(Sprite):
         self.position = position
 
     def on_collision(self, other):
-        #print 'BULLET DIED'
-        #print self, self.position, other, other.position
         if self.player != other:
             self.hit()
 
 
     def hit(self):
-        # only mark it as dead, as I cannot remove the pymunk stuff while within the collision detection phase
-        # as segfaults might occur
         game_layer = self.player.game_layer
-        game_layer.dead_items.add(self)
-
-
-class Ray(Sprite):
-    def __init__(self, agent, target):
-        super(Ray, self).__init__('img/bullet.png', agent.position, agent.rotation, agent.scale)
-        ###shape = RayShape(self, agent.position, target)
-        ###shape.group = agent.shape.group
-        ###self.shape = shape
-
+        game_layer.kill(self)
 
 class Wall(Sprite):
     def __init__(self, child):
@@ -817,19 +560,223 @@ class Wall(Sprite):
         self.label = None
         self.path = img['filename']
         self.rect = img['rect']
-        ###self.shape = WallShape(self)
 
 class PowerUp(Sprite):
     def __init__(self, type, position, game_layer):
         image = 'hud/%s.png' % type
         super(PowerUp, self).__init__(image, position)
+        self.collision_radius = (self.width+self.height)/4
         self.type = type
+        self.label = None
         self.game_layer = game_layer
 
     def on_collision(self, other):
+        pass
+    
+    def picked_up(self):
         # remove powerup as we consumed it
         self.die()
 
     def die(self):
-        self.game_layer.dead_items.add(self)
-        self.game_layer.spawn_powerup()
+        self.game_layer.kill(self)
+
+
+class ZombieSpawn(Sprite,be.CmdAndStateMixin):
+    def __init__(self,game_layer,img):
+        super(ZombieSpawn, self).__init__(str(img['filename']), img['position'],
+                                   img['rotation'], img['scale'],
+                                   img['opacity'])
+        self.anims = {'idle': be.get_animation('zspawn')
+                      }
+        self.play_anim('idle')
+        self.scale = 1.0
+        # mixins initialize members
+        self._devflags = {}
+        self.stname = 'sleeping'
+        self.next_stname = 'sleeping'
+        
+        self.label = img['label']
+        self.path = img['filename']
+        self.rect = img['rect']
+        self.radius = self.rect[2]
+        assert(self.rect[2]== self.rect[3])
+        self.game_layer = game_layer
+        self.que = collections.deque()
+        self.allow_attack_time = self.game_layer.frame_time
+        self.allow_retry_time = self.game_layer.frame_time
+        self.schedule(self.update)
+
+    def play_anim(self, anim_name):
+        self.image = self.anims[anim_name]
+        self.image_anchor = (self.image.frames[0].image.width / 2,
+                             self.image.frames[0].image.height / 2)
+        self.current_anim = anim_name
+
+    #the 'a_' methods are for servicing ScriptDirector.
+    def a_spawn(self,*params):
+        self.que.append(params)
+
+    #the 'e_' methods implements state functionality
+    #spawn cycle: glow hi, spawn, glow lo; if self actually visible, spawn sound
+
+    def e_sleeping(self,dt):
+        """ do nothing until thereis something to spawn"""
+        if self.que:
+            self.next_stname = 'wait'
+            action = FadeTo(255,2) + CallFunc(self._try_spawn)
+            self.do(action)
+
+    def e_wait(self,dt):
+        """ wait till state is changed externally or by callback """
+        pass
+            
+    def e_spawn(self,dt):
+        """ if no other entity overlaping, spawn the first entity in the queue.
+            if good guy overlapping, attack it so it will move or die"""
+        if self.game_layer.frame_time>self.allow_retry_time:
+            if self._can_spawn():
+                self.next_stname = 'wait'            
+                zombie_label , target_label = self.que.popleft()
+                try:
+                    target = self.game_layer.objs_by_label[target_label]
+                except KeyError:
+                    target = self.game_layer.player
+                ent = Zombie(self.game_layer, 'zombie1_idle',
+                             target,zombie_label)
+                ent.position = self.position
+                self.game_layer.add_agent(ent)
+                action = FadeTo(128,1) + CallFunc(self._end_spawn)
+                self.do(action)
+            self.allow_retry_time = (self.game_layer.frame_time +
+                                     gg.zombie_spawn_retry_time)
+
+    def _try_spawn(self):
+        self.next_stname = 'spawn'
+
+    def _end_spawn(self):
+        self.next_stname = 'sleeping'
+
+    def _can_spawn(self):
+        """ true if no overlapping agent. Side effect: damage overlapping good guys"""
+        x0 = self.x
+        y0 = self.y
+        radius = self.radius + 40
+        touched = [e for z,e in self.game_layer.agents_node.children
+                       if math.hypot(x0-e.x,y0-e.y)<radius]
+        if touched and self.game_layer.frame_time>self.allow_attack_time:
+            potentially_attack = [ e for e in touched if isinstance(e,Family)]
+            if potentially_attack:
+                self.allow_attack_time = (self.game_layer.frame_time +
+                                          gg.zombie_spawn_recovery_time)
+                e = potentially_attack[0]
+                e.receive_damage(gg.zombie_spawn_attack_damage, self)
+        return len(touched)==0
+        
+
+class PowerUpSpawn(Sprite,be.CmdAndStateMixin):
+    def __init__(self,game_layer,img):
+        super(PowerUpSpawn, self).__init__(str(img['filename']), img['position'],
+                                   img['rotation'], img['scale'],
+                                   img['opacity'])
+        self.anims = {'idle': be.get_animation('pspawn')
+                      }
+        self.play_anim('idle')
+        self.scale = 1.0
+        # mixins initialize members
+        self._devflags = {}
+        self.stname = 'sleeping'
+        self.next_stname = 'sleeping'
+        
+        self.label = img['label']
+        self.path = img['filename']
+        self.rect = img['rect']
+        self.radius = self.rect[2]
+        assert(self.rect[2]== self.rect[3])
+        self.game_layer = game_layer
+        self.que = collections.deque()
+        self.allow_retry_time = self.game_layer.frame_time
+        self.schedule(self.update)
+
+    def play_anim(self, anim_name):
+        self.image = self.anims[anim_name]
+        self.image_anchor = (self.image.frames[0].image.width / 2,
+                             self.image.frames[0].image.height / 2)
+        self.current_anim = anim_name
+
+    #the 'a_' methods are for servicing ScriptDirector.
+    def a_spawn(self,*params):
+        self.que.append(params)
+
+    #the 'e_' methods implements state functionality
+
+    def e_sleeping(self,dt):
+        """ do nothing until thereis something to spawn"""
+        if self.que:
+            self.next_stname = 'wait'
+            action = FadeTo(255,2) + CallFunc(self._try_spawn)
+            self.do(action)
+
+    def e_wait(self,dt):
+        """ wait till state is changed externally or by callback """
+        pass
+            
+    def e_spawn(self,dt):
+        """ spawn the first entity in the queue.
+        """
+        if self.game_layer.frame_time>self.allow_retry_time:
+            self.next_stname = 'wait'            
+            powerup_type, = self.que.popleft()
+            ent = PowerUp(powerup_type, self.position, self.game_layer)
+            self.game_layer.add_agent(ent)
+            action = FadeTo(128,1) + CallFunc(self._end_spawn)
+            self.do(action)
+            self.allow_retry_time = (self.game_layer.frame_time +
+                                     gg.powerup_spawn_retry_time)
+
+    def _try_spawn(self):
+        self.next_stname = 'spawn'
+
+    def _end_spawn(self):
+        self.next_stname = 'sleeping'
+
+# Nota: fijarse si podemos poner los spawns como el fire_light para que
+# resalten mejor.
+
+class Light(Sprite,be.CmdMixin):
+    def __init__(self,img):
+        super(Light, self).__init__(img)
+        self.on = 1
+        self.current_internal_action = None
+        # mixins initialize members
+        self._devflags = {}
+    
+    #the 'a_' methods are for servicing ScriptDirector and interaction light switch
+    def a_flicker(self,*params):
+        vals = [50,255]
+        v1 = vals[self.on]
+        v2 = vals[not self.on]
+        action = Delay(0.1)
+        for i in range(random.randint(5, 10)):
+            micro_delay = random.random()*0.50
+            micro_delay2 = random.random()*0.50
+            action = action + FadeTo(v1, micro_delay) + FadeTo(v2, micro_delay2)
+        self.do(action)
+
+    def a_turn_on(self,*params):
+        self.stop()
+        action = FadeTo(255,0.5)
+        self.do(action)
+        self.on = 1
+
+    def a_turn_off(self,*params):
+        self.stop()
+        action = FadeTo(50,0.5)
+        self.do(action)
+        self.on = 0
+
+    def a_toggle(self,*params):
+        if self.on:
+            self.a_turn_off()
+        else:
+            self.a_turn_on()
+
