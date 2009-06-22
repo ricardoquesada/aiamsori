@@ -90,14 +90,6 @@ WAVE_NUM   = [1,  1,  1,  1,  2,  2,  2,  2,  2, 3, 3, 3, 4, 4, 4]
 PWUP_MIN_TIME = 10
 PWUP_MAX_TIME = 30
 
-##        self.zombie_spawn = None
-##        self.z_spawn_lifetime = 0
-##        self.zombie_wave_number = 0
-##        self.schedule(self.respawn_zombies)
-##
-##        self.setup_powerups(item_spawn)
-##
-##        self.flicker()
 script = """
 #wait_for_event, map_loaded
 wait, 3
@@ -105,16 +97,36 @@ talk, Bee, "Zombies are coming!", 2
 talk, Mom, "Protect your family!", 2
 talk, Zack, "Click on us to move us", 2
 wait, 6
+##relay, item_spawn:item-spawn#0, set_devflag, trace_cmds, 1
+##relay, item_spawn:item-spawn#0, set_devflag, trace_state_changes, 1
+##relay, item_spawn:item-spawn#0, set_devflag, show_errors, 1
+add_powerup, item_spawn:item-spawn#0, shotgun
+talk, Dad, "DAMN ZOMBIES!!!! Where's my shotgun!!!", 2
+relay, lights:light#1, set_devflag, trace_cmds, 1
+relay, lights:light#1, set_devflag, show_errors, 1
+light_off, lights:light#3
+light_off, lights:light#6
+light_off, lights:light#8
+light_flicker, lights:light#1
+wait, 1
+light_flicker, lights:light#1
+light_flicker, lights:light#1
+wait, 5
+light_toggle, lights:light#1
+wait, 2
+light_toggle, lights:light#1
+wait, 2
+wait, 500
+#, 
 ##relay, zombie_spawn:zombie-spawm#0, set_devflag, trace_cmds, 1
 ##relay, zombie_spawn:zombie-spawm#0, set_devflag, trace_state_changes, 1
 ##relay, zombie_spawn:zombie-spawm#0, set_devflag, show_errors, 1
 add_zombie, zombie_spawn:zombie-spawm#0, zombie#1, boy
-add_zombie, zombie_spawn:zombie-spawm#0, zombie#2, girl
-add_zombie, zombie_spawn:zombie-spawm#0, zombie#3, mother
-add_zombie, zombie_spawn:zombie-spawm#0, zombie#3, father
+add_zombie, zombie_spawn:zombie-spawm#0, zombie#3, girl
+add_zombie, zombie_spawn:zombie-spawm#0, zombie#6, mother
+add_zombie, zombie_spawn:zombie-spawm#0, zombie#8, father
 wait, 500
 
-add_powerup, 'shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!"
 # level 0
 play level_begin
 add_swarm , 3, [wpts_initial patrol], 
@@ -233,10 +245,26 @@ class ScriptDirector(pyglet.event.EventDispatcher):
         self.dispatch_event("on_talk",parts[0],parts[1],parts[2]) #who, what, duration
 
     def c_add_zombie(self,parts):
-        self.dispatch_event("on_relay",parts[0],'spawn_zombie',parts[1],parts[2]) # zombie_spawn label, zombie label, target_label
+        self.dispatch_event("on_relay",parts[0],'spawn',parts[1],parts[2]) # zombie_spawn label, zombie label, target_label
+
+    def c_add_powerup(self,parts):
+        self.dispatch_event("on_relay",parts[0],'spawn',parts[1]) # powerup_spawn label, powerup type 
+
+    def c_light_on(self,parts):
+        self.dispatch_event("on_relay",parts[0],'turn_on')
+
+    def c_light_off(self,parts):
+        self.dispatch_event("on_relay",parts[0],'turn_off')
+
+    def c_light_toggle(self,parts):
+        self.dispatch_event("on_relay",parts[0],'toggle')
+
+    def c_light_flicker(self,parts):
+        self.dispatch_event("on_relay",parts[0],'flicker')
 
     def c_relay(self,parts):
         self.dispatch_event("on_relay",*parts)
+
 
 def test_next_command():
     script_director = ScriptDirector(script)
@@ -271,48 +299,6 @@ if __name__ == '__main__':
 ##                    self.z_spawn_lifetime = 0
 ##                    self.zombie_wave_number += 1
 
-##    def flicker(self):
-##        delay = random.random()*5+2
-##        action = Delay(delay)
-##        light = random.choice(self.lights.get_children())
-##
-##        for i in range(random.randint(5, 10)):
-##            micro_delay = random.random()*0.50
-##            micro_delay2 = random.random()*0.50
-##            action = action + FadeTo(50, micro_delay) + FadeTo(255, micro_delay2)
-##        action = action + CallFunc(self.flicker)
-##        light.do(action)
-##
-##    def setup_powerups(self, layer):
-##        self.item_spawn = []
-##        for c in layer.get_children():
-##            self.item_spawn.append( c.position )
-##        # wait 4 seconds before displaying first message
-##        self.do(Delay(3) + CallFunc(lambda: self.talk('Bee', "Zombies are coming!", duration=2, transient=False)))
-##        self.do(Delay(5) + CallFunc(lambda: self.talk('Mom', "Protect your family!", duration=2, transient=False)))
-##        self.do(Delay(7) + CallFunc(lambda: self.talk('Zack', "Click on us to move us", duration=2, transient=False)))
-##        self.do(Delay(9) + CallFunc(lambda: self.add_powerup('shotgun', "DAMN ZOMBIES!!!! Where's my shotgun!!!")))
-##        self.spawn_powerup()
-##
-##    def spawn_powerup(self, type=''):
-##        delay = random.randrange(PWUP_MIN_TIME, PWUP_MAX_TIME)
-##        self.do(Delay(delay) + CallFunc(lambda: self.add_powerup(type)))
-##
-##    def add_powerup(self, type='', msg=''):
-##        position = random.choice(self.item_spawn)
-##        if not type:
-##            # make ammo and life categories equally probable
-##            type = random.choice(POWERUP_TYPE_AMMO_LIST*3 + POWERUP_TYPE_LIFE_LIST)
-##        powerup = PowerUp(type, position, self)
-##        self.agents_node.add(powerup)
-##        item = type
-##        if item == 'burger':
-##            item = 'a burger'
-##        elif item == 'medicine':
-##            item = 'some medicine'
-##        if random.random() < UNKNOWN_ITEM_PROBABILTY:
-##            item = ''
-##        place = powerup.label if hasattr(powerup, 'label') else ''
 ##        if random.random() < UNKNOWN_PLACE_PROBABILTY:
 ##            place = ''
 ##        if not msg:

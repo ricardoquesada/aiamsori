@@ -10,6 +10,8 @@ zombie_spawn_recovery_time = 1.0
 zombie_spawn_attack_damage = 20
 zombie_spawn_retry_time = 0.5
 
+powerup_spawn_retry_time = 0.5
+
 top_speed = 430.0
 accel_factor = 300.0
 player_max_life = 100.0
