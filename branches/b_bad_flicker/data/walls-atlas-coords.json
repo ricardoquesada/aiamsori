@@ -1,0 +1,20 @@
+{
+    "walls/alambre_v.png": [
+        330, 
+        0, 
+        64, 
+        64
+    ], 
+    "walls/ventana_v.png": [
+        69, 
+        0, 
+        256, 
+        64
+    ], 
+    "walls/pared_v.png": [
+        399, 
+        0, 
+        64, 
+        64
+    ]
+}
