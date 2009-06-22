@@ -4,6 +4,7 @@ import math
 import geom
 import random
 from math import cos, sin, radians, degrees, atan, atan2, pi, sqrt
+from cocos.actions import Delay, CallFunc, FadeTo, FadeOut, Show, Hide, FadeIn, FadeOut
 
 RANDOM_DELTA = 128
 
@@ -111,6 +112,7 @@ class Father(Family):
                     weapon.ammo += WEAPON_FULL_AMMO
                     hud.set_bullets(weapon.ammo)
                     self.weapons['shotgun'] = weapon
+                other.picked_up()
                 self.switch_weapon('shotgun')
                 sound.play('pickup_shotgun')
         elif isinstance(other, Relative):
@@ -507,6 +509,7 @@ class Bullet(Sprite):
         self.player = player
         self.speed = 1000
         self.label = None
+        self.collision_radius = (self.width+self.height)/4
         self.schedule(self.update)
         
         # get target
@@ -562,27 +565,31 @@ class PowerUp(Sprite):
     def __init__(self, type, position, game_layer):
         image = 'hud/%s.png' % type
         super(PowerUp, self).__init__(image, position)
+        self.collision_radius = (self.width+self.height)/4
         self.type = type
         self.label = None
         self.game_layer = game_layer
 
     def on_collision(self, other):
+        pass
+    
+    def picked_up(self):
         # remove powerup as we consumed it
         self.die()
 
     def die(self):
         self.game_layer.kill(self)
-        self.game_layer.spawn_powerup()
 
 
 class ZombieSpawn(Sprite,be.CmdAndStateMixin):
-    def __init__(self,game_layer,img):#child):
-##        img = {'filename': child.path, 'position': child.position,
-##               'rotation': child.rotation, 'scale': child.scale,
-##               'opacity': child.opacity, 'rect': child.rect}
+    def __init__(self,game_layer,img):
         super(ZombieSpawn, self).__init__(str(img['filename']), img['position'],
                                    img['rotation'], img['scale'],
                                    img['opacity'])
+        self.anims = {'idle': be.get_animation('zspawn')
+                      }
+        self.play_anim('idle')
+        self.scale = 0.7
         # mixins initialize members
         self._devflags = {}
         self.stname = 'sleeping'
@@ -599,8 +606,14 @@ class ZombieSpawn(Sprite,be.CmdAndStateMixin):
         self.allow_retry_time = self.game_layer.frame_time
         self.schedule(self.update)
 
+    def play_anim(self, anim_name):
+        self.image = self.anims[anim_name]
+        self.image_anchor = (self.image.frames[0].image.width / 2,
+                             self.image.frames[0].image.height / 2)
+        self.current_anim = anim_name
+
     #the 'a_' methods are for servicing ScriptDirector.
-    def a_spawn_zombie(self,*params):
+    def a_spawn(self,*params):
         self.que.append(params)
 
     #the 'e_' methods implements state functionality
@@ -644,7 +657,7 @@ class ZombieSpawn(Sprite,be.CmdAndStateMixin):
         self.next_stname = 'sleeping'
 
     def _can_spawn(self):
-        """ true if no overlapping agent. Side effect: damage overlapping goog guys"""
+        """ true if no overlapping agent. Side effect: damage overlapping good guys"""
         x0 = self.x
         y0 = self.y
         radius = self.radius + 40
@@ -659,6 +672,111 @@ class ZombieSpawn(Sprite,be.CmdAndStateMixin):
                 e.receive_damage(gg.zombie_spawn_attack_damage, self)
         return len(touched)==0
         
-# ok, los spawn son visibles ahora. pero se verian mejor si estuviesen en lights,
-# preferiblemte con alguna animacion.
+
+class PowerUpSpawn(Sprite,be.CmdAndStateMixin):
+    def __init__(self,game_layer,img):
+        super(PowerUpSpawn, self).__init__(str(img['filename']), img['position'],
+                                   img['rotation'], img['scale'],
+                                   img['opacity'])
+        self.anims = {'idle': be.get_animation('pspawn')
+                      }
+        self.play_anim('idle')
+        self.scale = 0.5
+        # mixins initialize members
+        self._devflags = {}
+        self.stname = 'sleeping'
+        self.next_stname = 'sleeping'
+        
+        self.label = img['label']
+        self.path = img['filename']
+        self.rect = img['rect']
+        self.radius = self.rect[2]
+        assert(self.rect[2]== self.rect[3])
+        self.game_layer = game_layer
+        self.que = collections.deque()
+        self.allow_retry_time = self.game_layer.frame_time
+        self.schedule(self.update)
+
+    def play_anim(self, anim_name):
+        self.image = self.anims[anim_name]
+        self.image_anchor = (self.image.frames[0].image.width / 2,
+                             self.image.frames[0].image.height / 2)
+        self.current_anim = anim_name
+
+    #the 'a_' methods are for servicing ScriptDirector.
+    def a_spawn(self,*params):
+        self.que.append(params)
+
+    #the 'e_' methods implements state functionality
+
+    def e_sleeping(self,dt):
+        """ do nothing until thereis something to spawn"""
+        if self.que:
+            self.next_stname = 'wait'
+            action = FadeTo(255,2) + CallFunc(self._try_spawn)
+            self.do(action)
+
+    def e_wait(self,dt):
+        """ wait till state is changed externally or by callback """
+        pass
+            
+    def e_spawn(self,dt):
+        """ spawn the first entity in the queue.
+        """
+        if self.game_layer.frame_time>self.allow_retry_time:
+            self.next_stname = 'wait'            
+            powerup_type, = self.que.popleft()
+            ent = PowerUp(powerup_type, self.position, self.game_layer)
+            self.game_layer.add_agent(ent)
+            action = FadeTo(128,1) + CallFunc(self._end_spawn)
+            self.do(action)
+            self.allow_retry_time = (self.game_layer.frame_time +
+                                     gg.powerup_spawn_retry_time)
+
+    def _try_spawn(self):
+        self.next_stname = 'spawn'
+
+    def _end_spawn(self):
+        self.next_stname = 'sleeping'
+
+# Nota: fijarse si podemos poner los spawns como el fire_light para que
+# resalten mejor.
+
+class Light(Sprite,be.CmdMixin):
+    def __init__(self,img):
+        super(Light, self).__init__(img)
+        self.on = 1
+        self.current_internal_action = None
+        # mixins initialize members
+        self._devflags = {}
+    
+    #the 'a_' methods are for servicing ScriptDirector and interaction light switch
+    def a_flicker(self,*params):
+        vals = [50,255]
+        v1 = vals[self.on]
+        v2 = vals[not self.on]
+        action = Delay(0.1)
+        for i in range(random.randint(5, 10)):
+            micro_delay = random.random()*0.50
+            micro_delay2 = random.random()*0.50
+            action = action + FadeTo(v1, micro_delay) + FadeTo(v2, micro_delay2)
+        self.do(action)
+
+    def a_turn_on(self,*params):
+        self.stop()
+        action = FadeTo(255,0.5)
+        self.do(action)
+        self.on = 1
+
+    def a_turn_off(self,*params):
+        self.stop()
+        action = FadeTo(50,0.5)
+        self.do(action)
+        self.on = 0
+
+    def a_toggle(self,*params):
+        if self.on:
+            self.a_turn_off()
+        else:
+            self.a_turn_on()
 

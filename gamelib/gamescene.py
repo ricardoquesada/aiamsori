@@ -33,7 +33,7 @@ import sound
 from light import LightGroup
 import waypointing
 
-from gamecast import Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn
+from gamecast import Father, Zombie, Boy, Girl, Mother, Wall, ZombieSpawn, PowerUpSpawn
 from gamecast import PowerUp, POWERUP_TYPE_AMMO_LIST, POWERUP_TYPE_LIFE_LIST
 from wallmask import WallMask
 
@@ -77,7 +77,7 @@ def make_special_sprites_layer(layer_data, atlas, cls, game_layer):
     layer = BatchNode()
     for item in layer_data["sprites"]:
         obj = cls(game_layer,item)
-        layer.add(obj, name=obj.label)
+        layer.add(obj)
     return layer
 
 class DeadStuffLayer(cocos.cocosnode.CocosNode):
@@ -135,8 +135,14 @@ class GameLayer(Layer):
         for layer_data in layers:
             layer_type = layer_data['layer_type']
             layer_label = layer_data['label']
-            if layer_type == 'sprite' and layer_label=='zombie_spawn':
-                sprite_layer = make_special_sprites_layer(layer_data['data'], self.atlas, ZombieSpawn, self)
+            if layer_type == 'sprite' and layer_label in ['zombie_spawn','item_spawn']:
+                if layer_label=='zombie_spawn':
+                    cls = ZombieSpawn
+                else:
+                    cls = PowerUpSpawn                
+                sprite_layer = make_special_sprites_layer(layer_data['data'], self.atlas, cls, self)
+                # would be better in the lights layer, but even with some refactoring
+                # pyglet refuses...
                 self.map_node.add_layer(layer_data['label'], layer_data['z'],sprite_layer)
                 for z,c in sprite_layer.children:
                     self.objs_by_label[c.label] = c
@@ -150,17 +156,15 @@ class GameLayer(Layer):
                     collision_layers.append(sprite_layer)
                 if layer_label in ['walls', 'gates']:
                     walls_layers.append(sprite_layer)
-                if layer_label in ['item_spawn']:
-                    item_spawn = sprite_layer
                 if layer_label in ['waypoints']:
                     waypoints = sprite_layer
                     for z,c in sprite_layer.children: #? probably innecesary
                         self.objs_by_label[c.label] = c
                 if layer_label in ['lights']:
                     self.lights = LightGroup(sprite_layer)
-                    for z,c in sprite_layer.children:
+                    for c in self.lights.get_children():
                         self.objs_by_label[c.label] = c
-
+                        print c.label
 
         # temporary dead stuff layer
         # it should be above the furniture, but below the walls

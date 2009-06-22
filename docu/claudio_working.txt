@@ -5,7 +5,7 @@ Introducir Script director:
                secuencia el gameplay
 					level change
 					spawn entities
-					light control
+					light control (maybe)
 					hint talk
 					(quizas) hints alto nivel para estrategia zombie atack
         Descripcion tentativa inicial:
@@ -48,6 +48,13 @@ Introducir Script director:
 		+	line to (cmd,args,...) parser
 		+	exec loop del script
 		+	definir como los eventos de gamelayer se comunican a ScriptDirector: -> game_layer.script_director.game_event_handler
+		w	hacer que las entidades respondan a comandos del ScriptSirector haciendo que
+			todas las entidades incorporen el CmdMixin o CmdAndStateMixin
+			+	Agents
+			+	ZombieSpawn
+				Light
+				PowerupSpawn
+				
 ---------------------------------------------------------------------------------------------------
 	Idea abandonada: modificar el editor para que soporte una ventana secundaria que seria el view de ScriptDirector en el modo edicion.
   View Ideal:
