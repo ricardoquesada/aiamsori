@@ -589,7 +589,7 @@ class ZombieSpawn(Sprite,be.CmdAndStateMixin):
         self.anims = {'idle': be.get_animation('zspawn')
                       }
         self.play_anim('idle')
-        self.scale = 0.7
+        self.scale = 1.0
         # mixins initialize members
         self._devflags = {}
         self.stname = 'sleeping'
@@ -681,7 +681,7 @@ class PowerUpSpawn(Sprite,be.CmdAndStateMixin):
         self.anims = {'idle': be.get_animation('pspawn')
                       }
         self.play_anim('idle')
-        self.scale = 0.5
+        self.scale = 1.0
         # mixins initialize members
         self._devflags = {}
         self.stname = 'sleeping'
