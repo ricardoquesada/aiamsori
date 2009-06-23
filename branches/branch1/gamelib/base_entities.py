@@ -53,7 +53,7 @@ class CmdMixin(object):
         try:
             fn = getattr(self, 'a_%s'%cmd)
         except AttributeError:
-            if self.is_set_devflag('show errors'):
+            if self.is_set_devflag('show_errors'):
                 print 'do_cmd_error> agent |%s| received the unknown command |%s|'%(self.label,cmd)
             return
         fn(*args,**kwargs)        
@@ -85,12 +85,12 @@ class CmdAndStateMixin(object):
 ##        self.next_stname = ''
 
     def do_cmd(self,cmd, *args,**kwargs):
-        if self.is_set_devflag('trace cmds'):
+        if self.is_set_devflag('trace_cmds'):
             print 'do_cmd> agent |%s| received relayed command |%s| \n\targs=%s , \n\tkwargs=%s'%(self.label, cmd, args, kwargs)
         try:
             fn = getattr(self, 'a_%s'%cmd)
         except AttributeError:
-            if self.is_set_devflag('show errors'):
+            if self.is_set_devflag('show_errors'):
                 print 'do_cmd_error> agent |%s| received the unknown command |%s|'%(self.label,cmd)
             return
         fn(*args,**kwargs)        
