@@ -5,16 +5,16 @@ from math import sin
 from cocos.batch import BatchNode
 from cocos.sprite import Sprite
 
-from gamecast import Light
-
 def cap(value, min_v, max_v):
     return max(min(value, max_v), min_v)
 
 class LightGroup(BatchNode):
-    def __init__(self, layer):
+    def __init__(self):
         super(LightGroup, self).__init__()
+
+    def add_lights(self,layer,cls):
         for c in layer.get_children():
-            sp = Light(c.image)
+            sp = cls(c.image)
             sp.label = c.label
             sp.position = c.position
             sp.scale = c.scale
@@ -22,3 +22,4 @@ class LightGroup(BatchNode):
             sp.rotation = c.rotation
             sp.opacity = c.opacity
             self.add( sp )
+        

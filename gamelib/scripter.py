@@ -102,20 +102,20 @@ wait, 6
 ##relay, item_spawn:item-spawn#0, set_devflag, show_errors, 1
 add_powerup, item_spawn:item-spawn#0, shotgun
 talk, Dad, "DAMN ZOMBIES!!!! Where's my shotgun!!!", 2
-relay, lights:light#1, set_devflag, trace_cmds, 1
-relay, lights:light#1, set_devflag, show_errors, 1
-light_off, lights:light#3
-light_off, lights:light#6
-light_off, lights:light#8
-light_flicker, lights:light#1
-wait, 1
-light_flicker, lights:light#1
-light_flicker, lights:light#1
-wait, 5
-light_toggle, lights:light#1
-wait, 2
-light_toggle, lights:light#1
-wait, 2
+##relay, lights:light#1, set_devflag, trace_cmds, 1
+##relay, lights:light#1, set_devflag, show_errors, 1
+##light_off, lights:light#3
+##light_off, lights:light#6
+##light_off, lights:light#8
+##light_flicker, lights:light#1
+##wait, 1
+##light_flicker, lights:light#1
+##light_flicker, lights:light#1
+##wait, 5
+##light_toggle, lights:light#1
+##wait, 2
+##light_toggle, lights:light#1
+##wait, 2
 wait, 500
 #, 
 ##relay, zombie_spawn:zombie-spawm#0, set_devflag, trace_cmds, 1
