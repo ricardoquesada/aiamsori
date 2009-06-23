@@ -12,7 +12,8 @@ zombie_spawn_retry_time = 0.5
 
 powerup_spawn_retry_time = 0.5
 
-top_speed = 430.0
+#top_speed = 430.0 # 800. parece mucho, pero 430 parece poco
+top_speed = 600.0
 accel_factor = 300.0
 player_max_life = 100.0
 ##zombie_art_radius = 40.0

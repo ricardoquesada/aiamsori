@@ -645,7 +645,7 @@ class ZombieSpawn(Sprite,be.CmdAndStateMixin):
                              target,zombie_label)
                 ent.position = self.position
                 self.game_layer.add_agent(ent)
-                action = FadeTo(128,1) + CallFunc(self._end_spawn)
+                action = FadeTo(180,1) + CallFunc(self._end_spawn)
                 self.do(action)
             self.allow_retry_time = (self.game_layer.frame_time +
                                      gg.zombie_spawn_retry_time)
@@ -728,7 +728,7 @@ class PowerUpSpawn(Sprite,be.CmdAndStateMixin):
             powerup_type, = self.que.popleft()
             ent = PowerUp(powerup_type, self.position, self.game_layer)
             self.game_layer.add_agent(ent)
-            action = FadeTo(128,1) + CallFunc(self._end_spawn)
+            action = FadeTo(180,1) + CallFunc(self._end_spawn)
             self.do(action)
             self.allow_retry_time = (self.game_layer.frame_time +
                                      gg.powerup_spawn_retry_time)

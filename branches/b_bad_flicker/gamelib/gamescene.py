@@ -115,6 +115,7 @@ class GameLayer(Layer):
 
         self.show_fire_frames = 0
         self.fire_lights = Layer()
+        self.more_lights = Layer()
         self.fire_light = Sprite("data/newtiles/luz_escopeta.png")
         self.fire_light.scale = 1
         self.fire_lights.add(self.fire_light)
@@ -127,8 +128,10 @@ class GameLayer(Layer):
                 if layer_label=='zombie_spawn':
                     cls = ZombieSpawn
                 else:
-                    cls = PowerUpSpawn                
-                self.lights.add_special(layer_data['data'], cls, self)
+                    cls = PowerUpSpawn
+                for item in layer_data["data"]["sprites"]:
+                    obj = cls(self,item)
+                    self.more_lights.add(obj)
                 continue
             elif layer_type == 'sprite':
                 sprite_layer = make_sprites_layer(layer_data['data'], self.atlas)
@@ -147,7 +150,8 @@ class GameLayer(Layer):
                     self.lights.add_lights(sprite_layer,Light)
         for c in self.lights.get_children():
             self.objs_by_label[c.label] = c
-            print c.label
+        for c in self.more_lights.get_children():
+            self.objs_by_label[c.label] = c
 
         # temporary dead stuff layer
         # it should be above the furniture, but below the walls
@@ -246,6 +250,7 @@ class GameLayer(Layer):
             if self.show_fire_frames > 0:
                 self.fire_lights.visit()
                 self.show_fire_frames -= 1
+            self.more_lights.visit()
 
             gl.glPopMatrix()
 
@@ -328,7 +333,6 @@ class GameLayer(Layer):
     def on_exit(self):
         print "Exiting GameLayer"
         super(GameLayer, self).on_exit()
-        #self.light.disable()
         self.lights.on_exit()
         sound.stop_music()
 
